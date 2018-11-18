@@ -1,0 +1,2871 @@
+# ::id sdl_0002.24 ::date 2013-07-11T02:36:27 ::annotator SDL-AMR-09 ::preferred
+# ::snt The question is now , can we broaden out a bit the Audit Office director 's train of thought ?
+# ::save-date Mon Sep 16, 2013 ::file sdl_0002_24.txt
+(q / question-01
+      :ARG1 (p / possible :mode interrogative
+            :domain (b / broaden-01
+                  :ARG0 (w / we)
+                  :ARG1 (t / train
+                        :mod (t2 / think-01
+                              :ARG0 (p2 / person
+                                    :ARG0-of (h / have-org-role-91
+                                          :ARG1 (o / organization :name (n2 / name :op1 "Audit" :op2 "Office"))
+                                          :ARG2 (d / director)))))
+                  :ARG2 (b2 / bit)))
+      :time (n / now))
+
+# ::id sdl_0002.80 ::date 2013-07-09T12:47:12 ::annotator SDL-AMR-09 ::preferred
+# ::snt This caused the momentous " May 4th " Movement to break out in the country , and Xiao Kejian and others also protested in Paris .
+# ::save-date Wed Jul 10, 2013 ::file sdl_0002_80.txt
+(a / and
+      :op1 (c / cause-01
+            :ARG0 (t / this)
+            :ARG1 (b / break-06
+                  :ARG1 (m / movement :name (n / name :op1 "May" :op2 "4" :op3 "th")
+                        :mod (m2 / momentous))
+                  :location (c2 / country)))
+      :op2 (p / protest-01
+            :ARG0 (a2 / and
+                  :op1 (p2 / person :name (n2 / name :op1 "Xiao" :op2 "Kejian"))
+                  :op2 (o / other))
+            :location (c3 / city :name (n3 / name :op1 "Paris"))
+            :mod (a3 / also)))
+
+# ::id sdl_0002.100 ::date 2013-07-09T14:42:32 ::annotator SDL-AMR-09 ::preferred
+# ::snt Could it be that the television is broken ?
+# ::save-date Tue Jul 9, 2013 ::file sdl_0002_100.txt
+(p / possible :mode interrogative
+      :domain (b / break-01
+            :ARG1 (t / television)))
+
+# ::id nw.chtb_0112.17 ::date 2012-11-24T19:46:34 ::annotator SDL-AMR-09 ::preferred
+# ::snt Hence , activating the consumer market , especially the wide rural market , cultivating consumer hotspots and new economic growth points appear to be particularly urgent .
+# ::save-date Wed Dec 4, 2013 ::file nw_chtb_0112_17.txt
+(c / cause-01
+      :ARG1 (a / appear-02
+            :ARG1 (u / urgent
+                  :mod (p / particular)
+                  :domain (a2 / and
+                        :op1 (a5 / and
+                              :op1 (a3 / activate-01
+                                    :ARG1 (m / market
+                                          :mod (p2 / person
+                                                :ARG0-of (c3 / consume-01))))
+                              :op2 (a6 / activate-01
+                                    :ARG1 (m2 / market
+                                          :location (r / rural)
+                                          :mod (w / wide))
+                                    :mod (e2 / especially)))
+                        :op2 (c2 / cultivate-01
+                              :ARG1 (a4 / and
+                                    :op1 (h / hotspot
+                                          :mod p2)
+                                    :op2 (p3 / point
+                                          :mod (g / grow-01
+                                                :ARG1 (e / economy))
+                                          :mod (n / new))))))))
+
+# ::id nw.chtb_0134.3 ::date 2012-12-02T18:17:08 ::annotator SDL-AMR-09 ::preferred
+# ::snt Yongtu Long made the above statement during a speech held by the US - Asian Foundation .
+# ::save-date Sat Dec 7, 2013 ::file nw_chtb_0134_3.txt
+(s / state-01
+      :ARG0 (p2 / person :name (n / name :op1 "Yongtu" :op2 "Long"))
+      :ARG1 (t / thing
+            :location (a / above))
+      :time (s3 / speech
+            :ARG1-of (h / hold-04
+                  :ARG0 (o / organization :name (n2 / name :op1 "US" :op2 "Asian" :op3 "Foundation")))))
+
+# ::id nw.chtb_0156.3 ::date 2012-11-05T07:40:11 ::annotator SDL-AMR-09 ::preferred
+# ::snt With headquarters established in Canada , GreenKel is a large - scale multi-national group company manufacturing and selling fluorine - free coolant .
+# ::save-date Thu Dec 19, 2013 ::file nw_chtb_0156_3.txt
+(c3 / company
+      :mod (g2 / group)
+      :mod (m2 / multi-national)
+      :mod (s2 / scale
+            :mod (l / large))
+      :ARG0-of (e / establish-01
+            :ARG1 (h / headquarters)
+            :location (c4 / country :name (n2 / name :op1 "Canada")))
+      :ARG0-of (m / manufacture-01
+            :ARG1 (c5 / coolant
+                  :ARG1-of (f2 / free-41
+                        :ARG2 (f / fluorine))))
+      :ARG0-of (s / sell-01
+            :ARG1 c5)
+      :domain (c / company :name (n / name :op1 "GreenKel")))
+
+# ::id nw.chtb_0170.5 ::date 2012-11-27T13:28:32 ::annotator SDL-AMR-09 ::preferred
+# ::snt When mosquitoes feed , they suck the mold element from the cells of plants into their bodies .
+# ::save-date Tue Dec 10, 2013 ::file nw_chtb_0170_5.txt
+(s / suck-01
+      :ARG0 (m / mosquito)
+      :ARG1 (e / element
+            :mod (m2 / mold))
+      :ARG2 (c / cell
+            :part-of (p / plant))
+      :destination (b / body
+            :poss m)
+      :time (f / feed-01
+            :ARG2 m))
+
+# ::id nw.chtb_0216.15 ::date 2012-12-20T11:39:18 ::annotator SDL-AMR-09 ::preferred
+# ::snt He denied the statement that the food reserve on the orbital station is only enough to last 10 days .
+# ::save-date Wed Dec 18, 2013 ::file nw_chtb_0216_15.txt
+(d2 / deny-01
+      :ARG0 (h / he)
+      :ARG1 (s / state-01
+            :ARG1 (e / enough
+                  :mod (o / only)
+                  :domain (r / reserve
+                        :mod (f / food)
+                        :location (s2 / station
+                              :ARG0-of (o2 / orbit-01)))
+                  :purpose (l / last-01
+                        :ARG1 r
+                        :ARG2 (t3 / temporal-quantity :quant 10
+                              :unit (d3 / day))))))
+
+# ::id bolt12_10510_9811.12 ::date 2012-12-18T10:09:09 ::annotator SDL-AMR-09 ::preferred
+# ::snt From leaders to the common people, everyone needs to keep that in mind.
+# ::save-date Thu Dec 19, 2013 ::file bolt12_10510_9811_12.txt
+(o / obligate-01
+      :ARG2 (r2 / remember-01
+            :ARG0 (e / everyone
+                  :prep-from (p / person
+                        :ARG0-of (l / lead-02))
+                  :prep-to (p2 / person
+                        :mod (c / common)))
+            :ARG1 (t / that)))
+
+# ::id bolt12_10511_2844.1 ::date 2012-12-20T11:51:58 ::annotator SDL-AMR-09 ::preferred
+# ::snt In Chengdu, which is over 100 kms away from the epicenter, the earthquake should not have an intensity of over 7, or 8 at the most.
+# ::save-date Sat Jan 25, 2014 ::file bolt12_10511_2844_1.txt
+(e3 / expect-01
+      :ARG1 (h / have-quant-91
+            :ARG1 (s / seismic-quantity
+                  :quant-of (e / earthquake)
+                  :location (c / city :name (n / name :op1 "Chengdu")
+                        :location (r2 / relative-position
+                              :op1 (e2 / epicenter)
+                              :quant (o3 / over
+                                    :op1 (d / distance-quantity :quant 100
+                                          :unit (k / kilometer))))))
+            :ARG2 (a / at-most
+                  :op1 (o / or :op1 7 :op2 8))))
+
+# ::id bolt12_10511_2891.4 ::date 2012-12-22T13:07:56 ::annotator SDL-AMR-09 ::preferred
+# ::snt On the day of the Tangshan Earthquake, i.e. July 28th, those on duty at Mao Zedong's quarters were Wang Dongxing, Wang Hongwen, and Mao Zedong's confidential secretary, Zhang Yufeng.
+# ::save-date Mon Nov 11, 2013 ::file bolt12_10511_2891_4.txt
+(p / person
+      :prep-on (d / duty
+            :time (d2 / day
+                  :time-of (e / earthquake :name (n5 / name :op1 "Tangshan" :op2 "Earthquake"))
+                  :ARG0-of (m / mean-01
+                        :ARG1 (d3 / date-entity :month 7 :day 28)))
+            :location (q / quarter
+                  :poss p5))
+      :domain (a / and
+            :op1 (p2 / person :name (n / name :op1 "Wang" :op2 "Dongxing"))
+            :op2 (p3 / person :name (n2 / name :op1 "Wang" :op2 "Hongwen"))
+            :op3 (p4 / person :name (n3 / name :op1 "Zhang" :op2 "Yufeng")
+                  :ARG0-of (h / have-org-role-91
+                        :ARG1 (p5 / person :name (n4 / name :op1 "Mao" :op2 "Zedong"))
+                        :ARG2 (s / secretary
+                              :mod (c / confidence))))))
+
+# ::id bolt12_10511_3031.1 ::date 2012-12-22T16:46:30 ::annotator SDL-AMR-09 ::preferred
+# ::snt After the nineties, state-owned engineering enterprises stopped recruiting construction workers.
+# ::save-date Sat Dec 22, 2012 ::file bolt12_10511_3031_1.txt
+(s / stop-01
+      :ARG0 (e / enterprise
+            :mod (e2 / engineer-01)
+            :ARG1-of (o / own-01
+                  :ARG0 (s2 / state)))
+      :ARG1 (r / recruit-01
+            :ARG0 e
+            :ARG1 (p / person
+                  :ARG0-of (w / work-01
+                        :ARG1 (c / construct-01))))
+      :time (a / after
+            :op1 (d / date-entity :decade 1990)))
+
+# ::id bolt12_12240_8611.3 ::date 2012-12-08T19:27:27 ::annotator SDL-AMR-09 ::preferred
+# ::snt Dear friends, let me fill in some of the words for the melody right now in my heart.
+# ::save-date Tue Dec 3, 2013 ::file bolt12_12240_8611_3.txt
+(s2 / say-01
+      :ARG0 i
+      :ARG1 (l / let-01 :mode imperative
+            :ARG0 f2
+            :ARG1 (f / fill-05
+                  :ARG0 (i / i)
+                  :ARG1 (w / word
+                        :quant (s / some)
+                        :prep-for (m / melody
+                              :ARG1-of (b / be-located-at-91
+                                    :ARG2 (h / heart
+                                          :part-of i))))
+                  :time (n / now
+                        :mod (r / right))))
+      :ARG2 (f2 / friend
+            :mod (d / dear)))
+
+# ::id bolt12_3473_7371.2 ::date 2012-12-17T17:11:11 ::annotator SDL-AMR-09 ::preferred
+# ::snt In the past 10 years, behind these Chinese high-tech magnates who emerged one after another was sure to be the shadow of the U.S. owned International Data Group (IDG).
+# ::save-date Tue Jan 7, 2014 ::file bolt12_3473_7371_2.txt
+(s / shadow-01
+      :ARG0 (o / organization :name (n / name :op1 "International" :op2 "Data" :op3 "Group")
+            :ARG1-of (o2 / own-01
+                  :ARG0 (c / country :name (n2 / name :op1 "U.S."))))
+      :ARG1 (m / magnate
+            :mod (t3 / tech
+                  :mod (h / high))
+            :ARG0-of (e / emerge-02
+                  :manner (m2 / magnate
+                        :mod (o3 / one)
+                        :time (a2 / after
+                              :op1 (m3 / magnate
+                                    :mod (a / another)))))
+            :mod (c2 / country :name (n3 / name :op1 "China"))
+            :mod (t2 / this))
+      :mod (s2 / sure)
+      :time (b / before
+            :op1 (n4 / now)
+            :duration (t / temporal-quantity :quant 10
+                  :unit (y / year))))
+
+# ::id bolt12_3492_6281.12 ::date 2012-12-05T13:53:53 ::annotator SDL-AMR-09 ::preferred
+# ::snt Life is never a bed of roses in any location, even more in a foreign land where there is a language barrier, different customs and no family or friends.
+# ::save-date Sun Nov 10, 2013 ::file bolt12_3492_6281_12.txt
+(b / bed :polarity -
+      :consist-of (r / rose)
+      :domain (l / life)
+      :time (e / ever)
+      :location (l4 / location
+            :mod (a2 / any))
+      :location (l2 / land
+            :mod (f / foreign)
+            :location-of (a4 / and
+                  :op1 (b2 / barrier
+                        :mod (l3 / language))
+                  :op2 (c / custom
+                        :ARG1-of (d / differ-02))
+                  :op3 (o / or :polarity -
+                        :op1 (f2 / family)
+                        :op2 (f3 / friend)))
+            :mod (m / more
+                  :mod (e2 / even))))
+
+# ::id PROXY_AFP_ENG_20020105_0162.2 ::date 2013-05-01T11:37:06 ::snt-type country ::annotator LDC-AMR-14 ::preferred
+# ::snt Saudi Arabia (SA)
+# ::save-date Thu May 2, 2013 ::file PROXY_AFP_ENG_20020105_0162_2.txt
+(c / country
+  :name (n / name
+          :op1 "Saudi"
+          :op2 "Arabia"))
+
+# ::id PROXY_AFP_ENG_20020111_0093.32 ::date 2013-05-09T08:57:18 ::snt-type body ::annotator LDC-AMR-14 ::preferred
+# ::snt FIFA president Sepp Blatter sent a letter last November to South Korea's World Cup organizing committee calling for immediate and decisive measures against cruelty to dogs.
+# ::save-date Wed Dec 11, 2013 ::file PROXY_AFP_ENG_20020111_0093_32.txt
+(s / send-01
+      :ARG0 (p / person :name (n / name :op1 "Sepp" :op2 "Blatter")
+            :ARG0-of (h / have-org-role-91
+                  :ARG1 (o / organization :name (n2 / name :op1 "FIFA"))
+                  :ARG2 (p2 / president)))
+      :ARG1 (l / letter)
+      :ARG2 (c / committee
+            :ARG0-of (o2 / organize-01
+                  :ARG1 (g / game :name (n3 / name :op1 "World" :op2 "Cup")))
+            :poss (c2 / country :name (n4 / name :op1 "South" :op2 "Korea")))
+      :purpose (c3 / call-03
+            :ARG0 p
+            :ARG1 (m / measure
+                  :purpose (c5 / counter-01
+                        :ARG1 (c4 / cruel
+                              :beneficiary (d2 / dog)))
+                  :mod (i / immediate)
+                  :mod (d / decisive)))
+      :time (d3 / date-entity :month 11
+            :mod (l2 / last)))
+
+# ::id PROXY_AFP_ENG_20020115_0320.3 ::date 2013-05-09T15:59:49 ::snt-type topic ::annotator LDC-AMR-14 ::preferred
+# ::snt International; Government; terrorism; war and conflict; dissent; leader
+# ::save-date Thu May 9, 2013 ::file PROXY_AFP_ENG_20020115_0320_3.txt
+(a / and
+  :op1 (i / international)
+  :op2 (g / government-organization
+         :ARG0-of (g2 / govern-01))
+  :op3 (t / terrorism)
+  :op4 (a2 / and
+         :op1 (w / war-01)
+         :op2 (c / conflict-01))
+  :op5 (d / dissent-01)
+  :op6 (p / person
+         :ARG0-of (l / lead-02)))
+
+# ::id PROXY_AFP_ENG_20020115_0320.7 ::date 2013-05-10T13:03:38 ::snt-type body ::annotator LDC-AMR-14 ::preferred
+# ::snt Around 1400 alleged religious extremists have been arrested since 020112 under severe actions against Islamic militants and sectarian radicals announced by President Pervez Musharraf during the weekend.
+# ::save-date Wed Dec 11, 2013 ::file PROXY_AFP_ENG_20020115_0320_7.txt
+(a / arrest-01
+      :ARG1 (e / extremist
+            :mod (r / religion)
+            :ARG1-of (a2 / allege-01)
+            :quant (a3 / around :op1 1400))
+      :time (s / since
+            :op1 (d / date-entity :year 2002 :month 1 :day 12))
+      :prep-under (a4 / act-02
+            :prep-against (a5 / and
+                  :op1 (m / militant
+                        :mod (r2 / religious-group :name (n / name :op1 "Islam")))
+                  :op2 (r3 / radical
+                        :mod (s2 / sectarian)))
+            :ARG1-of (a6 / announce-01
+                  :ARG0 (p / person :name (n2 / name :op1 "Pervez" :op2 "Musharraf")
+                        :ARG0-of (h / have-org-role-91
+                              :ARG2 (p2 / president)))
+                  :time (w / weekend))
+            :mod (s3 / severe)))
+
+# ::id PROXY_AFP_ENG_20020115_0320.17 ::date 2013-05-14T13:36:22 ::snt-type body ::annotator LDC-AMR-14 ::preferred
+# ::snt The 2 hardline militant groups fighting Indian rule in Kashmir are the Lashkar-e-Taiba and Jaish-e-Mohammad.
+# ::save-date Fri Jan 17, 2014 ::file PROXY_AFP_ENG_20020115_0320_17.txt
+(g / group :quant 2
+      :consist-of (m / militant
+            :mod (h / hardline))
+      :ARG0-of (f / fight-01
+            :ARG1 (r / rule-03
+                  :ARG0 (c / country :name (n / name :op1 "India"))
+                  :ARG1 (w / world-region :name (n2 / name :op1 "Kashmir"))))
+      :domain (a / and
+            :op1 (o / organization :name (n3 / name :op1 "Lashkar-e-Taiba"))
+            :op2 (o2 / organization :name (n4 / name :op1 "Jaish-e-Mohammad"))))
+
+# ::id PROXY_AFP_ENG_20020117_0270.19 ::date 2013-05-09T11:22:27 ::snt-type body ::annotator LDC-AMR-14 ::preferred
+# ::snt Iranian law states the death penalty for drug trafficking.
+# ::save-date Mon May 13, 2013 ::file PROXY_AFP_ENG_20020117_0270_19.txt
+(s / state-01
+  :ARG0 (l / law
+          :source (c / country
+                    :name (n / name
+                            :op1 "Iran")))
+  :ARG1 (p / penalize-01
+          :ARG0 l
+          :ARG2 (t / trafficking
+                  :mod (d / drug))
+          :manner (d2 / die-01)))
+
+# ::id PROXY_AFP_ENG_20020123_0346.3 ::date 2013-05-13T14:43:55 ::snt-type topic ::annotator LDC-AMR-14 ::preferred
+# ::snt International; terrorism
+# ::save-date Mon May 13, 2013 ::file PROXY_AFP_ENG_20020123_0346_3.txt
+(a / and
+  :op1 (i / international)
+  :op2 (t / terrorism))
+
+# ::id PROXY_AFP_ENG_20020123_0346.8 ::date 2013-05-13T15:42:29 ::snt-type body ::annotator LDC-AMR-14 ::preferred
+# ::snt Bradley stated that the company has been significantly focused on prevention of cyberattacks.
+# ::save-date Mon May 13, 2013 ::file PROXY_AFP_ENG_20020123_0346_8.txt
+(s / state-01
+  :ARG0 (p / person
+          :name (n / name
+                  :op1 "Bradley"))
+  :ARG1 (f / focus-01
+          :ARG1 (c / company)
+          :ARG2 (p2 / prevent-01
+                  :ARG1 (a / attack-01
+                          :mod (c2 / cyber)))
+          :degree (s2 / significant)))
+
+# ::id PROXY_AFP_ENG_20020128_0449.11 ::date 2013-05-15T08:00:14 ::snt-type body subordinate ::annotator LDC-AMR-14 ::preferred
+# ::snt Power cuts could lead to a failure of all work with space craft.
+# ::save-date Wed May 29, 2013 ::file PROXY_AFP_ENG_20020128_0449_11.txt
+(p / possible
+      :domain (l / lead-03
+            :ARG0 (c / cut-02
+                  :ARG1 (p2 / power))
+            :ARG2 (f / fail-01
+                  :ARG2 (w / work-01
+                        :ARG1 (s / space-craft)
+                        :quant (a / all)))))
+
+# ::id PROXY_AFP_ENG_20020304_0028.29 ::date 2013-05-22T09:25:07 ::snt-type body ::annotator LDC-AMR-14 ::preferred
+# ::snt The Korea Herald stated that critics say Boeing would benefit most from the points minimum because it would gain fewer points than Dassault in terms of technology transfer and subcontracts.
+# ::save-date Tue Jan 21, 2014 ::file PROXY_AFP_ENG_20020304_0028_29.txt
+(s / state-01
+      :ARG0 (n / newspaper :name (n2 / name :op1 "Korea" :op2 "Herald"))
+      :ARG1 (s2 / say-01
+            :ARG0 (p / person
+                  :ARG0-of (c / criticize-01))
+            :ARG1 (b / benefit-01
+                  :ARG0 (m2 / minimum
+                        :consist-of (p2 / point))
+                  :ARG1 (c2 / company :name (n3 / name :op1 "Boeing"))
+                  :degree (m / most)
+                  :ARG1-of (c3 / cause-01
+                        :ARG0 (g / gain-02
+                              :ARG0 c2
+                              :ARG1 (p3 / point
+                                    :mod (f / few
+                                          :degree (m3 / more)
+                                          :compared-to (c4 / company :name (n4 / name :op1 "Dassault"))))
+                              :mod (t / term
+                                    :mod (a / and
+                                          :op1 (t2 / transfer-01
+                                                :ARG1 (t3 / technology))
+                                          :op2 (s3 / subcontract-01))))))))
+
+# ::id PROXY_AFP_ENG_20020329_0022.16 ::date 2013-06-09T14:47:21 ::snt-type body ::annotator LDC-AMR-14 ::preferred
+# ::snt Military officials said Lim intimated the problems could be as serious as a 940000 nuclear standoff over North Korea's suspected nuclear weapons development that came close to conflict.
+# ::save-date Thu Jan 9, 2014 ::file PROXY_AFP_ENG_20020329_0022_16.txt
+(s / say-01
+      :ARG0 (p4 / person
+            :ARG0-of (h / have-org-role-91
+                  :ARG1 (m / military)
+                  :ARG2 (o / official)))
+      :ARG1 (i / intimate-01
+            :ARG0 (p / person :name (n / name :op1 "Lim"))
+            :ARG1 (p2 / possible
+                  :domain (s2 / serious-41
+                        :ARG1 (p3 / problem)
+                        :compared-to (s3 / standoff
+                              :mod (n2 / nucleus)
+                              :time (d2 / date-entity :year 1994)
+                              :ARG1-of (c / cause-01
+                                    :ARG0 (d3 / develop-02
+                                          :ARG0 (c2 / country :name (n3 / name :op1 "North" :op2 "Korea"))
+                                          :ARG1 (w / weapon
+                                                :mod (n4 / nucleus))
+                                          :ARG1-of (s4 / suspect-01)))
+                              :ARG1-of (c4 / close-41
+                                    :ARG2 (c3 / conflict)))))))
+
+# ::id PROXY_AFP_ENG_20020404_0305.2 ::date 2013-05-28T13:32:33 ::snt-type country ::annotator LDC-AMR-14 ::preferred
+# ::snt India (IN)
+# ::save-date Tue May 28, 2013 ::file PROXY_AFP_ENG_20020404_0305_2.txt
+(c / country :name (n / name :op1 "India"))
+
+# ::id PROXY_AFP_ENG_20020518_0107.36 ::date 2013-06-08T18:42:12 ::snt-type body ::annotator LDC-AMR-14 ::preferred
+# ::snt Iran funded Afghanistan's rebel Northern Alliance.
+# ::save-date Fri Jan 24, 2014 ::file PROXY_AFP_ENG_20020518_0107_36.txt
+(f / fund-01
+      :ARG0 (c / country :name (n3 / name :op1 "Iran"))
+      :ARG1 (o / organization :name (n / name :op1 "Northern" :op2 "Alliance")
+            :mod (r / rebel)
+            :poss (c2 / country :name (n2 / name :op1 "Afghanistan"))))
+
+# ::id PROXY_AFP_ENG_20020522_0013.7 ::date 2013-06-06T15:03:41 ::snt-type body ::annotator LDC-AMR-14 ::preferred
+# ::snt Chen was sentenced to death in 1997 for the illegal manufacture of methamphetamines disguised as a soap manufacturing plant.
+# ::save-date Wed Jul 10, 2013 ::file PROXY_AFP_ENG_20020522_0013_7.txt
+(s / sentence-01
+      :ARG1 (p / person :name (n / name :op1 "Chen"))
+      :ARG2 (d2 / die-01
+            :ARG1 p)
+      :ARG3 (m / manufacture-01
+            :ARG1 (m2 / methamphetamine)
+            :manner (l / legal :polarity -)
+            :ARG1-of (d3 / disguise-01
+                  :ARG2 (p2 / plant
+                        :purpose (m3 / manufacture-01
+                              :ARG1 (s2 / soap)))))
+      :time (d / date-entity :year 1997))
+
+# ::id PROXY_AFP_ENG_20020522_0013.15 ::date 2013-06-06T16:36:06 ::snt-type body ::annotator LDC-AMR-14 ::preferred
+# ::snt The Western national executed was a Vietnamese-Canadian woman whose execution in 2000 caused a diplomatic controversy with Canada.
+# ::save-date Thu Jun 6, 2013 ::file PROXY_AFP_ENG_20020522_0013_15.txt
+(e / execute-01
+      :ARG1 (w / woman
+            :source (a / and
+                  :op1 (c / country :name (n / name :op1 "Vietnam"))
+                  :op2 (c2 / country :name (n2 / name :op1 "Canada")))
+            :domain (n3 / national
+                  :source (w2 / world-region :name (n4 / name :op1 "West"))))
+      :ARG0-of (c3 / cause-01
+            :ARG1 (c4 / controversy
+                  :mod (d2 / diplomatic)
+                  :accompanier c2))
+      :time (d3 / date-entity :year 2000))
+
+# ::id PROXY_AFP_ENG_20020610_0336.16 ::date 2013-06-20T18:12:11 ::snt-type body ::annotator LDC-AMR-14 ::preferred
+# ::snt Lemahieu said that this ceremony had less processed opium and heroin than opium seeds.
+# ::save-date Thu Jul 11, 2013 ::file PROXY_AFP_ENG_20020610_0336_16.txt
+(s / say-01
+      :ARG0 (p2 / person :name (n2 / name :op1 "Lemahieu"))
+      :ARG1 (h / have-03
+            :ARG0 (c / ceremony
+                  :mod (t / this))
+            :ARG1 (l / less
+                  :degree-of (a / and
+                        :op1 (o / opium)
+                        :op2 (h2 / heroin)
+                        :ARG1-of (p / process-01))
+                  :compared-to (s2 / seed
+                        :part-of o))))
+
+# ::id PROXY_AFP_ENG_20020626_0144.29 ::date 2013-05-25T14:19:18 ::snt-type body ::annotator UCO-AMR-05 ::preferred
+# ::snt War-torn Afghanistan continues to be the top supplier of heroin to Europe and the producer of almost all the opiates consumed in Central Asia.
+# ::save-date Fri Jan 17, 2014 ::file PROXY_AFP_ENG_20020626_0144_29.txt
+(c / continue-01
+      :ARG1 (a / and
+            :op1 (s / supply-01
+                  :ARG0 (c2 / country :name (n / name :op1 "Afghanistan")
+                        :ARG1-of (t / tear-01
+                              :ARG0 (w / war)))
+                  :ARG1 (h / heroin)
+                  :ARG2 (c4 / continent :name (n2 / name :op1 "Europe"))
+                  :mod (t2 / top))
+            :op2 (p / produce-01
+                  :ARG0 c2
+                  :ARG1 (o / opiate
+                        :quant (a2 / all
+                              :degree (a3 / almost))
+                        :ARG1-of (c3 / consume-01
+                              :location (w3 / world-region :name (n3 / name :op1 "Central" :op2 "Asia")))))))
+
+# ::id PROXY_AFP_ENG_20020629_0321.15 ::date 2013-05-25T15:48:08 ::snt-type body ::annotator UCO-AMR-05 ::preferred
+# ::snt There has been a sharp increase in Indian Defense Ministry's purchases of military hardware including night vision devices, unmanned aerial vehicles and other anti-terrorism devices.
+# ::save-date Tue Sep 17, 2013 ::file PROXY_AFP_ENG_20020629_0321_15.txt
+(i / increase-01
+      :ARG1 (p / purchase-01
+            :ARG0 (m / ministry
+                  :mod (d / defense)
+                  :mod (c / country :name (n / name :op1 "India")))
+            :ARG1 (h / hardware
+                  :mod (m2 / military)
+                  :ARG2-of (i2 / include-01
+                        :ARG1 (a / and
+                              :op1 (d2 / device
+                                    :purpose (s2 / see-01
+                                          :time (n2 / night)))
+                              :op2 (v2 / vehicle
+                                    :ARG1-of (m3 / man-01 :polarity -)
+                                    :mod (a2 / aerial))
+                              :op3 (d3 / device
+                                    :mod (o / other)
+                                    :ARG0-of (c2 / counter-01
+                                          :ARG1 (t / terrorism)))))))
+      :manner (s / sharp))
+
+# ::id PROXY_AFP_ENG_20020723_0353.12 ::date 2013-05-27T16:22:16 ::snt-type body ::annotator UCO-AMR-05 ::preferred
+# ::snt ASEAN must agree on a definition of terrorism to identify the common enemy.
+# ::save-date Mon May 27, 2013 ::file PROXY_AFP_ENG_20020723_0353_12.txt
+(o / obligate-01
+  :ARG2 (a / agree-01
+          :ARG0 (o2 / organization
+                  :name (n / name
+                          :op1 "ASEAN"))
+          :ARG1 (t / thing
+                  :ARG2-of (d / define-01
+                             :ARG1 (t2 / terrorism)))
+          :purpose (i / identify-01
+                     :ARG0 o2
+                     :ARG1 (e / enemy
+                             :ARG1-of (s / share-01
+                                        :ARG0 o2)))))
+
+# ::id PROXY_AFP_ENG_20020723_0353.14 ::date 2013-05-27T16:37:17 ::snt-type body ::annotator UCO-AMR-05 ::preferred
+# ::snt The 3 countries share sea borders frequently used by pirates and criminals in evading pursuing troops.
+# ::save-date Wed Jul 24, 2013 ::file PROXY_AFP_ENG_20020723_0353_14.txt
+(s / share-01
+      :ARG0 (c / country :quant 3)
+      :ARG1 (l / location
+            :ARG2-of (b2 / be-located-at-91
+                  :ARG1 (b / border-01
+                        :ARG2 (s2 / sea)
+                        :ARG1-of (u / use-01
+                              :ARG0 (a / and
+                                    :op1 (p / pirate)
+                                    :op2 (c2 / criminal))
+                              :purpose (e / evade-01
+                                    :ARG0 a
+                                    :ARG1 (t / troop
+                                          :ARG0-of (p2 / pursue-01)))
+                              :frequency (f / frequent))))))
+
+# ::id PROXY_AFP_ENG_20021015_0171.1 ::date 2013-07-12T13:52:20 ::snt-type date ::annotator UCO-AMR-05 ::preferred
+# ::snt 2002-10-15
+# ::save-date Fri Jul 12, 2013 ::file PROXY_AFP_ENG_20021015_0171_1.txt
+(d / date-entity :day 15 :month 10 :year 2002)
+
+# ::id PROXY_AFP_ENG_20021018_0360.2 ::date 2013-07-19T12:40:29 ::snt-type country ::annotator UCO-AMR-05 ::preferred
+# ::snt Iraq (IQ)
+# ::save-date Fri Jul 19, 2013 ::file PROXY_AFP_ENG_20021018_0360_2.txt
+(c / country :name (n / name :op1 "Iraq"))
+
+# ::id PROXY_AFP_ENG_20021102_0031.15 ::date 2013-07-22T12:07:15 ::snt-type body ::annotator UCO-AMR-05 ::preferred
+# ::snt Hasina wants the military to arrest real criminals and not violate Bangladesh's constitution and human rights because of concern about such violations in the name of anti-crime drive.
+# ::save-date Tue Jul 23, 2013 ::file PROXY_AFP_ENG_20021102_0031_15.txt
+(w / want-01
+      :ARG0 (p / person :name (n / name :op1 "Hasina"))
+      :ARG1 (a / and
+            :op1 (a2 / arrest-01
+                  :ARG0 (m / military)
+                  :ARG1 (c2 / criminal
+                        :mod (r / real)))
+            :op2 (v / violate-01 :polarity -
+                  :ARG0 m
+                  :ARG1 (a3 / and
+                        :op1 (c3 / constitution
+                              :poss (c / country :name (n2 / name :op1 "Bangladesh")))
+                        :op2 (t / thing
+                              :ARG1-of (e / entitle-01
+                                    :ARG2 (h / human))))
+                  :beneficiary (d / drive
+                        :ARG0-of (o / oppose-01
+                              :ARG1 (c6 / crime)))
+                  :mod (s / such)))
+      :ARG1-of (c4 / cause-01
+            :ARG0 (c5 / concern-01
+                  :ARG0 v)))
+
+# ::id PROXY_AFP_ENG_20021230_0032.2 ::date 2013-06-04T16:02:02 ::snt-type country ::annotator UCO-AMR-05 ::preferred
+# ::snt China (CN)
+# ::save-date Tue Jun 4, 2013 ::file PROXY_AFP_ENG_20021230_0032_2.txt
+(c / country :name (n / name :op1 "China"))
+
+# ::id PROXY_AFP_ENG_20030220_0697.13 ::date 2013-07-11T16:00:01 ::snt-type body ::annotator UCO-AMR-05 ::preferred
+# ::snt The U.S. government was skeptical of Iran's intentions and stated that Iran's pursuit of a complete fuel cycle only made sense if it were pursuing nuclear weapons.
+# ::save-date Thu Sep 26, 2013 ::file PROXY_AFP_ENG_20030220_0697_13.txt
+(a / and
+      :op1 (s / skeptic
+            :domain (g / government-organization
+                  :ARG0-of (g2 / govern-01
+                        :ARG1 (c / country :name (n / name :op1 "U.S."))))
+            :topic (i / intend-01
+                  :ARG0 (c2 / country :name (n2 / name :op1 "Iran"))))
+      :op2 (s2 / state-01
+            :ARG0 g
+            :ARG1 (m / make-06
+                  :ARG1 (p / pursue-01
+                        :ARG0 c2
+                        :ARG1 (c4 / cycle
+                              :mod (f / fuel)
+                              :mod (c5 / complete)))
+                  :ARG2 (s3 / sense)
+                  :condition (p2 / pursue-01
+                        :ARG0 c2
+                        :ARG1 (w / weapon
+                              :mod (n4 / nucleus)))
+                  :mod (o / only))))
+
+# ::id PROXY_AFP_ENG_20030220_0697.27 ::date 2013-07-12T10:22:08 ::snt-type body ::annotator UCO-AMR-05 ::preferred
+# ::snt The plant in Yazd Province would produce concentrated yellow cake uranium while another facility at an undisclosed location would complete the cycle by producing finished fuel made entirely in Iran.
+# ::save-date Fri Jul 12, 2013 ::file PROXY_AFP_ENG_20030220_0697_27.txt
+(p2 / produce-01
+      :ARG0 (p3 / plant
+            :location (p / province :name (n / name :op1 "Yazd" :op2 "Province")))
+      :ARG1 (u / uranium
+            :mod (c2 / cake
+                  :mod (y / yellow))
+            :ARG1-of (c5 / concentrate-02))
+      :time (c3 / complete-01
+            :ARG0 (f / facility
+                  :mod (a / another)
+                  :location (l / location
+                        :ARG1-of (d / disclose-01 :polarity -)))
+            :ARG1 (c4 / cycle)
+            :manner (p4 / produce-01
+                  :ARG1 (f2 / fuel
+                        :mod (f3 / finish)
+                        :ARG1-of (m / make-01
+                              :degree (e / entire)
+                              :location (c / country :name (n2 / name :op1 "Iran")))))))
+
+# ::id PROXY_AFP_ENG_20030321_0363.10 ::date 2013-07-04T17:06:03 ::snt-type body ::annotator UCO-AMR-05 ::preferred
+# ::snt Kazakhstan's increased air defenses come during Kazakhstan's air force carries out exercises along its Caspian shores.
+# ::save-date Mon Dec 9, 2013 ::file PROXY_AFP_ENG_20030321_0363_10.txt
+(i / increase-01
+      :ARG0 (c / country :name (n / name :op1 "Kazakhstan"))
+      :ARG1 (d / defense
+            :mod (a / air)
+            :poss c)
+      :time (d2 / during
+            :op1 (c2 / carry-03
+                  :ARG0 (m / military :name (n2 / name :op1 "Air" :op2 "Force")
+                        :poss c)
+                  :ARG1 (e / exercise)
+                  :location (a2 / along
+                        :op1 (s / shore
+                              :location (s2 / sea :name (n3 / name :op1 "Caspian" :op2 "Sea")))))))
+
+# ::id PROXY_AFP_ENG_20030330_0257.1 ::date 2013-07-06T17:14:38 ::snt-type date ::annotator UCO-AMR-05 ::preferred
+# ::snt 2003-03-30
+# ::save-date Sat Jul 6, 2013 ::file PROXY_AFP_ENG_20030330_0257_1.txt
+(d2 / date-entity :year 2003 :month 3 :day 30)
+
+# ::id PROXY_AFP_ENG_20030330_0257.9 ::date 2013-07-06T17:52:31 ::snt-type body ::annotator UCO-AMR-05 ::preferred
+# ::snt No other drug has become as integral in decades.
+# ::save-date Sat Jul 6, 2013 ::file PROXY_AFP_ENG_20030330_0257_9.txt
+(b / become-01
+      :ARG1 (d / drug :polarity -
+            :mod (o / other))
+      :ARG2 (i / integral
+            :degree (a / as))
+      :time (d2 / decade
+            :quant (m / multiple)))
+
+# ::id PROXY_AFP_ENG_20030330_0257.32 ::date 2013-08-13T15:56:54 ::snt-type body ::annotator UCO-AMR-05 ::preferred
+# ::snt The pill costs five cents to produce.
+# ::save-date Tue Aug 13, 2013 ::file PROXY_AFP_ENG_20030330_0257_32.txt
+(c2 / cost-01
+      :ARG1 (p / produce-01
+            :ARG1 (p2 / pill))
+      :ARG2 (m / monetary-quantity :quant 5
+            :unit (c / cent)))
+
+# ::id PROXY_AFP_ENG_20030406_0055.2 ::date 2013-09-10T07:57:27 ::snt-type country ::annotator UCO-AMR-05 ::preferred
+# ::snt Pakistan (PK)
+# ::save-date Tue Sep 10, 2013 ::file PROXY_AFP_ENG_20030406_0055_2.txt
+(c / country :name (n / name :op1 "Pakistan"))
+
+# ::id PROXY_AFP_ENG_20030624_0449.14 ::date 2013-05-04T14:01:49 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt Last week French police raided more than a dozen locations linked to the People's Mujahedeen northwest of Paris.
+# ::save-date Fri Jan 17, 2014 ::file PROXY_AFP_ENG_20030624_0449_14.txt
+(r / raid-01
+      :ARG0 (p / police
+            :mod (c / country :name (n / name :op1 "France")))
+      :ARG1 (l / location
+            :quant (m / more-than :op1 12)
+            :ARG1-of (l2 / link-01
+                  :ARG1 (o / organization :name (n2 / name :op1 "People's" :op2 "Mujahedeen")))
+            :location (r2 / relative-position
+                  :op1 (c2 / city :name (n3 / name :op1 "Paris"))
+                  :direction (n4 / northwest)))
+      :time (w / week
+            :mod (l3 / last)))
+
+# ::id PROXY_AFP_ENG_20030630_0211.9 ::date 2013-05-05T06:03:00 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt Wi Sung-lac is the head of the South Korean Foreign Ministry's North American Affairs Bureau.
+# ::save-date Wed May 29, 2013 ::file PROXY_AFP_ENG_20030630_0211_9.txt
+(p2 / person
+  :ARG0-of (h2 / head-01
+             :ARG1 (g2 / government-organization
+                     :name (n4 / name
+                             :op1 "North"
+                             :op2 "American"
+                             :op3 "Affairs"
+                             :op4 "Bureau")
+                     :part-of (g / government-organization
+                                :name (n2 / name
+                                        :op1 "Foreign"
+                                        :op2 "Ministry")
+                                :mod (c / country
+                                       :name (n3 / name
+                                               :op1 "South"
+                                               :op2 "Korea")))))
+  :domain (p / person
+            :name (n / name
+                    :op1 "Wi"
+                    :op2 "Sung-lac")))
+
+# ::id PROXY_AFP_ENG_20030715_0045.23 ::date 2013-05-07T09:11:40 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt Kim Myong-Chol stated that North Korea is carefully monitoring all Australian behavior and that Australia must be careful how Australia acts towards North Korea.
+# ::save-date Thu May 16, 2013 ::file PROXY_AFP_ENG_20030715_0045_23.txt
+(s / state-01
+      :ARG0 (p / person :name (n / name :op1 "Kim" :op2 "Myong-Chol"))
+      :ARG1 (a / and
+            :op1 (m / monitor-01
+                  :ARG0 (c / country :name (n2 / name :op1 "North" :op2 "Korea"))
+                  :ARG1 (b / behave-01
+                        :ARG0 (c2 / country :name (n3 / name :op1 "Australia"))
+                        :quant (a2 / all))
+                  :manner (c3 / careful))
+            :op2 (o / obligate-01
+                  :ARG1 c2
+                  :ARG2 (c4 / care-01
+                        :ARG0 c2
+                        :ARG1 (a3 / act-01
+                                :prep-toward c)))))
+
+# ::id PROXY_AFP_ENG_20031202_0313.23 ::date 2013-05-08T03:34:47 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt A spokeswoman for Germany's Federal exports office stated to Agence France-Presse that the application for an export licence was being studied at ministerial level due to the political considerations involved.
+# ::save-date Mon Sep 16, 2013 ::file PROXY_AFP_ENG_20031202_0313_23.txt
+(s / state-01
+      :ARG0 (p3 / person
+            :ARG0-of (h / have-org-role-91
+                  :ARG1 (g2 / government-organization :name (n3 / name :op1 "Federal" :op2 "Exports" :op3 "Office")
+                        :poss (c / country :name (n / name :op1 "Germany")))
+                  :ARG2 (s2 / spokeswoman)))
+      :ARG1 (s3 / study-01
+            :ARG1 (a2 / apply-01
+                  :ARG1 (l / licence
+                        :mod (e / export-01)))
+            :prep-at (l2 / level
+                  :mod (p4 / person
+                        :ARG0-of (h2 / have-org-role-91
+                              :ARG2 (m / minister))))
+            :ARG1-of (c2 / cause-01
+                  :ARG0 (c3 / consider-01
+                        :mod (p / politics)
+                        :ARG1-of (i / involve-01))))
+      :ARG2 (p2 / publication :name (n2 / name :op1 "Agence" :op2 "France-Presse")))
+
+# ::id PROXY_AFP_ENG_20031202_0313.28 ::date 2013-05-08T04:04:06 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt Siemens stated that the Hanau plutonium-processing facility was also abandoned due to political difficulties at a time of growing debate about the future of nuclear power.
+# ::save-date Mon May 27, 2013 ::file PROXY_AFP_ENG_20031202_0313_28.txt
+(s / state-01
+  :ARG0 (c / company
+          :name (n / name
+                  :op1 "Siemens"))
+  :ARG1 (a / abandon-01
+          :ARG1 (f / facility
+                  :ARG0-of (p / process-01
+                             :ARG1 (p2 / plutonium))
+                  :location (c4 / city
+                              :name (n2 / name
+                                      :op1 "Hanau")))
+          :ARG1-of (c3 / cause-01
+                     :ARG0 (d / difficulty
+                             :mod (p3 / politics)
+                             :time (d2 / debate-01
+                                     :ARG1 (f2 / future
+                                             :poss (p5 / power
+                                                     :mod (n4 / nucleus)))
+                                     :ARG1-of (g / grow-01))
+                             :mod (a3 / also)))))
+
+# ::id PROXY_AFP_ENG_20040203_0804.4 ::date 2013-05-17T15:13:06 ::snt-type summary ::annotator SDL-AMR-09 ::preferred
+# ::snt Live poultry smuggling undermines WHO and FAO efforts to restrict bird flu spread in Asia.
+# ::save-date Wed May 29, 2013 ::file PROXY_AFP_ENG_20040203_0804_4.txt
+(u / undermine-01
+  :ARG0 (s / smuggle-01
+          :ARG1 (p / poultry
+                  :ARG0-of (l / live-01)))
+  :ARG1 (e / effort
+          :poss (a / and
+                  :op1 (o / organization
+                         :name (n / name
+                                 :op1 "WHO"))
+                  :op2 (o2 / organization
+                         :name (n2 / name
+                                 :op1 "FAO")))
+          :purpose (r / restrict-01
+                     :ARG0 a
+                     :ARG1 (s2 / spread-02
+                             :ARG1 (f / flu
+                                     :mod (b / bird))
+                             :location (c / continent
+                                         :name (n3 / name
+                                                 :op1 "Asia"))))))
+
+# ::id PROXY_AFP_ENG_20040203_0804.31 ::date 2013-05-19T15:59:15 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt The H5N1 flu strain has caused 13 deaths and reported outbreaks in 10 countries.
+# ::save-date Wed Jul 24, 2013 ::file PROXY_AFP_ENG_20040203_0804_31.txt
+(c / cause-01
+      :ARG0 (s / strain :name (n / name :op1 "H5N1")
+            :mod (f / flu))
+      :ARG1 (a2 / and :quant 13
+            :op1 (d / die-01)
+            :op2 (b / break-13
+                  :ARG1-of (r2 / report-01)))
+      :location (c2 / country :quant 10))
+
+# ::id PROXY_AFP_ENG_20040216_0567.1 ::date 2013-05-02T07:17:17 ::snt-type date ::annotator SDL-AMR-09 ::preferred
+# ::snt 2004-02-16
+# ::save-date Thu May 2, 2013 ::file PROXY_AFP_ENG_20040216_0567_1.txt
+(d / date-entity :month 2 :day 16 :year 2004)
+
+# ::id PROXY_AFP_ENG_20040305_0056.9 ::date 2013-05-14T14:10:59 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt Up to 700 insurgents and their relatives and 8 rebel commanders surrendered after government troops surrounded several northern holdouts in late February 2004.
+# ::save-date Tue May 28, 2013 ::file PROXY_AFP_ENG_20040305_0056_9.txt
+(s / surrender-01
+  :ARG0 (a / and
+          :op1 (i / insurgent
+                 :quant (u / up-to
+                          :op1 700))
+          :op2 (r / relative
+                 :poss i)
+          :op3 (p / person
+                 :quant 8
+                 :ARG0-of (c2 / command-02
+                            :ARG1 (p2 / person
+                                    :ARG0-of (r2 / rebel-01)))))
+  :time (a2 / after
+          :op1 (s2 / surround-01
+                 :ARG1 (t / troop
+                         :mod (g / government-organization
+                                :ARG0-of (g2 / govern-01)))
+                 :ARG2 (h / holdout
+                         :quant (s3 / several)
+                         :mod (n / north))
+                 :time (l2 / late
+                         :op1 (d / date-entity
+                                :month 2
+                                :year 2004)))))
+
+# ::id PROXY_AFP_ENG_20040508_0150.10 ::date 2013-05-21T15:53:20 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt The Albanian Government has been working on a project of national strategy which will require international support and cooperation.
+# ::save-date Mon May 27, 2013 ::file PROXY_AFP_ENG_20040508_0150_10.txt
+(w / work-01
+  :ARG0 (g / government-organization
+          :ARG0-of (g2 / govern-01
+                     :ARG1 (c / country
+                             :name (n / name
+                                     :op1 "Albania"))))
+  :ARG1 (p / project
+          :topic (s / strategy
+                   :mod (n2 / nation))
+          :ARG0-of (r / require-01
+                     :ARG1 (a / and
+                             :op1 (s3 / support-01)
+                             :op2 (c2 / cooperate-01)
+                             :mod (i / international)))))
+
+# ::id PROXY_AFP_ENG_20040626_0107.7 ::date 2013-05-16T20:28:11 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt International diplomats witnessed the incineration.
+# ::save-date Wed Sep 18, 2013 ::file PROXY_AFP_ENG_20040626_0107_7.txt
+(w / witness-01
+      :ARG0 (p / person
+            :mod (i / international)
+            :ARG0-of (h / have-org-role-91
+                  :ARG2 (d / diplomat)))
+      :ARG1 (i2 / incinerate-01))
+
+# ::id PROXY_AFP_ENG_20040720_0035.14 ::date 2013-05-15T05:55:56 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt Last week Hong Kong's Wen Wei Po daily newspaper quoted Chinese military sources as stating that Taiwan must rejoin China or face military action within 20 years.
+# ::save-date Wed Sep 25, 2013 ::file PROXY_AFP_ENG_20040720_0035_14.txt
+(q / quote-01
+      :ARG0 (n / newspaper :name (n2 / name :op1 "Wen" :op2 "Wei" :op3 "Po")
+            :frequency (r2 / rate-entity-91
+                  :ARG3 (t2 / temporal-quantity :quant 1
+                        :unit (d / day)))
+            :poss (c4 / city :name (n3 / name :op1 "Hong" :op2 "Kong")))
+      :ARG1 (s / source
+            :mod (m / military)
+            :mod (c / country :name (n4 / name :op1 "China")))
+      :ARG2 (s2 / state-01
+            :ARG0 s
+            :ARG1 (o / obligate-01
+                  :ARG1 (c2 / country :name (n5 / name :op1 "Taiwan"))
+                  :ARG2 (o2 / or
+                        :op1 (r / rejoin-01
+                              :ARG0 c2
+                              :ARG1 c)
+                        :op2 (f / face-01
+                              :ARG0 c2
+                              :ARG1 (a / action
+                                    :mod (m2 / military))
+                              :time (w2 / within
+                                    :op1 (t / temporal-quantity :quant 20
+                                          :unit (y / year)))))))
+      :time (w / week
+            :mod (l / last)))
+
+# ::id PROXY_AFP_ENG_20040728_0433.14 ::date 2013-05-23T03:35:29 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt The second plant will be ready to generate electricity in 7 years.
+# ::save-date Wed Sep 18, 2013 ::file PROXY_AFP_ENG_20040728_0433_14.txt
+(r / ready-01
+      :ARG1 (p / plant
+            :ord (o / ordinal-entity :value 2))
+      :ARG2 (g / generate-01
+            :ARG0 p
+            :ARG1 (e / electricity))
+      :time (a / after
+            :op1 (n / now)
+            :quant (t / temporal-quantity :quant 7
+                  :unit (y / year))))
+
+# ::id PROXY_AFP_ENG_20050601_0389.3 ::date 2013-05-26T17:28:45 ::snt-type topic ::annotator SDL-AMR-09 ::preferred
+# ::snt terrorism; technology; Telecom
+# ::save-date Mon May 27, 2013 ::file PROXY_AFP_ENG_20050601_0389_3.txt
+(a / and
+      :op1 (t / terrorism)
+      :op2 (t2 / technology)
+      :op3 (t3 / telecommunication))
+
+# ::id PROXY_AFP_ENG_20050603_0056.5 ::date 2013-05-26T16:58:55 ::snt-type summary ::annotator SDL-AMR-09 ::preferred
+# ::snt One of the missiles broke up over two Turkish villages.
+# ::save-date Wed Sep 18, 2013 ::file PROXY_AFP_ENG_20050603_0056_5.txt
+(b / break-08
+      :ARG1 (m / missile :quant 1
+            :ARG1-of (i / include-91
+                  :ARG2 (m2 / missile)))
+      :location (o / over
+            :op1 (v / village :quant 2
+                  :mod (c / country :name (n / name :op1 "Turkey")))))
+
+# ::id PROXY_AFP_ENG_20050708_0783.14 ::date 2013-05-31T07:31:58 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt Currently 24000 patients in Brazil receive Kaletra.
+# ::save-date Thu Jun 6, 2013 ::file PROXY_AFP_ENG_20050708_0783_14.txt
+(r / receive-01
+  :ARG0 (p / patient :quant 24000
+          :location (c / country
+                      :name (n2 / name :op1 "Brazil")))
+  :ARG1 (p2 / product
+          :name (n / name :op1 "Kaletra"))
+  :time (c2 / current))
+
+# ::id PROXY_AFP_ENG_20050718_0646.16 ::date 2013-06-01T13:08:12 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt Government crackdown --
+# ::save-date Tue Jun 4, 2013 ::file PROXY_AFP_ENG_20050718_0646_16.txt
+(c / crack-06
+      :ARG1 (g / government-organization
+            :ARG0-of (g2 / govern-01)))
+
+# ::id PROXY_AFP_ENG_20050919_0252.8 ::date 2013-06-02T12:26:55 ::snt-type body subordinate ::annotator SDL-AMR-09 ::preferred
+# ::snt on 17-18 September 2005 Spain detained the group on suspicion of possession and trafficking of weapons.
+# ::save-date Tue Jun 4, 2013 ::file PROXY_AFP_ENG_20050919_0252_8.txt
+(d / detain-01
+      :ARG0 (c / country :name (n / name :op1 "Spain"))
+      :ARG1 (g / group)
+      :ARG2 (s / suspect-01
+            :ARG1 (a / and
+                  :op1 (p / possess-01
+                        :ARG0 g
+                        :ARG1 (w / weapon))
+                  :op2 (t / traffic-00
+                        :ARG0 g
+                        :ARG1 w)))
+      :time (d2 / date-interval
+            :op1 (d3 / date-entity :year 2005 :month 9 :day 17)
+            :op2 (d4 / date-entity :year 2005 :month 9 :day 18)))
+
+# ::id PROXY_AFP_ENG_20051018_0064.2 ::date 2013-06-02T22:10:38 ::snt-type country ::annotator SDL-AMR-09 ::preferred
+# ::snt India (IN); Pakistan (PK)
+# ::save-date Sun Jun 2, 2013 ::file PROXY_AFP_ENG_20051018_0064_2.txt
+(a / and
+      :op1 (c / country :name (n / name :op1 "India"))
+      :op2 (c2 / country :name (n2 / name :op1 "Pakistan")))
+
+# ::id PROXY_AFP_ENG_20051018_0064.3 ::date 2013-06-02T21:56:23 ::snt-type topic ::annotator SDL-AMR-09 ::preferred
+# ::snt weather and natural disaster; war and conflict; terrorism
+# ::save-date Tue Sep 17, 2013 ::file PROXY_AFP_ENG_20051018_0064_3.txt
+(a / and
+      :op1 (a2 / and
+            :op1 (w / weather)
+            :op2 (d / disaster
+                  :mod (n / nature)))
+      :op2 (a3 / and
+            :op1 (w2 / war)
+            :op2 (c / conflict-01))
+      :op3 (t / terrorism))
+
+# ::id PROXY_AFP_ENG_20051212_0547.1 ::date 2013-06-07T03:38:42 ::snt-type date ::annotator SDL-AMR-09 ::preferred
+# ::snt 2005-12-12
+# ::save-date Fri Jun 7, 2013 ::file PROXY_AFP_ENG_20051212_0547_1.txt
+(d / date-entity
+  :day 12
+  :month 12
+  :year 2005)
+
+# ::id PROXY_AFP_ENG_20070116_0270.6 ::date 2013-06-16T11:11:54 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt Israel and South Korea share concerns over the connection between North Korea and Iran in the pursuit of weapons of mass destruction.
+# ::save-date Mon Jul 15, 2013 ::file PROXY_AFP_ENG_20070116_0270_6.txt
+(s / share-01
+  :ARG0 (a / and
+          :op1 (c / country
+                 :name (n / name
+                         :op1 "Israel"))
+          :op2 (c2 / country
+                 :name (n2 / name
+                         :op1 "South"
+                         :op2 "Korea")))
+  :ARG1 (c3 / concern-01
+          :ARG0 (c5 / connect-01
+                  :ARG1 (a4 / and
+                          :op1 (c9 / country
+                                 :name (n3 / name
+                                         :op1 "North"
+                                         :op2 "Korea"))
+                          :op2 (c10 / country
+                                 :name (n4 / name
+                                         :op1 "Iran")))
+                  :purpose (p / pursue-01
+                             :ARG0 a4
+                             :ARG1 (w2 / weapon
+                                     :ARG2-of (d2 / destroy-01
+                                                :degree (m2 / mass)))))
+          :ARG1 a))
+
+# ::id PROXY_AFP_ENG_20070201_0099.19 ::date 2013-06-02T22:38:32 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt China said it had the right to carry out the test after destroying the satellite.
+# ::save-date Wed Jul 17, 2013 ::file PROXY_AFP_ENG_20070201_0099_19.txt
+(s / say-01
+  :ARG0 (c / country
+          :name (n / name
+                  :op1 "China"))
+  :ARG1 (e / entitle-01
+          :ARG1 (t / test-01
+                  :ARG0 c
+                  :time (a / after
+                          :op1 (d / destroy-01
+                                 :ARG0 c
+                                 :ARG1 (s2 / satellite))))
+          :ARG2 c))
+
+# ::id PROXY_AFP_ENG_20070203_0026.4 ::date 2013-06-02T22:46:36 ::snt-type summary ::annotator SDL-AMR-09 ::preferred
+# ::snt 10 individuals are detained in Saudi Arabia on February 3, 2007 for suspicion of illegally collecting money to fund terror-related activities.
+# ::save-date Sun Jun 9, 2013 ::file PROXY_AFP_ENG_20070203_0026_4.txt
+(d / detain-01
+      :ARG1 (i / individual :quant 10)
+      :ARG2 (s / suspect-01
+            :ARG1 (c2 / collect-01
+                  :ARG0 i
+                  :ARG1 (m / money)
+                  :manner (l / law :polarity -)
+                  :purpose (f / fund-01
+                        :ARG0 i
+                        :ARG1 (a / activity
+                              :ARG1-of (r / relate-01
+                                    :ARG2 (t / terror)))))
+            :ARG2 i)
+      :location (c / country :name (n / name :op1 "Saudi" :op2 "Arabia"))
+      :time (d2 / date-entity :day 3 :month 2 :year 2007))
+
+# ::id PROXY_AFP_ENG_20070207_0243.13 ::date 2013-06-02T01:28:31 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt Possession of more than 600 grams of heroin or more than 20 kilograms of opium carries the death penalty in communist Vietnam.
+# ::save-date Thu Jul 18, 2013 ::file PROXY_AFP_ENG_20070207_0243_13.txt
+(p2 / penalize-01
+  :ARG2 (p / possess-01
+          :ARG1 (o / or
+                  :op1 (h / heroin
+                         :quant (m / more-than
+                                  :op1 (m3 / mass-quantity
+                                         :quant 600
+                                         :unit (g / gram))))
+                  :op2 (o2 / opium
+                         :quant (m2 / more-than
+                                  :op1 (m4 / mass-quantity
+                                         :quant 20
+                                         :unit (k / kilogram))))))
+  :instrument (d / die-01)
+  :location (c2 / country
+              :name (n / name
+                      :op1 "Vietnam")
+              :mod (c3 / communism)))
+
+# ::id PROXY_AFP_ENG_20070209_0566.7 ::date 2013-05-31T23:39:22 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt The Kurds were seized the week of 4 February 2007 as part of an investigation headed by France's top anti-terrorist judge Jean-Louis Bruguiere.
+# ::save-date Tue Sep 17, 2013 ::file PROXY_AFP_ENG_20070209_0566_7.txt
+(s / seize-01
+      :ARG1 (p / person
+            :mod (e / ethnic-group :name (n / name :op1 "Kurd")))
+      :time (w / week
+            :mod (d / date-entity :year 2007 :month 2 :day 4))
+      :subevent-of (i / investigate-01
+            :ARG1-of (h / head-01
+                  :ARG0 (p2 / person :name (n2 / name :op1 "Jean-Louis" :op2 "Bruguiere")
+                        :ARG0-of (o / oppose-01
+                              :ARG1 (t / terrorism))
+                        :mod (t2 / top)
+                        :ARG0-of (h2 / have-org-role-91
+                              :ARG1 (c / country :name (n3 / name :op1 "France"))
+                              :ARG3 (j / judge-01))))))
+
+# ::id PROXY_AFP_ENG_20070327_0002.3 ::date 2013-06-10T06:33:29 ::snt-type topic ::annotator SDL-AMR-09 ::preferred
+# ::snt International; Government; weapons; proliferation; war and conflict; military
+# ::save-date Tue Sep 17, 2013 ::file PROXY_AFP_ENG_20070327_0002_3.txt
+(a / and
+      :op1 (i / international)
+      :op2 (g / government-organization
+            :ARG0-of (g2 / govern-01))
+      :op3 (w / weapon)
+      :op4 (p / proliferate-01)
+      :op5 (a2 / and
+            :op1 (w2 / war)
+            :op2 (c / conflict-01))
+      :op6 (m / military))
+
+# ::id PROXY_AFP_ENG_20070331_0467.2 ::date 2013-06-10T14:40:29 ::snt-type country ::annotator SDL-AMR-09 ::preferred
+# ::snt Kenya (KE)
+# ::save-date Mon Jun 10, 2013 ::file PROXY_AFP_ENG_20070331_0467_2.txt
+(c / country :name (n / name :op1 "Kenya"))
+
+# ::id PROXY_AFP_ENG_20070419_0476.2 ::date 2013-06-10T08:14:21 ::snt-type country ::annotator SDL-AMR-09 ::preferred
+# ::snt India (IN); Iran, Islamic Republic of (IR); Korea, Democratic People's Republic of (KP)
+# ::save-date Mon Jun 17, 2013 ::file PROXY_AFP_ENG_20070419_0476_2.txt
+(a / and
+      :op1 (c / country :name (n / name :op1 "India"))
+      :op2 (c2 / country :name (n2 / name :op1 "Islamic" :op2 "Republic" :op3 "of" :op4 "Iran"))
+      :op3 (c3 / country :name (n3 / name :op1 "Democratic" :op2 "People's" :op3 "Republic" :op4 "of" :op5 "Korea")))
+
+# ::id PROXY_AFP_ENG_20070504_0296.7 ::date 2013-06-13T06:34:28 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt The 2 arrested candidates are Leoluca Lanza of the Christian-Democrats for Independence Party and Giovanni riina from Silvio Berlusconi's Forza Italia party.
+# ::save-date Tue Sep 17, 2013 ::file PROXY_AFP_ENG_20070504_0296_7.txt
+(c3 / candidate :quant 2
+      :ARG1-of (a2 / arrest-01)
+      :domain (a / and
+            :op1 (p4 / person :name (n / name :op1 "Leoluca" :op2 "Lanza")
+                  :ARG0-of (h / have-org-role-91
+                        :ARG1 (p / political-party :name (n3 / name :op1 "Christian-Democrats" :op2 "for" :op3 "Independence" :op4 "Party"))))
+            :op2 (p5 / person :name (n2 / name :op1 "Giovanni" :op2 "Riina")
+                  :ARG0-of (h2 / have-org-role-91
+                        :ARG1 (p2 / political-party :name (n4 / name :op1 "Forza" :op2 "Italia" :op3 "Party")
+                              :ARG1-of (h3 / have-org-role-91
+                                    :ARG0 (p3 / person :name (n5 / name :op1 "Silvio" :op2 "Berlusconi"))))))))
+
+# ::id PROXY_AFP_ENG_20070521_0178.2 ::date 2013-06-10T08:38:02 ::snt-type country ::annotator SDL-AMR-09 ::preferred
+# ::snt Estonia (EE); Europe; Russian Federation (RU)
+# ::save-date Wed Jun 26, 2013 ::file PROXY_AFP_ENG_20070521_0178_2.txt
+(a / and
+      :op1 (c / country :name (n / name :op1 "Estonia"))
+      :op2 (c2 / continent :name (n2 / name :op1 "Europe"))
+      :op3 (c3 / country :name (n3 / name :op1 "Russian" :op2 "Federation")))
+
+# ::id PROXY_AFP_ENG_20070521_0178.15 ::date 2013-06-14T08:11:47 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt Estonia began barring access to key government and some private websites 3 weeks ago after the onset of a series of cyber attacks against Estonia.
+# ::save-date Mon Jul 22, 2013 ::file PROXY_AFP_ENG_20070521_0178_15.txt
+(b / begin-01
+      :ARG0 (c / country :name (n / name :op1 "Estonia"))
+      :ARG1 (b2 / bar-01
+            :ARG0 c
+            :ARG1 (a / access-01
+                  :ARG1 (a6 / and
+                        :op1 (w / website
+                              :mod (g / government-organization
+                                    :ARG0-of (g2 / govern-01))
+                              :mod (k / key))
+                        :op2 (w3 / website
+                              :mod (p / private)
+                              :quant (s / some)))))
+      :time (b3 / before
+            :op1 (n2 / now)
+            :quant (t / temporal-quantity :quant 3
+                  :unit (w2 / week)))
+      :time (a4 / after
+            :op1 (o / onset
+                  :poss (a5 / attack-01
+                        :ARG1 c
+                        :mod (c2 / cyber)
+                        :quant (s2 / series)))))
+
+# ::id PROXY_AFP_ENG_20070521_0178.30 ::date 2013-06-15T09:23:07 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt Access to critical websites was never restricted.
+# ::save-date Wed Jun 26, 2013 ::file PROXY_AFP_ENG_20070521_0178_30.txt
+(r / restrict-01 :polarity -
+      :ARG1 (a / access-01
+            :ARG1 (w / website
+                  :mod (c / critical)))
+      :time (e / ever))
+
+# ::id PROXY_AFP_ENG_20070525_0061.3 ::date 2013-06-16T14:03:33 ::snt-type topic ::annotator SDL-AMR-09 ::preferred
+# ::snt Military; technology
+# ::save-date Sun Jun 16, 2013 ::file PROXY_AFP_ENG_20070525_0061_3.txt
+(a / and
+      :op1 (m / military)
+      :op2 (t / technology))
+
+# ::id PROXY_AFP_ENG_20070529_0077.15 ::date 2013-09-01T06:37:19 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt Ivanov stated that Russians should be confident in the nation's defense and security capabilities.
+# ::save-date Wed Sep 11, 2013 ::file PROXY_AFP_ENG_20070529_0077_15.txt
+(s / state-01
+  :ARG0 (p3 / person
+          :name (n3 / name
+                  :op1 "Ivanov"))
+  :ARG1 (r / recommend-01
+          :ARG1 (c2 / confident-41
+                  :ARG1 (p4 / person
+                          :mod (c3 / country
+                                 :name (n4 / name
+                                         :op1 "Russia")))
+                  :ARG2 (a / and
+                          :op1 (c / capable-41
+                                 :ARG1 n5
+                                 :ARG2 (d / defend-01))
+                          :op2 (c4 / capable-41
+                                 :ARG1 (n5 / nation)
+                                 :ARG2 (s2 / security))))))
+
+# ::id DF-170-181103-888_2097.5 ::date 2013-09-16T07:28:10 ::annotator LDC-AMR-14 ::preferred
+# ::snt He needs to conduct a beer summit between Palin and NBC.
+# ::save-date Fri Jan 24, 2014 ::file DF-170-181103-888_2097_5.txt
+(n / need-01
+      :ARG0 (h / he)
+      :ARG1 (c / conduct-01
+            :ARG0 h
+            :ARG1 (m / meet-03
+                  :ARG0 (p / person :name (n2 / name :op1 "Palin"))
+                  :ARG1 (p2 / publication :name (n3 / name :op1 "NBC"))
+                  :mod (s / summit
+                        :mod (b / beer)))))
+
+# ::id DF-170-181104-872_5719.12 ::date 2013-09-18T06:27:28 ::annotator LDC-AMR-14 ::preferred
+# ::snt #2 Bringing us Universal Healthcare
+# ::save-date Sat Jan 25, 2014 ::file DF-170-181104-872_5719_12.txt
+(b / bring-01 :li 2
+      :ARG1 (h / healthcare
+            :mod (u / universal))
+      :ARG2 (w / we))
+
+# ::id DF-170-181104-872_8783.8 ::date 2013-09-18T08:36:03 ::annotator LDC-AMR-14 ::preferred
+# ::snt Palin is the real star behind the Republican ticket this year.
+# ::save-date Sat Jan 25, 2014 ::file DF-170-181104-872_8783_8.txt
+(s / star
+      :domain (p3 / person :name (n / name :op1 "Palin"))
+      :mod (r / real)
+      :mod (b / behind
+            :op1 (t / ticket
+                  :mod (p4 / political-party :name (n2 / name :op1 "Republican"))))
+      :time (y / year
+            :mod (t2 / this)))
+
+# ::id DF-170-181110-876_4423.15 ::date 2013-09-21T06:58:43 ::annotator LDC-AMR-14 ::preferred
+# ::snt Not, I suspect, as it relates to magnetic pole shift or drift.
+# ::save-date Sat Sep 21, 2013 ::file DF-170-181110-876_4423_15.txt
+(s / suspect-01
+      :ARG0 (i / i)
+      :ARG1 (r / relate-01 :polarity -
+            :ARG1 (i2 / it)
+            :ARG2 (o / or
+                  :op1 (s2 / shift-01
+                        :ARG1 (p / pole
+                              :mod (m / magnet)))
+                  :op2 (d / drift-01
+                        :ARG1 p))))
+
+# ::id DF-170-181110-876_5223.3 ::date 2013-09-21T10:25:15 ::annotator LDC-AMR-14 ::preferred
+# ::snt 'Flow,' a documentary on what the privatization of water really means which was the inspiration for me creating this thread.
+# ::save-date Sat Sep 21, 2013 ::file DF-170-181110-876_5223_3.txt
+(i / inspire-01
+      :ARG0 (d / documentary :name (n / name :op1 "Flow")
+            :topic (m / mean-01
+                  :ARG0 (p / privatize-01
+                        :ARG1 (w / water))
+                  :mod (r / really)))
+      :ARG1 (i2 / i)
+      :ARG2 (c / create-01
+            :ARG0 i2
+            :ARG1 (t / thread
+                  :mod (t2 / this))))
+
+# ::id DF-170-181113-874_8063.15 ::date 2013-09-21T16:11:09 ::annotator LDC-AMR-14 ::preferred
+# ::snt What he's saying isn't, obviously, that we shouldn't care about the long run.
+# ::save-date Sat Sep 21, 2013 ::file DF-170-181113-874_8063_15.txt
+(o / obvious-41
+      :ARG1 (s / say-01 :polarity -
+            :ARG0 (h / he)
+            :ARG1 (r / recommend-01
+                  :ARG1 (c / care-01 :polarity -
+                        :ARG0 (w / we)
+                        :ARG1 (r2 / run
+                              :extent (l / long))))))
+
+# ::id DF-170-181118-887_5920.30 ::date 2013-09-29T09:08:01 ::annotator LDC-AMR-14 ::preferred
+# ::snt Preferably with a solution that would allow soldiers lost to this idiotic policy to reenlist if they still wish to.
+# ::save-date Sun Sep 29, 2013 ::file DF-170-181118-887_5920_30.txt
+(p / prefer-01
+      :ARG1 (s / solution
+            :ARG0-of (a / allow-01
+                  :ARG1 (e / enlist-01
+                        :ARG0 (p2 / person
+                              :ARG0-of (h / have-org-role-91
+                                    :ARG2 (s2 / soldier))
+                              :ARG1-of (l / lose-02
+                                    :ARG1-of (c / cause-01
+                                          :ARG0 (p3 / policy
+                                                :mod (i / idiot)))))
+                        :mod (a2 / again))
+                  :condition (w / wish-01
+                        :ARG0 p2
+                        :ARG1 e
+                        :time (s3 / still)))))
+
+# ::id DF-170-181118-887_5920.32 ::date 2013-09-29T09:16:45 ::annotator LDC-AMR-14 ::preferred
+# ::snt The military is against things that make it run less efficiently.
+# ::save-date Sun Sep 29, 2013 ::file DF-170-181118-887_5920_32.txt
+(o / oppose-01
+      :ARG0 (m / military)
+      :ARG1 (t / thing
+            :ARG0-of (m2 / make-02
+                  :ARG1 (r / run-01
+                        :ARG1 m
+                        :ARG2-of (e / efficient-41
+                              :ARG1 m
+                              :degree (l / less))))))
+
+# ::id DF-183-195681-794_9722.13 ::date 2013-08-28T22:47:03 ::annotator UCO-AMR-05 ::preferred
+# ::snt Of what Am I trying to convince you?
+# ::save-date Wed Aug 28, 2013 ::file DF-183-195681-794_9722_13.txt
+(t / try-01
+      :ARG0 (i / i)
+      :ARG1 (c / convince-01
+            :ARG0 i
+            :ARG1 (y / you)
+            :ARG2 (a / amr-unknown)))
+
+# ::id DF-183-195681-794_9722.18 ::date 2013-08-28T23:26:58 ::annotator UCO-AMR-05 ::preferred
+# ::snt If that article represents the final word on "substance" to you, that's fine with me.
+# ::save-date Mon Sep 16, 2013 ::file DF-183-195681-794_9722_18.txt
+(f / fine-00
+      :ARG1 (t / that)
+      :ARG2 (i / i)
+      :condition (r / represent-01
+            :ARG0 (a / article
+                  :domain (t2 / that))
+            :ARG1 (w / word
+                  :mod (f2 / final)
+                  :topic (s / substance))
+            :beneficiary (y / you)))
+
+# ::id DF-199-192772-680_8771.3 ::date 2013-09-04T19:09:23 ::annotator UCO-AMR-05 ::preferred
+# ::snt I think you are answering if two men are the "same" and not necessarily if they are equal in rights or should be.
+# ::save-date Thu Sep 12, 2013 ::file DF-199-192772-680_8771_3.txt
+(t / think-01
+      :ARG0 (i / i)
+      :ARG1 (a3 / and
+            :op1 (a / answer-01
+                  :ARG0 (y / you)
+                  :ARG1 (s / same-41
+                        :ARG1 (m / men :quant 2)))
+            :op2 (a4 / answer-01 :polarity -
+                  :ARG0 y
+                  :ARG1 (o / or
+                        :op1 (e / equal-01
+                              :ARG1 m
+                              :mod (r / right))
+                        :op2 (o2 / obligate-01
+                              :ARG1 m
+                              :ARG2 e)))))
+
+# ::id DF-199-192772-681_0232.1 ::date 2013-09-04T19:29:26 ::annotator UCO-AMR-05 ::preferred
+# ::snt While riding the bus earlier this week, I overheard a man say that if he "had the guts to do it," he would jump off an overpass.
+# ::save-date Thu Sep 12, 2013 ::file DF-199-192772-681_0232_1.txt
+(o / overhear-01
+      :ARG0 (i / i)
+      :ARG1 (s / say-01
+            :ARG0 (m / man)
+            :ARG1 (j / jump-03
+                  :ARG0 m
+                  :source (o2 / overpass)
+                  :condition (h / have-03
+                        :ARG0 m
+                        :ARG1 (g / guts
+                              :purpose j))
+                  :direction (o3 / off)))
+      :time (r / ride-01
+            :ARG1 (b / bus)
+            :time (e / early
+                  :degree (m2 / more)
+                  :time (w / week
+                        :domain (t / this)))))
+
+# ::id DF-199-192772-681_0984.8 ::date 2013-09-11T18:47:01 ::annotator UCO-AMR-05 ::preferred
+# ::snt Of course, access to petroleum itelf is not the only issue.
+# ::save-date Wed Sep 11, 2013 ::file DF-199-192772-681_0984_8.txt
+(i / issue
+      :domain (a / access-01
+            :ARG1 (p / petroleum
+                  :mod p)
+            :mod (o / only :polarity -))
+      :mod (o2 / of-course))
+
+# ::id DF-199-192772-681_0984.38 ::date 2013-09-13T14:35:37 ::annotator UCO-AMR-05 ::preferred
+# ::snt I think what you are going to see is a shift towards localized economies.
+# ::save-date Fri Sep 13, 2013 ::file DF-199-192772-681_0984_38.txt
+(t / think-01
+      :ARG0 (i / i)
+      :ARG1 (s / see-01
+            :ARG0 (y / you)
+            :ARG1 (s2 / shift-01
+                  :ARG2 (e / economy
+                        :ARG1-of (l / localize-01)))))
+
+# ::id DF-199-192783-685_0989.27 ::date 2013-08-15T02:47:14 ::annotator SDL-AMR-09 ::preferred
+# ::snt I'm thinking Farmerman means what he says.
+# ::save-date Thu Aug 15, 2013 ::file DF-199-192783-685_0989_27.txt
+(t / think-01
+      :ARG0 (i / i)
+      :ARG1 (m / mean-01
+            :ARG0 (p / person :name (n / name :op1 "Farmerman"))
+            :ARG1 (t2 / thing
+                  :ARG1-of (s / say-01
+                        :ARG0 p))))
+
+# ::id DF-199-192783-685_0989.33 ::date 2013-08-15T03:57:30 ::annotator SDL-AMR-09 ::preferred
+# ::snt You repeatedly voted for and supported a president and an administration who was clearly and obviously incompetent and ideologically extreme.
+# ::save-date Wed Sep 18, 2013 ::file DF-199-192783-685_0989_33.txt
+(a / and
+      :op1 (v / vote-01
+            :ARG0 (y / you)
+            :ARG1 (a2 / and
+                  :op1 (p / person
+                        :ARG0-of (h / have-org-role-91
+                              :ARG2 (p2 / president)))
+                  :op2 (g / government-organization
+                        :ARG0-of (a3 / administrate-01))
+                  :mod (i3 / incompetence
+                        :mod (c2 / clear)
+                        :mod (o2 / obvious))
+                  :mod (e2 / extreme
+                        :mod (i / ideology))))
+      :op2 (s / support-01
+            :ARG0 y
+            :ARG1 a2)
+      :ARG1-of (r / repeat-01))
+
+# ::id DF-199-192784-587_5251.8 ::date 2013-08-16T01:39:23 ::annotator SDL-AMR-09 ::preferred
+# ::snt While I disagree with you that we'd all be Nazis, it was over 60 years ago, and the man has obviously reformed.
+# ::save-date Fri Jan 17, 2014 ::file DF-199-192784-587_5251_8.txt
+(c / contrast-01
+      :ARG1 (d / disagree-01
+            :ARG0 (i / i)
+            :ARG1 (y2 / you)
+            :ARG2 (n / nazis
+                  :domain (w / we
+                        :mod (a4 / all))))
+      :ARG2 (a3 / and
+            :op1 (b / be-temporally-at-91
+                  :ARG1 (i2 / it)
+                  :ARG2 (b2 / before
+                        :op1 (n2 / now)
+                        :quant (o / over
+                              :op1 (t / temporal-quantity :quant 60
+                                    :unit (y / year)))))
+            :op2 (r / reform-01
+                  :ARG1 (m / man)
+                  :ARG1-of (o2 / obvious-41))))
+
+# ::id DF-199-192794-660_6610.11 ::date 2013-08-22T03:23:26 ::annotator SDL-AMR-09 ::preferred
+# ::snt So I ask do you think drugs can be good for some people?
+# ::save-date Wed Sep 11, 2013 ::file DF-199-192794-660_6610_11.txt
+(c / cause-01
+  :ARG1 (a / ask-01
+          :ARG0 (i / i)
+          :ARG1 (t / think-01
+                  :ARG0 (y / you)
+                  :ARG1 (p / possible
+                          :domain (g / good-42
+                                    :ARG1 (p2 / person
+                                            :quant (s / some))
+                                    :ARG2 (d / drug)))
+                  :mode interrogative)))
+
+# ::id lpp_1943.1 ::date 2012-06-07T17:06:07 ::annotator ISI-AMR-05 ::preferred
+# ::snt Chapter 1 .
+# ::zh I
+# ::save-date Thu Jun 7, 2012 ::file lpp_1943_1.txt
+(c / chapter
+  :mod 1)
+
+# ::id lpp_1943.53 ::date 2012-07-24T11:54:57 ::annotator ISI-AMR-05 ::preferred
+# ::snt That , however , is not my fault .
+# ::zh 这不是我的过错。
+# ::save-date Tue Apr 9, 2013 ::file lpp_1943_53.txt
+(c / contrast-01
+  :ARG2 (f / fault-01
+          :ARG1 (i / i)
+          :ARG2 (t / that)
+          :polarity -))
+
+# ::id lpp_1943.126 ::date 2012-07-31T10:09:21 ::annotator ISI-AMR-05 ::preferred
+# ::snt And he sank into a reverie , which lasted a long time .
+# ::zh 说到这里，他就长时间地陷入沉思之中。
+# ::save-date Thu Jun 4, 2015 ::file lpp_1943_126.txt
+(a / and
+      :op2 (s / sink-01
+            :ARG0 (h / he)
+            :ARG4 (r / reverie
+                  :ARG1-of (l / long-03))))
+
+# ::id lpp_1943.134 ::date 2012-07-31T10:54:57 ::annotator ISI-AMR-05 ::preferred
+# ::snt That is so .
+# ::zh “那当然。
+# ::save-date Sat Dec 29, 2012 ::file lpp_1943_134.txt
+(s / so
+  :domain (t / that))
+
+# ::id lpp_1943.233 ::date 2012-11-08T07:45:11 ::annotator ISI-AMR-05 ::preferred
+# ::snt If it is only a sprout of radish or the sprig of a rose - bush , one would let it grow wherever it might wish .
+# ::zh 如果是小萝卜或是玫瑰的嫩苗，就让它去自由地生长。
+# ::save-date Thu May 2, 2013 ::file lpp_1943_233.txt
+(a / allow-01
+      :ARG0 (o / one)
+      :ARG1 (g / grow-01
+            :ARG1 i
+            :location (w2 / wish-01
+                  :ARG0 i
+                  :ARG1-of (p / possible-01)))
+      :condition (o2 / or
+            :op1 (s / sprout
+                  :part-of (r / radish))
+            :op2 (s2 / sprig
+                  :part-of (b2 / bush
+                        :mod (r2 / rose)))
+            :mod (o3 / only)
+            :domain (i / it)))
+
+# ::id lpp_1943.320 ::date 2012-11-19T12:10:21 ::annotator ISI-AMR-05 ::preferred
+# ::snt I do n't believe anything .
+# ::zh 我什么也不认为！
+# ::save-date Tue Apr 23, 2013 ::file lpp_1943_320.txt
+(b2 / believe-01 :polarity -
+      :ARG0 (i / i)
+      :ARG1 (a2 / anything))
+
+# ::id lpp_1943.324 ::date 2012-11-19T12:15:08 ::annotator ISI-AMR-05 ::preferred
+# ::snt Matters of consequence !
+# ::zh “正经事？”
+# ::save-date Tue Apr 23, 2013 ::file lpp_1943_324.txt
+(m / matter
+      :ARG0-of (h / have-03
+            :ARG1 (c / consequence)))
+
+# ::id lpp_1943.334 ::date 2012-11-19T12:32:18 ::annotator ISI-AMR-05 ::preferred
+# ::snt He has never looked at a star .
+# ::zh 他从来没有看过一颗星星。
+# ::save-date Mon Apr 15, 2013 ::file lpp_1943_334.txt
+(l / look-01 :polarity -
+      :ARG0 (h / he)
+      :ARG1 (s / star)
+      :time (e / ever))
+
+# ::id lpp_1943.342 ::date 2012-11-20T10:16:50 ::annotator ISI-AMR-05 ::preferred
+# ::snt The flowers have been growing thorns for millions of years .
+# ::zh “几百万年以来花儿都在制造着刺，
+# ::save-date Sat Apr 20, 2013 ::file lpp_1943_342.txt
+(g / grow-03
+      :ARG0 (f / flower)
+      :ARG1 (t / thorn)
+      :duration (m / multiple
+            :op1 (t2 / temporal-quantity :quant 1000000
+                  :unit (y / year))))
+
+# ::id lpp_1943.438 ::date 2012-11-11T13:02:46 ::annotator ISI-AMR-05 ::preferred
+# ::snt But , as he said , one never knows !
+# ::zh 他想，说不定它还会活动呢！
+# ::save-date Tue Apr 9, 2013 ::file lpp_1943_438.txt
+(c / contrast-01
+      :ARG2 (s / say-01
+            :ARG0 (h / he)
+            :ARG1 (k / know-01 :polarity -
+                  :ARG0 (o / one))))
+
+# ::id lpp_1943.460 ::date 2012-11-11T15:47:56 ::annotator ISI-AMR-05 ::preferred
+# ::snt It is my fault that you have not known it all the while .
+# ::zh “但由于我的过错，你一点也没有理会。
+# ::save-date Sat Jul 25, 2015 ::file lpp_1943_460.txt
+(f / fault-01
+      :ARG1 (i3 / i)
+      :ARG2 (k / know-01 :polarity -
+            :ARG0 (y / you)
+            :ARG1 (i2 / it)
+            :time (w / while-away-01
+                  :duration (a / all))))
+
+# ::id lpp_1943.505 ::date 2012-11-13T15:55:17 ::annotator ISI-AMR-05 ::preferred
+# ::snt That frightens me ...
+# ::zh “这倒叫我有点紧张…
+# ::save-date Tue Nov 13, 2012 ::file lpp_1943_505.txt
+(f / frighten-01
+  :ARG0 (t / that)
+  :ARG1 (i / i))
+
+# ::id lpp_1943.529 ::date 2012-11-19T20:04:51 ::annotator ISI-AMR-05 ::preferred
+# ::snt " Over all that , " the king answered .
+# ::zh “统治这一切。”
+# ::save-date Tue Dec 11, 2012 ::file lpp_1943_529.txt
+(a / answer-01
+  :ARG0 (k / king)
+  :ARG2 (o / over
+          :op1 (t / that
+                 :mod (a2 / all))))
+
+# ::id lpp_1943.557 ::date 2012-11-25T17:27:14 ::annotator ISI-AMR-05 ::preferred
+# ::snt And you will see how well I am obeyed .
+# ::zh 你将看到我的命令一定会被服从的。”
+# ::save-date Fri Apr 19, 2013 ::file lpp_1943_557.txt
+(s / see-01
+      :ARG0 (y / you)
+      :ARG1 (o / obey-01
+            :ARG1 (i / i)
+            :manner (w / well
+                  :degree (a / amr-unknown))))
+
+# ::id lpp_1943.608 ::date 2012-11-26T18:28:52 ::annotator ISI-AMR-05 ::preferred
+# ::snt For , to conceited men , all other men are admirers .
+# ::zh 在那些爱虚荣的人眼里，别人都成了他们的崇拜者。
+# ::save-date Tue May 7, 2013 ::file lpp_1943_608.txt
+(o2 / opine-01
+      :ARG0 (m2 / man
+            :mod (c / conceit))
+      :ARG1 (p2 / person
+            :ARG0-of (a3 / admire-01)
+            :domain (m / man
+                  :mod (o / other)
+                  :mod (a / all))))
+
+# ::id lpp_1943.667 ::date 2012-11-08T14:00:38 ::annotator ISI-AMR-05 ::preferred
+# ::snt I have so much to do !
+# ::zh 我的工作很多…
+# ::save-date Fri Apr 26, 2013 ::file lpp_1943_667.txt
+(o / obligate-01
+  :ARG1 (i / i)
+  :ARG2 (d / do-02
+          :ARG1 (m / much
+                  :degree (s / so))))
+
+# ::id lpp_1943.708 ::date 2012-11-09T17:10:17 ::annotator ISI-AMR-05 ::preferred
+# ::snt It is a very different matter .
+# ::zh 这不是一码事。”
+# ::save-date Mon Aug 5, 2013 ::file lpp_1943_708.txt
+(m / matter
+      :ARG1-of (d / differ-02
+            :degree (v / very))
+      :domain (i / it))
+
+# ::id lpp_1943.1387 ::annotator ISI-AMR-05 ::preferred
+# ::snt I had loosened the golden muffler that he always wore .
+# ::zh æˆ‘è§£å¼€äº†ä»–ä¸€ç›´å¸¦ç€çš„é‡‘é»„è‰²çš„å›´è„–ã€‚
+# ::save-date Mon Nov 3, 2014 ::file lpp_1943_1387.txt
+(l / loosen-01
+      :ARG0 (i / i)
+      :ARG1 (m / muffler
+            :consist-of (g / gold)
+            :ARG1-of (w / wear-01
+                  :ARG0 (h / he)
+                  :time (a / always))))
+
+# ::id nw.wsj_0005.2 ::date 2012-04-26T15:06:47 ::annotator ISI-AMR-01 ::preferred
+# ::snt He succeeds Terrence D. Daniels , formerly a W.R. Grace vice chairman , who resigned .
+# ::save-date Fri Sep 13, 2013 ::file nw_wsj_0005_2.txt
+(s / succeed-02
+      :ARG0 (h / he)
+      :ARG1 (p / person :name (t / name :op1 "Terrence" :op2 "D." :op3 "Daniels")
+            :ARG0-of (r / resign-01)
+            :ARG0-of (h2 / have-org-role-91
+                  :ARG1 (c / company :name (w / name :op1 "W.R." :op2 "Grace"))
+                  :ARG2 (c2 / chairman
+                        :mod (v / vice))
+                  :time (f / former))))
+
+# ::id lpp_1943.1366 ::annotator ISI-AMR-05 ::preferred
+# ::snt It is the right day , but this is not the place .
+# ::zh æ—¥å­æ˜¯å¯¹çš„ï¼›ä½†åœ°ç‚¹ä¸æ˜¯è¿™é‡Œâ€¦â€
+# ::save-date Sun Dec 20, 2015 ::file lpp_1943_1366.txt
+(c / contrast-01
+      :ARG1 (d / day
+            :ARG2-of (r / right-06))
+      :ARG2 (p / place :polarity -
+            :domain (t / this)))
+
+# ::id lpp_1943.1368 ::annotator ISI-AMR-05 ::preferred
+# ::snt At no time did I see or hear anyone .
+# ::zh æˆ‘è¿˜æ˜¯çœ‹ä¸åˆ°ï¼Œä¹Ÿå¬ä¸è§ä»»ä½•åˆ«äººã€‚
+# ::save-date Mon Apr 15, 2013 ::file lpp_1943_1368.txt
+(o / or
+      :op1 (s / see-01 :polarity -
+            :ARG0 (i / i)
+            :ARG1 (a / anyone))
+      :op2 (h / hear-01 :polarity -
+            :ARG0 i
+            :ARG1 a)
+      :time (e / ever))
+
+# ::id lpp_1943.1371 ::annotator ISI-AMR-05 ::preferred
+# ::snt You have nothing to do but wait for me there .
+# ::zh ä½ åœ¨é‚£é‡Œç­‰ç€æˆ‘å°±è¡Œäº†ã€‚
+# ::save-date Mon Apr 15, 2013 ::file lpp_1943_1371.txt
+(h2 / have-03
+      :ARG0 (y / you)
+      :ARG1 (n / nothing
+            :ARG1-of (d / do-02
+                  :ARG0 y)
+            :ARG1-of (c / contrast-01
+                  :ARG2 (w2 / wait-01
+                        :ARG1 y
+                        :ARG2 (i / i)
+                        :location (t2 / there)))))
+
+# ::id lpp_1943.1378 ::annotator ISI-AMR-05 ::preferred
+# ::snt I want to get down from the wall .
+# ::zh æˆ‘è¦ä¸‹æ¥äº†ï¼ â€¦â€
+# ::save-date Mon Apr 15, 2013 ::file lpp_1943_1378.txt
+(w / want-01
+      :ARG0 (i / i)
+      :ARG1 (g / get-05
+            :ARG0 i
+            :ARG2 (r / relative-position
+                  :op1 (w2 / wall)
+                  :direction (d / down))))
+
+# ::id lpp_1943.1388 ::annotator ISI-AMR-05 ::preferred
+# ::snt I had moistened his temples , and had given him some water to drink .
+# ::zh æˆ‘ç”¨æ°´æ¸æ¹¿äº†ä»–çš„å¤ªé˜³ç©´ï¼Œè®©ä»–å–äº†ç‚¹æ°´ã€‚
+# ::save-date Sat Dec 29, 2012 ::file lpp_1943_1388.txt
+(a / and
+      :op1 (m / moisten-01
+            :ARG0 (i / i)
+            :ARG1 (t / temple
+                  :poss (h / he)))
+      :op2 (g / give-01
+            :ARG0 i
+            :ARG1 (w / water
+                  :quant (s / some)
+                  :purpose (d / drink-01))
+            :ARG2 h))
+
+# ::id lpp_1943.1394 ::annotator ISI-AMR-05 ::preferred
+# ::snt How do you know about that ?
+# ::zh â€œä½ æ€Žä¹ˆçŸ¥é“çš„ï¼Ÿâ€
+# ::save-date Sat Dec 29, 2012 ::file lpp_1943_1394.txt
+(k / know-01
+      :ARG0 (y / you)
+      :ARG1 (t / that)
+      :manner (a / amr-unknown))
+
+# ::id lpp_1943.1400 ::annotator ISI-AMR-05 ::preferred
+# ::snt His look was very serious , like someone lost far away .
+# ::zh ä»–çš„çœ¼ç¥žå¾ˆä¸¥è‚ƒï¼Œæœ›ç€é¥è¿œçš„åœ°æ–¹ã€‚
+# ::save-date Wed Nov 4, 2015 ::file lpp_1943_1400.txt
+(l / look-01
+      :ARG0 (h / he)
+      :ARG2-of (s / serious-01
+            :degree (v / very))
+      :ARG1-of (r / resemble-01
+            :ARG2 (s2 / someone
+                  :ARG1-of (l2 / lose-02
+                        :direction (a / away
+                              :mod (f / far))))))
+
+# ::id lpp_1943.1445 ::annotator ISI-AMR-05 ::preferred
+# ::snt For some , who are travelers , the stars are guides .
+# ::zh å¯¹æ—…è¡Œçš„äººæ¥è¯´ï¼Œæ˜Ÿæ˜Ÿæ˜¯å‘å¯¼ã€‚
+# ::save-date Sun Dec 30, 2012 ::file lpp_1943_1445.txt
+(g / guide-01
+      :ARG0 (s / star)
+      :ARG1 (s2 / some
+            :ARG0-of (t / travel-01)))
+
+# ::id lpp_1943.1481 ::annotator ISI-AMR-05 ::preferred
+# ::snt That night I did not see him set out on his way .
+# ::zh è¿™å¤©å¤œé‡Œï¼Œæˆ‘æ²¡æœ‰çœ‹åˆ°ä»–èµ·ç¨‹ã€‚
+# ::save-date Tue Mar 1, 2016 ::file lpp_1943_1481.txt
+(s / see-01 :polarity -
+      :ARG0 (i / i)
+      :ARG1 (s2 / set-out-07
+            :ARG0 (h / he)
+            :ARG1 (w / way
+                  :poss h))
+      :time (d / date-entity
+            :dayperiod (n / night)
+            :mod (t / that)))
+
+# ::id lpp_1943.1502 ::annotator ISI-AMR-05 ::preferred
+# ::snt All the stars will be wells with a rusty pulley .
+# ::zh æ‰€æœ‰çš„æ˜Ÿæ˜Ÿéƒ½å°†æ˜¯å¸¦æœ‰ç”Ÿäº†é”ˆçš„è¾˜è½³çš„äº•ã€‚
+# ::save-date Mon Nov 3, 2014 ::file lpp_1943_1502.txt
+(s / star
+      :domain (w / well
+            :ARG0-of (h / have-03
+                  :ARG1 (p / pulley
+                        :mod (r / rust))))
+      :mod (a / all))
+
+# ::id lpp_1943.1510 ::annotator ISI-AMR-05 ::preferred
+# ::snt And he sat down , because he was afraid .
+# ::zh ä»–è¿™æ—¶åä¸‹æ¥ï¼Œå› ä¸ºä»–å®³æ€•äº†ã€‚
+# ::save-date Mon May 13, 2013 ::file lpp_1943_1510.txt
+(a / and
+      :op2 (s / sit-down-02
+            :ARG1 (h / he)
+            :ARG1-of (c / cause-01
+                  :ARG0 (f / fear-01
+                        :ARG0 h))))
+
+# ::id lpp_1943.1515 ::annotator ISI-AMR-05 ::preferred
+# ::snt She has four thorns , of no use at all , to protect herself against all the world .
+# ::zh å¥¹åªæœ‰å››æ ¹å¾®ä¸è¶³é“çš„åˆºï¼Œä¿æŠ¤è‡ªå·±ï¼ŒæŠµæŠ—å¤–æ•Œâ€¦â€
+# ::save-date Tue Apr 23, 2013 ::file lpp_1943_1515.txt
+(h / have-03
+      :ARG0 (s / she)
+      :ARG1 (t / thorn :quant 4
+            :ARG1-of (u / use-01 :polarity -))
+      :purpose (p / protect-01
+            :ARG0 t
+            :ARG1 s
+            :ARG2 (w / world
+                  :mod (a / all))))
+
+# ::id lpp_1943.1291 ::annotator ISI-AMR-05 ::preferred
+# ::snt I did not want him to tire himself with the rope .
+# ::zh æˆ‘ä¸æ„¿è®©ä»–è´¹åŠ²ã€‚
+# ::save-date Sun Dec 2, 2012 ::file lpp_1943_1291.txt
+(w / want-01
+      :ARG0 (i / i)
+      :ARG1 (t / tire-01
+            :ARG0 (h / he)
+            :ARG1 h
+            :instrument (r / rope))
+      :polarity -)
+
+# ::id lpp_1943.1230 ::date 2012-11-15T19:56:42 ::annotator ISI-AMR-05 ::preferred
+# ::snt He has never been either hungry or thirsty .
+# ::zh â€œä»–ä»Žæ¥ä¸çŸ¥é“é¥¥æ¸´ã€‚
+# ::save-date Thu May 9, 2013 ::file lpp_1943_1230.txt
+(a / and
+      :op1 (h / hunger-01
+            :ARG0 (h2 / he)
+            :polarity -)
+      :op2 (t / thirst-01
+            :ARG0 h2
+            :polarity -)
+      :time (e / ever))
+
+# ::id lpp_1943.1234 ::date 2012-11-15T20:20:35 ::annotator ISI-AMR-05 ::preferred
+# ::snt I made a gesture of weariness .
+# ::zh æˆ‘æ˜¾å‡ºåŽŒçƒ¦çš„æ ·å­ï¼š
+# ::save-date Wed Jun 3, 2015 ::file lpp_1943_1234.txt
+(g2 / gesture-01
+      :ARG0 (i / i)
+      :ARG1 (w / weary-01
+            :ARG1 i))
+
+# ::id lpp_1943.1267 ::date 2013-04-20T20:54:32 ::annotator ISI-AMR-05 ::preferred
+# ::snt I felt deeply moved , and stirred .
+# ::zh æˆ‘å¾ˆæ¿€åŠ¨ã€‚
+# ::save-date Sun Jul 26, 2015 ::file lpp_1943_1267.txt
+(f / feel-01
+      :ARG0 (i / i)
+      :ARG1 (a / and
+            :op1 (m / move-05
+                  :ARG1 i
+                  :ARG1-of (d / deep-02))
+            :op2 (s / stir-02
+                  :ARG1 i)))
+
+# ::id lpp_1943.1209 ::date 2012-11-27T12:54:54 ::annotator ISI-AMR-05 ::preferred
+# ::snt This was a merchant who sold pills that had been invented to quench thirst .
+# ::zh è¿™æ˜¯ä¸€ä½è´©å–èƒ½å¤Ÿæ­¢æ¸´çš„ç²¾åˆ¶è¯ä¸¸çš„å•†äººã€‚
+# ::save-date Fri May 10, 2013 ::file lpp_1943_1209.txt
+(p / person
+      :ARG0-of (s / sell-01
+            :ARG1 (p2 / pill
+                  :ARG1-of (i / invent-01
+                        :purpose (q / quench-01
+                              :ARG1 (t / thirst-01)))))
+     :ARG0-of (m / merchandise-01)
+     :domain (t2 / this))
+
+# ::id lpp_1943.105 ::date 2012-07-31T07:42:19 ::annotator ISI-AMR-05 ::preferred
+# ::snt The little prince , who asked me so many questions , never seemed to hear the ones I asked him .
+# ::zh å°çŽ‹å­å‘æˆ‘æå‡ºäº†å¾ˆå¤šé—®é¢˜ï¼Œå¯æ˜¯ï¼Œå¯¹æˆ‘æå‡ºçš„é—®é¢˜ï¼Œä»–å¥½è±¡åŽ‹æ ¹æ²¡æœ‰å¬è§ä¼¼çš„ã€‚
+# ::save-date Wed Apr 8, 2015 ::file lpp_1943_105.txt
+(s / seem-01
+      :ARG1 (h / hear-01 :polarity -
+            :ARG0 (p / prince
+                  :mod (l / little)
+                  :ARG0-of (a / ask-01
+                        :ARG2 (i / i)
+                        :ARG1 (q / question
+                              :quant (m / many
+                                    :degree (s2 / so)))))
+            :ARG1 (o / one
+                  :ARG1-of (a2 / ask-01
+                        :ARG0 i
+                        :ARG2 p))
+            :time (e2 / ever)))
+
+# ::id lpp_1943.275 ::date 2012-11-14T11:00:13 ::annotator ISI-AMR-05 ::preferred
+# ::snt At first you seemed to be very much surprised .
+# ::zh å¼€å§‹ï¼Œä½ æ˜¾å¾—å¾ˆæƒŠå¥‡çš„æ ·å­ï¼Œ
+# ::save-date Wed Aug 7, 2013 ::file lpp_1943_275.txt
+(s / seem-01
+      :ARG1 (s2 / surprise-01
+            :ARG1 (y / you)
+            :degree (m / much
+                  :degree (v / very)))
+      :time (a / at-first))
+
+# ::id lpp_1943.470 ::date 2012-11-11T17:09:27 ::annotator ISI-AMR-05 ::preferred
+# ::snt It seems that they are very beautiful .
+# ::zh æ®è¯´è¿™æ˜¯å¾ˆç¾Žçš„ã€‚
+# ::save-date Sat Jul 25, 2015 ::file lpp_1943_470.txt
+(s / seem-01
+      :ARG1 (b / beautiful-02
+            :ARG1 (t2 / they)
+            :degree (v2 / very)))
+
+# ::id lpp_1943.478 ::date 2012-11-11T18:01:54 ::annotator ISI-AMR-05 ::preferred
+# ::snt For she did not want him to see her crying .
+# ::zh å¥¹æ˜¯æ€•å°çŽ‹å­çœ‹è§å¥¹åœ¨å“­ã€‚
+# ::save-date Wed Apr 10, 2013 ::file lpp_1943_478.txt
+(w / want-01 :polarity -
+      :ARG0 (s / she)
+      :ARG1 (s2 / see-01
+            :ARG0 (h / he)
+            :ARG1 (c / cry-02
+                  :ARG0 s)))
+
+# ::id lpp_1943.820 ::date 2012-11-14T18:11:13 ::annotator ISI-AMR-05 ::preferred
+# ::snt Perhaps that is because he is thinking of something else besides himself .
+# ::zh è¿™å¯èƒ½æ˜¯å› ä¸ºä»–æ‰€å…³å¿ƒçš„æ˜¯åˆ«çš„äº‹ï¼Œè€Œä¸æ˜¯ä»–è‡ªå·±ã€‚â€
+# ::save-date Mon Sep 22, 2014 ::file lpp_1943_820.txt
+(p / possible-01
+      :ARG1 (c / cause-01
+            :ARG0 (t / think-01
+                  :ARG0 (h / he)
+                  :ARG2 (s / something
+                        :mod (e / else)
+                        :ARG1-of (d / differ-02
+                              :ARG2 h)))))
+
+# ::id lpp_1943.834 ::date 2012-11-15T06:20:55 ::annotator ISI-AMR-05 ::preferred
+# ::snt What are you doing ?
+# ::zh ä½ åœ¨è¿™é‡Œå¹²ä»€ä¹ˆï¼Ÿâ€
+# ::save-date Tue Apr 16, 2013 ::file lpp_1943_834.txt
+(d2 / do-02
+      :ARG0 (y / you)
+      :ARG1 (a / amr-unknown))
+
+# ::id lpp_1943.30 ::date 2012-07-24T08:57:30 ::annotator ISI-AMR-05 ::preferred
+# ::snt I would try to find out , so , if this was a person of true understanding .
+# ::zh æˆ‘æƒ³çŸ¥é“ä»–æ˜¯å¦çœŸçš„æœ‰ç†è§£èƒ½åŠ›ã€‚
+# ::save-date Thu Feb 4, 2016 ::file lpp_1943_30.txt
+(t / try-01
+      :ARG0 (i / i)
+      :ARG1 (f / find-out-03
+            :ARG0 i
+            :ARG1 (u2 / understand-01 :mode interrogative
+                  :ARG0 (p / person
+                        :mod (t2 / this))
+                  :ARG1-of (t3 / true-01))))
+
+# ::id lpp_1943.195 ::date 2012-08-07T10:20:58 ::annotator ISI-AMR-05 ::preferred
+# ::snt I shall certainly try to make my portraits as true to life as possible .
+# ::zh å½“ç„¶ï¼Œæˆ‘ä¸€å®šè¦æŠŠè¿™äº›ç”»å°½é‡åœ°ç”»å¾—é€¼çœŸï¼Œ
+# ::save-date Sun Apr 12, 2015 ::file lpp_1943_195.txt
+(t / try-01
+      :ARG0 (i / i)
+      :ARG1 (m / make-02
+            :ARG0 i
+            :ARG1 (t2 / true-02
+                  :ARG1 (p / portrait
+                        :poss i)
+                  :ARG2 (l / life)
+                  :degree (m2 / most)
+                  :compared-to (p2 / possible-01)))
+      :mod (c / certain))
+
+# ::id lpp_1943.94 ::date 2012-07-31T06:59:45 ::annotator ISI-AMR-05 ::preferred
+# ::snt Do you think that this sheep will have to have a great deal of grass ?
+# ::zh ä½ è¯´è¿™åªç¾Šéœ€è¦å¾ˆå¤šè‰å—ï¼Ÿâ€
+# ::save-date Mon Apr 15, 2013 ::file lpp_1943_94.txt
+(t / think-01
+      :ARG0 (y / you)
+      :ARG1 (o / obligate-01
+            :ARG1 s
+            :ARG2 (h / have-03
+                  :ARG0 (s / sheep
+                        :mod (t2 / this))
+                  :ARG1 (g / grass
+                        :quant (d / deal
+                              :mod (g2 / great)))))
+      :mode interrogative)
+
+# ::id lpp_1943.165 ::date 2012-07-31T12:53:52 ::annotator ISI-AMR-05 ::preferred
+# ::snt Does he collect butterflies ?
+# ::zh ä»–æ˜¯å¦æ”¶é›†è´è¶æ ‡æœ¬å‘€ï¼Ÿâ€
+# ::save-date Tue Jul 31, 2012 ::file lpp_1943_165.txt
+(c / collect-01
+      :ARG0 (h / he)
+      :ARG1 (b / butterfly)
+      :mode interrogative)
+
+# ::id nw.wsj_0003.29 ::date 2012-05-26T21:50:24 ::annotator ISI-AMR-01 ::preferred
+# ::snt But you have to recognize that these events took place 35 years ago .
+# ::save-date Tue Sep 24, 2013 ::file nw_wsj_0003_29.txt
+(c / contrast-01
+      :ARG2 (o / obligate-01
+            :ARG1 (y / you)
+            :ARG2 (r / recognize-02
+                  :ARG0 y
+                  :ARG1 (b / be-temporally-at-91
+                        :ARG1 (e / event
+                              :mod (t / this))
+                        :ARG2 (b2 / before
+                              :op1 (n / now)
+                              :quant (t2 / temporal-quantity :quant 35
+                                    :unit (y2 / year)))))))
+
+# ::id nw.wsj_0008.1 ::date 2012-04-26T15:45:26 ::annotator ISI-AMR-01 ::preferred
+# ::snt The federal government suspended sales of U.S. savings bonds because Congress has n't lifted the ceiling on government debt .
+# ::save-date Fri Jun 15, 2012 ::file nw_wsj_0008_1.txt
+(s / suspend-01
+  :ARG0 (g4 / government-organization
+          :ARG0-of (g / govern-01)
+          :mod (f / federal))
+  :ARG1 (s2 / sell-01
+          :ARG1 (b / bond
+                  :mod (s3 / savings)
+                  :mod (c3 / country
+                         :name (n / name
+                                 :op1 "U.S."))))
+  :ARG1-of (c / cause-01
+             :ARG0 (l / lift-01
+                     :ARG0 (g3 / government-organization
+                             :name (n2 / name
+                                     :op1 "Congress"))
+                     :ARG1 (c4 / ceiling
+                             :prep-on (d / debt
+                                        :mod (g5 / government-organization
+                                               :ARG0-of (g2 / govern-01))))
+                     :polarity -)))
+
+# ::id nw.wsj_0010.4 ::date 2012-05-13T20:21:56 ::annotator ISI-AMR-01 ::preferred
+# ::snt And the city decided to treat its guests more like royalty or rock stars than factory owners .
+# ::save-date Sun May 13, 2012 ::file nw_wsj_0010_4.txt
+(a / and
+  :op2 (d / decide-01
+         :ARG0 (c / city)
+         :ARG1 (t / treat-01
+                 :ARG0 c
+                 :ARG1 (g / guest
+                         :poss c)
+                 :ARG2 (o / or
+                         :op1 (r / royalty)
+                         :op2 (s / star
+                                :mod (r2 / rock))
+                         :degree (m / more)
+                         :compared-to (p / person
+                                        :ARG0-of (o2 / own-01
+                                                   :ARG1 (f / factory)))))))
+
+# ::id nw.wsj_0010.13 ::date 2012-05-15T09:00:23 ::annotator ISI-AMR-01 ::preferred
+# ::snt After the race , Fortune 500 executives drooled like schoolboys over the cars and drivers .
+# ::save-date Mon Sep 23, 2013 ::file nw_wsj_0010_13.txt
+(d / drool-02
+      :ARG0 (p2 / person
+            :ARG0-of (h / have-org-role-91
+                  :ARG1 (c2 / company
+                        :mod (t / thing :name (n / name :op1 "Fortune" :op2 "500")))
+                  :ARG2 (e / executive)))
+      :ARG1 (a / and
+            :op1 (c / car)
+            :op2 (p / person
+                  :ARG0-of (d2 / drive-01)))
+      :time (a2 / after
+            :op1 (r / race-02))
+      :ARG1-of (r3 / resemble-01
+            :ARG2 (d3 / drool-02
+                  :ARG0 (s2 / schoolboy))))
+
+# ::id wb.eng_0003.5 ::date 2012-08-27T11:30:38 ::annotator ISI-AMR-01 ::preferred
+# ::snt Already it is changing development patterns for the worse and causing localized traffic congestion around its exits .
+# ::save-date Mon Sep 10, 2012 ::file wb_eng_0003_5.txt
+(a / and
+  :op1 (c / change-01
+         :ARG0 (i / it)
+         :ARG1 (p / pattern
+                 :mod (d / develop-02))
+         :ARG2 (b / bad
+                 :degree (m / more)))
+  :op2 (c2 / cause-01
+         :ARG0 i
+         :ARG1 (c3 / congest-01
+                 :ARG1 (a2 / around
+                         :op1 (e / exit
+                                :poss i))
+                 :ARG2 (t / traffic)
+                 :ARG1-of (l2 / localize-01)))
+  :time (a3 / already))
+
+# ::id wb.eng_0003.13 ::date 2012-09-14T14:13:20 ::annotator ISI-AMR-01 ::preferred
+# ::snt Where 's Homer Simpson when you need him ?
+# ::save-date Sun Sep 16, 2012 ::file wb_eng_0003_13.txt
+(b / be-located-at-91
+      :ARG1 (p / person :name (h / name :op1 "Homer" :op2 "Simpson"))
+      :ARG2 (a / amr-unknown)
+      :time (n / need-01
+            :ARG0 (y / you)
+            :ARG1 p))
+
+# ::id wb.eng_0003.60 ::date 2012-10-17T07:13:49 ::annotator ISI-AMR-01 ::preferred
+# ::snt If we recognize that roads primarily benefit businesses then we should do two things :
+# ::save-date Wed Oct 24, 2012 ::file wb_eng_0003_60.txt
+(r2 / recommend-01
+  :ARG1 (d / do-02
+          :ARG0 w
+          :ARG1 (t / thing
+                  :quant 2))
+  :condition (r / recognize-02
+               :ARG0 (w / we)
+               :ARG1 (b / benefit-01
+                       :ARG0 (r3 / road)
+                       :ARG1 (b2 / business)
+                       :mod (p / primary))))
+
+# ::id wb.eng_0003.62 ::date 2012-10-17T07:25:25 ::annotator ISI-AMR-01 ::preferred
+# ::snt Why is it so hard to understand ?
+# ::save-date Wed Oct 17, 2012 ::file wb_eng_0003_62.txt
+(h / hard
+  :domain (u / understand-01
+            :ARG1 (i / it))
+  :ARG1-of (c / cause-01
+             :ARG0 (a / amr-unknown)))
+
+# ::id wb.eng_0003.52 ::date 2012-09-28T09:33:32 ::annotator ISI-AMR-01 ::preferred
+# ::snt You all are dead wrong .
+# ::save-date Mon Oct 15, 2012 ::file wb_eng_0003_52.txt
+(w / wrong-41
+  :ARG1 (y / y'all)
+  :degree (d / dead))
+
+# ::id sdl_0002.22 ::date 2013-07-11T02:11:13 ::annotator SDL-AMR-09 ::preferred
+# ::snt Audit cadres must require themselves to adhere to the standards they apply when auditing others .
+# ::save-date Thu Jul 11, 2013 ::file sdl_0002_22.txt
+(o2 / obligate-01
+      :ARG2 (r / require-01
+            :ARG0 (c / cadre
+                  :ARG0-of (a / audit-01))
+            :ARG1 (a2 / adhere-02
+                  :ARG0 c
+                  :ARG1 (s / standard
+                        :ARG1-of (a3 / apply-02
+                              :ARG0 c
+                              :ARG2 (a4 / audit-01
+                                    :ARG0 c
+                                    :ARG1 (o / other)))))
+            :ARG2 c))
+
+# ::id sdl_0002.25 ::date 2013-07-11T02:43:30 ::annotator SDL-AMR-09 ::preferred
+# ::snt Do prosecuting authorities dare to be prosecuted ?
+# ::save-date Thu Jul 11, 2013 ::file sdl_0002_25.txt
+(d / dare-01 :mode interrogative
+      :ARG0 (a / authority
+            :ARG0-of (p2 / prosecute-01))
+      :ARG1 (p / prosecute-01
+            :ARG1 a))
+
+# ::id sdl_0002.32 ::date 2013-07-11T04:10:57 ::annotator SDL-AMR-09 ::preferred
+# ::snt He made people realize the strength of gratitude and touching nature of reciprocation .
+# ::save-date Thu Jul 11, 2013 ::file sdl_0002_32.txt
+(m / make-02
+      :ARG0 (h / he)
+      :ARG1 (r / realize-01
+            :ARG0 p
+            :ARG1 (a / and
+                  :op1 (s / strength
+                        :mod (g / gratitude))
+                  :op2 (n / nature
+                        :mod (t / touch-01)
+                        :mod (r2 / reciprocate-00))))
+      :beneficiary (p / person))
+
+# ::id sdl_0002.65 ::date 2013-07-10T09:19:15 ::annotator SDL-AMR-09 ::preferred
+# ::snt He just emailed that friend to ask him how much it cost .
+# ::save-date Wed Jul 10, 2013 ::file sdl_0002_65.txt
+(e / email-01
+      :ARG0 (h / he)
+      :ARG1 (a / ask-01
+            :ARG0 h
+            :ARG1 (c / cost-01
+                  :ARG1 (i / it)
+                  :ARG2 (a2 / amr-unknown))
+            :ARG2 f)
+      :ARG2 (f / friend
+            :mod (t / that))
+      :time (j / just))
+
+# ::id sdl_0002.97 ::date 2013-07-09T14:27:43 ::annotator SDL-AMR-09 ::preferred
+# ::snt Currently a group of Australian physicists are accelerating their work to realize everybody 's wish .
+# ::save-date Tue Jul 9, 2013 ::file sdl_0002_97.txt
+(a / accelerate-01
+      :ARG0 (g / group-01
+            :ARG1 (p / physicist
+                  :mod (c / country :name (n / name :op1 "Australia"))))
+      :ARG1 (w / work-01
+            :ARG0 p)
+      :time (c2 / current)
+      :purpose (r / realize-02
+            :ARG0 p
+            :ARG1 (w2 / wish-01
+                  :ARG0 (e / everybody))))
+
+# ::id sdl_0003.64 ::date 2013-07-10T01:45:58 ::annotator SDL-AMR-09 ::preferred
+# ::snt It was not possible to confirm the credibility of this statement from an independent source .
+# ::save-date Wed Jul 10, 2013 ::file sdl_0003_64.txt
+(p / possible :polarity -
+      :domain (c / confirm-01
+            :ARG0 (s2 / source
+                  :ARG0-of (d / depend-01 :polarity -))
+            :ARG1 (c2 / credibility
+                  :domain (t / thing
+                        :ARG1-of (s / state-01)
+                        :mod (t2 / this)))))
+
+# ::id sdl_0002.88 ::date 2013-07-09T13:24:41 ::annotator SDL-AMR-09 ::preferred
+# ::snt Do they still have time to wait for us to succeed ?
+# ::save-date Wed Jul 10, 2013 ::file sdl_0002_88.txt
+(h / have-03 :mode interrogative
+      :ARG0 (t / they)
+      :ARG1 (t2 / time)
+      :mod (s / still)
+      :purpose (w / wait-01
+            :ARG1 t
+            :ARG2 (s2 / succeed-01
+                  :ARG0 (w2 / we))))
+
+# ::id bolt12_10489_6271.5 ::date 2012-12-09T19:08:12 ::annotator SDL-AMR-09 ::preferred
+# ::snt I actually had some other classmates there, and was going to call them.
+# ::save-date Fri Nov 8, 2013 ::file bolt12_10489_6271_5.txt
+(a / and
+      :op1 (h / have-03
+            :ARG0 (i / i)
+            :ARG1 (c2 / classmate
+                  :quant (s / some)
+                  :mod (o / other)
+                  :location (t / there))
+            :mod (a2 / actual))
+      :op2 (c / call-02
+            :ARG0 i
+            :ARG1 c2))
+
+# ::id bolt12_10489_6271.8 ::date 2012-12-09T19:31:50 ::annotator SDL-AMR-09 ::preferred
+# ::snt I had a look at my call register, and out of dozens of calls dialed only one was properly connected!
+# ::save-date Fri Nov 8, 2013 ::file bolt12_10489_6271_8.txt
+(a / and
+      :op1 (l / look-01
+            :ARG0 (i / i)
+            :ARG1 (r / register-02
+                  :ARG1 (c2 / call-02
+                        :ARG0 i)))
+      :op2 (c / connect-01
+            :ARG1 (c3 / call-02
+                  :quant (o / only :op1 1)
+                  :ARG1-of (i2 / include-91
+                        :ARG2 (c4 / call-02
+                              :quant (m / multiple :op1 12)
+                              :ARG1-of (d3 / dial-01))))
+            :manner (p / proper)))
+
+# ::id bolt12_10510_8171.4 ::date 2012-12-14T20:12:18 ::annotator SDL-AMR-09 ::preferred
+# ::snt We all saw the damage wreaked by the Wenchuan Earthquake.
+# ::save-date Wed Nov 6, 2013 ::file bolt12_10510_8171_4.txt
+(s / see-01
+      :ARG0 (w / we
+            :quant (a / all))
+      :ARG1 (d / damage-01
+            :ARG0 e
+            :ARG1-of (w2 / wreak-01
+                  :ARG0 (e / earthquake
+                        :name (n / name
+                              :op1 "Wenchuan"
+                              :op2 "Earthquake")))))
+
+# ::id bolt12_10510_8171.10 ::date 2012-12-15T06:45:01 ::annotator SDL-AMR-09 ::preferred
+# ::snt Once a powerful earthquake strikes, the people's lives really do become as tiny as those of ants.
+# ::save-date Thu Nov 7, 2013 ::file bolt12_10510_8171_10.txt
+(b / become-01
+      :ARG1 (t2 / tiny
+            :domain (l / life
+                  :poss (p / person))
+            :ARG1-of (r2 / resemble-01
+                  :ARG2 (t4 / tiny
+                        :domain (l2 / life
+                              :poss (a / ant)))))
+      :time (s / strike-01
+            :ARG0 (e4 / earthquake
+                  :mod (p2 / powerful)))
+      :mod (r / really))
+
+# ::id bolt12_10510_8841.6 ::date 2012-12-16T09:01:52 ::annotator SDL-AMR-09 ::preferred
+# ::snt I pray to the God to open his eyes and don't let disasters visit the Chinese land again!
+# ::save-date Mon Nov 4, 2013 ::file bolt12_10510_8841_6.txt
+(p / pray-01
+      :ARG0 (i / i)
+      :ARG1 (a / and
+            :op1 (o / open-01
+                  :ARG0 p2
+                  :ARG1 (e / eye
+                        :part-of p2))
+            :op2 (l / let-01 :polarity -
+                  :ARG0 p2
+                  :ARG1 (v / visit-01
+                        :ARG0 (d / disaster)
+                        :ARG1 (l2 / land
+                              :poss (c / country :name (n2 / name :op1 "China")))
+                        :mod (a2 / again))))
+      :ARG2 (p2 / person :name (n / name :op1 "God")))
+
+# ::id bolt12_10510_9313.8 ::date 2012-12-17T06:37:56 ::annotator SDL-AMR-09 ::preferred
+# ::snt The aim was to settle disputes, stop fights and stabilize the society.
+# ::save-date Mon Nov 11, 2013 ::file bolt12_10510_9313_8.txt
+(a2 / aim-01
+      :ARG1 (a / and
+            :op1 (s / settle-02
+                  :ARG1 (d / dispute-01))
+            :op2 (s2 / stop-01
+                  :ARG1 (f / fight-01))
+            :op3 (s3 / stabilize-01
+                  :ARG1 (s4 / society))))
+
+# ::id bolt12_10510_9796.1 ::date 2012-12-18T08:04:14 ::annotator SDL-AMR-09 ::preferred
+# ::snt Humans can manufacture tanks that are much more powerful than ants, but humans cannot manufacture a living ant...
+# ::save-date Thu Nov 28, 2013 ::file bolt12_10510_9796_1.txt
+(c / contrast-01
+      :ARG1 (p / possible
+            :domain (m / manufacture-01
+                  :ARG0 (h / human)
+                  :ARG1 (t / tank
+                        :mod (p3 / powerful
+                              :degree (m2 / more
+                                    :mod (m3 / much))
+                              :compared-to (a / ant)))))
+      :ARG2 (p2 / possible :polarity -
+            :domain (m4 / manufacture-01
+                  :ARG0 h
+                  :ARG1 (a2 / ant
+                        :ARG0-of (l / live-01)))))
+
+# ::id bolt12_10510_9811.5 ::date 2012-12-18T09:22:53 ::annotator SDL-AMR-09 ::preferred
+# ::snt A defeated general can't claim to be brave.
+# ::save-date Tue Nov 5, 2013 ::file bolt12_10510_9811_5.txt
+(p / possible :polarity -
+      :domain (c / claim-01
+            :ARG0 (p2 / person
+                  :ARG1-of (d / defeat-01)
+                  :ARG0-of (h / have-org-role-91
+                        :ARG2 (g / general)))
+            :ARG1 (b / brave
+                  :domain p2)))
+
+# ::id bolt12_10510_9873.3 ::date 2012-12-18T10:28:47 ::annotator SDL-AMR-09 ::preferred
+# ::snt Are you afraid of going to Hell when you die?
+# ::save-date Tue Dec 18, 2012 ::file bolt12_10510_9873_3.txt
+(f / fear-01 :mode interrogative
+      :ARG0 (y / you)
+      :ARG1 (g / go-01
+            :ARG1 y
+            :ARG4 (h / hell)
+            :time (d / die-01
+                  :ARG1 y)))
+
+# ::id bolt12_10510_9873.10 ::date 2012-12-19T18:14:11 ::annotator SDL-AMR-09 ::preferred
+# ::snt How did they set it up?
+# ::save-date Wed Dec 19, 2012 ::file bolt12_10510_9873_10.txt
+(s / set-03
+      :ARG0 (t / they)
+      :ARG1 (i / it)
+      :manner (a / amr-unknown))
+
+# ::id bolt12_10511_2816.7 ::date 2012-12-20T11:36:25 ::annotator SDL-AMR-09 ::preferred
+# ::snt Strike-type earthquakes have various types of precursory signs, which are widespread, long-lasting, and quite variable.
+# ::save-date Tue Nov 5, 2013 ::file bolt12_10511_2816_7.txt
+(h / have-03
+      :ARG0 (e / earthquake
+            :mod (t / type
+                  :mod (s / strike-01)))
+      :ARG1 (s2 / sign
+            :ARG0-of (p / precede-01)
+            :mod (t2 / type
+                  :mod (v / various))
+            :ARG1-of (s3 / spread-02
+                  :extent (w / wide))
+            :ARG1-of (l / last-01
+                  :ARG2 (l2 / long))
+            :ARG1-of (v2 / vary-01
+                  :ARG2 (q / quite))))
+
+# ::id bolt12_10511_2851.8 ::date 2012-12-22T10:17:42 ::annotator SDL-AMR-09 ::preferred
+# ::snt Natural disasters cannot be predicted, but the school buildings should not have collapsed.
+# ::save-date Tue Nov 5, 2013 ::file bolt12_10511_2851_8.txt
+(c / contrast-01
+      :ARG1 (p / possible :polarity -
+            :domain (p2 / predict-01
+                  :ARG1 (d / disaster
+                        :mod (n / natural))))
+      :ARG2 (r / recommend-01
+            :ARG1 (c2 / collapse-01 :polarity -
+                  :ARG1 (b / building
+                        :mod (s / school)))))
+
+# ::id bolt12_10511_3031.5 ::date 2012-12-22T17:28:25 ::annotator SDL-AMR-09 ::preferred
+# ::snt Due to formal working units no longer taking on young employees, working units got increasingly older and broken up.
+# ::save-date Wed Nov 6, 2013 ::file bolt12_10511_3031_5.txt
+(g / get-03
+      :ARG1 (u / unit
+            :ARG0-of (w / work-01))
+      :ARG2 (a / and
+            :op1 (o / old
+                  :degree (m / more))
+            :op2 (b / break-08
+                  :ARG1 u)
+            :manner (i / increase-01))
+      :ARG1-of (c / cause-01
+            :ARG0 (t / take-09
+                  :ARG0 (u2 / unit
+                        :ARG0-of (w2 / work-01)
+                        :mod (f / formal))
+                  :ARG1 (p / person
+                        :ARG1-of (e / employ-01)
+                        :mod (y / young))
+                  :time (n / no-longer))))
+
+# ::id bolt12_2981_0166.1 ::date 2012-12-09T16:01:31 ::annotator SDL-AMR-09 ::preferred
+# ::snt Faced with rascals and hooligans like the Americans, the Chinese have no choice but to arm themselves.
+# ::save-date Thu Nov 21, 2013 ::file bolt12_2981_0166_1.txt
+(o / obligate-01
+      :ARG1 (p / person
+            :mod (c / country :name (n / name :op1 "China")))
+      :ARG2 (a / arm-01
+            :ARG0 p
+            :ARG1 p)
+      :ARG1-of (c3 / cause-01
+            :ARG0 (f / face-01
+                  :ARG0 (a2 / and
+                        :op1 (r / rascal)
+                        :op2 (h2 / hooligan)
+                        :example (p2 / person
+                              :mod (c4 / country :name (n2 / name :op1 "America"))))
+                  :ARG1 p)))
+
+# ::id bolt12_3988_7641.18 ::date 2012-11-28T13:41:26 ::annotator SDL-AMR-09 ::preferred
+# ::snt On the one hand, it helps the government to reduce and narrow the gap of wealth;
+# ::save-date Sun Nov 17, 2013 ::file bolt12_3988_7641_18.txt
+(c / contrast-01
+      :ARG1 (h / help-01
+            :ARG0 (i / it)
+            :ARG1 (a / and
+                  :op1 (r / reduce-01
+                        :ARG0 g
+                        :ARG1 (g3 / gap
+                              :mod (w / wealth)))
+                  :op2 (n / narrow-01
+                        :ARG0 g
+                        :ARG1 g3))
+            :ARG2 (g / government-organization
+                  :ARG0-of (g2 / govern-01))))
+
+# ::id bolt12_3991_0111.29 ::date 2012-12-19T18:15:09 ::annotator SDL-AMR-09 ::preferred
+# ::snt If the upper beams are correctly placed, the lower beams will not go awry.
+# ::save-date Mon Nov 25, 2013 ::file bolt12_3991_0111_29.txt
+(g / go-01 :polarity -
+      :ARG1 (b / beam
+            :mod (l / low
+                  :degree (m / more)))
+      :ARG4 (a / awry)
+      :condition (p / place-01
+            :ARG1 (b2 / beam
+                  :mod (u / up
+                      :degree (m2 / more)))
+            :manner (c / correct)))
+
+# ::id bolt12_4474_0751.12 ::date 2012-12-06T11:11:04 ::annotator SDL-AMR-09 ::preferred
+# ::snt Meanwhile, the crowded highways and complicated road traffic cause people to have greater expectations in the development of the subway.
+# ::save-date Thu Nov 14, 2013 ::file bolt12_4474_0751_12.txt
+(c / cause-01
+      :ARG0 (a / and
+            :op1 (h / highway
+                  :ARG1-of (c2 / crowd-01))
+            :op2 (t / traffic
+                  :mod (r / road)
+                  :ARG1-of (c3 / complicate-01)))
+      :ARG1 (e / expect-01
+            :ARG0 (p / person)
+            :ARG1 (t2 / thing
+                  :mod (g / great
+                        :degree (m / more)))
+            :topic (d / develop-02
+                  :ARG1 (s / subway)))
+      :time (m2 / meanwhile))
+
+# ::id edinburgh_1003.1 ::date 2016-05-25T12:26:05
+# ::snt that's a terribly small horse for you to ride .
+# ::save-date Wed May 25, 2016 ::user nathans ::file edinburgh_1003_1.txt
+(s / small
+      :degree (t / terribly)
+      :domain (h / horse
+            :mod (t2 / that))
+      :beneficiary (r / ride-01
+            :ARG0 (y / you)
+            :ARG1 h))
+
+# ::id edinburgh_1003.2 ::date 2016-05-25T12:31:26
+# ::snt why don't you look at some of the toys in the basket .
+# ::save-date Sat Jun 4, 2016 ::user nathans ::file edinburgh_1003_2.txt
+(r / recommend-01
+      :ARG1 (l / look-01
+            :ARG0 y
+            :ARG1 (t / toy
+                  :mod (s / some)
+                  :location (b / basket)))
+      :ARG2 (y / you))
+
+# ::id edinburgh_1003.3 ::date 2016-05-25T12:38:21
+# ::snt does he walk like you or does he go hop hop hop ?
+# ::save-date Wed May 25, 2016 ::user nathans ::file edinburgh_1003_3.txt
+(m / multiple-choice-91
+      :ARG1 (w / walk-01
+            :ARG0 (h / he)
+            :ARG1-of (r / resemble-01
+                  :ARG2 (w2 / walk-01
+                        :ARG0 (y / you))))
+      :ARG2 (g / go-05
+            :ARG0 h
+            :ARG1 (h2 / hop-01 :mode expressive)))
+
+# ::id edinburgh_1003.4 ::date 2016-05-25T12:46:23
+# ::snt if you look out the other window maybe you'll see it .
+# ::save-date Wed May 25, 2016 ::user nathans ::file edinburgh_1003_4.txt
+(p / possible-01
+      :ARG1 (s / see-01
+            :ARG0 (y / you)
+            :ARG1 (i / it))
+      :condition (l / look-01
+            :ARG0 y
+            :direction (o / out
+                  :op1 (w / window
+                        :mod (o2 / other)))))
+
+# ::id edinburgh_1003.5 ::date 2016-05-25T12:54:24
+# ::snt I think that one's too large to go in the window .
+# ::save-date Sat Jun 4, 2016 ::user nathans ::file edinburgh_1003_5.txt
+(t / think-01
+      :ARG0 (i / i)
+      :ARG1 (h / have-degree-91
+            :ARG1 (l / large)
+            :ARG2 (o / one
+                  :mod (t2 / that))
+            :ARG3 (t3 / too)
+            :ARG5 (g / go-01
+                  :ARG1 o
+                  :ARG4 (w / window))))
+
+# ::id edinburgh_1003.6 ::date 2016-05-25T13:01:10
+# ::snt not the kind you hit but the kind you kick .
+# ::save-date Sat Jun 4, 2016 ::user nathans ::file edinburgh_1003_6.txt
+(i2 / instead-of-91
+      :ARG1 (k / kind-yy
+            :ARG1-of (k2 / kick-01
+                  :ARG0 (p / person)))
+      :ARG2 (k3 / kind-yy
+            :ARG1-of (h / hit-01
+                  :ARG0 (p2 / person))))
+
+# ::id edinburgh_1003.7 ::date 2016-05-25T13:04:51
+# ::snt why don't you take that over and show it to him .
+# ::save-date Wed May 25, 2016 ::user nathans ::file edinburgh_1003_7.txt
+(r / recommend-01
+      :ARG1 (a / and
+            :op1 (t / take-01
+                  :ARG0 (y / you)
+                  :ARG1 (t2 / that)
+                  :direction (o / over))
+            :op2 (s / show-01
+                  :ARG0 y
+                  :ARG1 t2
+                  :ARG2 (h / he))))
+
+# ::id edinburgh_1003.8 ::date 2016-05-25T13:09:12
+# ::snt I guess Cliffy looks at Bozo at her house .
+# ::save-date Wed May 25, 2016 ::user nathans ::file edinburgh_1003_8.txt
+(g / guess-01
+      :ARG0 (i / i)
+      :ARG1 (l / look-01
+            :ARG0 (p / person :name (n / name :op1 "Cliffy"))
+            :ARG1 (p2 / person :name (n2 / name :op1 "Bozo"))
+            :location (h / house
+                  :poss p2)))
+
+# ::id edinburgh_1003.9 ::date 2016-05-25T13:10:57
+# ::snt you don't have anything else to put in the box do you ?
+# ::save-date Sat Jun 4, 2016 ::user nathans ::file edinburgh_1003_9.txt
+(h / have-03 :polarity -
+      :ARG0 (y / you)
+      :ARG1 (a / anything
+            :mod (e / else)
+            :purpose (p / put-01
+                  :ARG1 a
+                  :ARG2 (b / box)))
+      :ARG1-of (r / request-confirmation-91))
+
+# ::id edinburgh_1003.10 ::date 2016-05-25T14:04:59
+# ::snt why don't you come over here and play with the ball ?
+# ::save-date Wed May 25, 2016 ::user nathans ::file edinburgh_1003_10.txt
+(r / recommend-01
+      :ARG1 (a / and
+            :op1 (c / come-01
+                  :ARG1 y
+                  :ARG4 (h / here)
+                  :direction (o / over))
+            :op2 (p / play-01
+                  :ARG2 (b / ball)))
+      :ARG2 (y / you))
+
+# ::id sdl_0002.59 ::date 2013-07-10T04:44:46 ::annotator SDL-AMR-09 ::preferred
+# ::snt I can work on my current research topic .
+# ::save-date Thu Jul 11, 2013 ::file sdl_0002_59.txt
+(p / possible
+      :domain (w / work-01
+            :ARG0 (i / i)
+            :ARG1 (t / topic
+                  :mod (r / research-01
+                        :ARG0 i)
+                  :mod (c / current))))
+
+# ::id sdl_0002.65 ::date 2013-07-10T09:19:15 ::annotator SDL-AMR-09 ::preferred
+# ::snt He just emailed that friend to ask him how much it cost .
+# ::save-date Wed Jul 10, 2013 ::file sdl_0002_65.txt
+(e / email-01
+      :ARG0 (h / he)
+      :ARG1 (a / ask-01
+            :ARG0 h
+            :ARG1 (c / cost-01
+                  :ARG1 (i / it)
+                  :ARG2 (a2 / amr-unknown))
+            :ARG2 f)
+      :ARG2 (f / friend
+            :mod (t / that))
+     :time (j / just))
+
+# ::id PROXY_AFP_ENG_20070906_0523.10 ::date 2013-06-22T01:22:13 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt The Times quoted an unidentified British government source as stating that the Chinese government was engaged in hostile intelligence activities.
+# ::save-date Wed Sep 25, 2013 ::file PROXY_AFP_ENG_20070906_0523_10.txt
+(q / quote-01
+      :ARG0 (n / newspaper :name (n4 / name :op1 "The" :op2 "Times"))
+      :ARG1 (s / source
+            :mod (g / government-organization
+                  :ARG0-of (g2 / govern-01
+                        :ARG1 (c / country :name (n2 / name :op1 "Britain"))))
+            :ARG1-of (i / identify-01 :polarity -))
+      :ARG2 (e / engage-01
+            :ARG1 (g3 / government-organization
+                  :ARG0-of (g4 / govern-01
+                        :ARG1 (c2 / country :name (n3 / name :op1 "China"))))
+            :ARG2 (a / activity
+                  :topic (i2 / intelligence)
+                  :mod (h / hostile))))
+
+# ::id PROXY_AFP_ENG_20081104_0091.10 ::date 2013-07-09T09:58:51 ::snt-type body subordinate ::annotator SDL-AMR-09 ::preferred
+# ::snt Fe concluded wrongly that Iraq most likely had weapons of mass destruction .
+# ::save-date Tue Jul 23, 2013 ::file PROXY_AFP_ENG_20081104_0091_10.txt
+(c / conclude-01
+      :ARG0 (g / government-organization :name (n / name :op1 "FE"))
+      :ARG1 (l / likely
+            :degree (m2 / most)
+            :domain (h / have-03
+                  :ARG0 (c2 / country :name (n2 / name :op1 "Iraq"))
+                  :ARG1 (w2 / weapon
+                        :ARG2-of (d / destroy-01
+                              :degree (m / mass)))))
+      :manner (w / wrong))
+
+# ::id nw.chtb_0287.3 ::date 2012-11-15T21:13:00 ::annotator SDL-AMR-09 ::preferred
+# ::snt According to experts , Jupiter , which orbits the Sun like the Earth , is the largest planet in the solar system .
+# ::save-date Sat Dec 14, 2013 ::file nw_chtb_0287_3.txt
+(s2 / say-01
+      :ARG0 (p / person
+            :ARG1-of (e2 / expert-41))
+      :ARG1 (p4 / planet
+            :mod (l4 / large
+                  :degree (m / most)
+                  :compared-to (s5 / system
+                        :mod s3))
+            :domain (p2 / planet :name (n / name :op1 "Jupiter")
+                  :ARG0-of (o / orbit-01
+                        :ARG1 (s3 / star :name (n2 / name :op1 "Sun"))
+                        :ARG1-of (r / resemble-01
+                              :ARG2 (p3 / planet :name (n3 / name :op1 "Earth")))))))
+
+# ::id nw.chtb_0285.3 ::date 2012-11-14T19:22:29 ::annotator SDL-AMR-09 ::preferred
+# ::snt At the same time , he also demanded that new talks be held to end the civil war in Bosnia - Herzegovina .
+# ::save-date Wed Nov 14, 2012 ::file nw_chtb_0285_3.txt
+(d / demand-01
+      :ARG0 (h / he)
+      :ARG1 (h2 / hold-04
+            :ARG1 (t / talk-01
+                  :mod (n / new)
+                  :purpose (e / end-01
+                        :ARG1 (w / war
+                              :mod (c / civil)
+                              :location (c2 / country
+                                    :name (n2 / name
+                                          :op1 "Bosnia-Herzegovina"))))))
+      :mod (a / also)
+      :time (t2 / time
+            :ARG1-of (s / same-41)))
+
+# ::id PROXY_NYT_ENG_20080808_0162.32 ::date 2013-08-05T10:51:50 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt Late on 8 August 2008 it was unclear whether ground combat had taken place between Russian and Georgian soldiers or had been limited to fighting between separatists and Georgian forces.
+# ::save-date Fri Sep 20, 2013 ::file PROXY_NYT_ENG_20080808_0162_32.txt
+(c / clear :polarity -
+      :time (l / late
+            :op1 (d / date-entity :day 8 :month 8 :year 2008))
+      :domain (o / or :mode interrogative
+            :op1 (c2 / combat-01
+                  :ARG0 (a3 / and
+                        :op1 (s / soldier
+                              :mod (c3 / country :name (n / name :op1 "Russia")))
+                        :op2 (s3 / soldier
+                              :mod (c4 / country :name (n2 / name :op1 "Georgia"))))
+                  :location (g / ground)
+                  :ARG1-of (t / take-14
+                        :ARG2 (p / place)))
+            :op2 (l2 / limit-01
+                  :ARG1 c2
+                  :ARG2 (f / fight-01
+                        :ARG0 (b / between
+                              :op1 (s2 / separatist)
+                              :op2 (f2 / force
+                                    :mod c4))))))
+
+# ::id PROXY_APW_ENG_20080214_1715.14 ::date 2013-07-14T11:28:04 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt Nancy schepeter-Hughes stated that most victims of kidney trafficking are coerced by need and not by physical force.
+# ::save-date Tue Aug 27, 2013 ::file PROXY_APW_ENG_20080214_1715_14.txt
+(s / state-01
+      :ARG0 (p / person :name (n / name :op1 "Nancy" :op2 "Scheper-Hughes"))
+      :ARG1 (c2 / contrast-01
+            :ARG1 (c / coerce-01
+                  :ARG0 (n2 / need-01)
+                  :ARG1 (v / victim
+                        :quant (m / most)
+                        :mod (t / traffic-00
+                              :ARG1 (k / kidney))))
+            :ARG2 (c3 / coerce-01 :polarity -
+                  :ARG0 (f / force
+                        :mod (p2 / physical))
+                  :ARG1 v)))
+
+# ::id PROXY_AFP_ENG_20020210_0074.18 ::date 2013-05-20T15:11:13 ::snt-type body ::annotator LDC-AMR-14 ::preferred
+# ::snt Drug trafficking from Afghanistan has been concealed so securely that it will be impossible to uncover.
+# ::save-date Sat Jul 6, 2013 ::file PROXY_AFP_ENG_20020210_0074_18.txt
+(c / conceal-01
+      :ARG1 (t / traffic-00
+            :ARG1 (d / drug)
+            :source (c2 / country :name (n / name :op1 "Afghanistan")))
+      :mod (s / secure
+            :degree (s2 / so
+                  :ARG0-of (c3 / cause-01
+                        :ARG1 (p / possible :polarity -
+                              :domain (u / uncover-01
+                                    :ARG1 t))))))
+
+# ::id bolt12_64545_0524.1 ::date 2012-12-23T18:26:29 ::annotator SDL-AMR-09 ::preferred
+# ::snt The ruling authorities actually should pay attention to these kinds of capitulators and traitors of China!
+# ::save-date Sun Dec 8, 2013 ::file bolt12_64545_0524_1.txt
+(r / recommend-01
+      :ARG1 (p / pay-01
+            :ARG0 a
+            :ARG1 (a2 / attention)
+            :ARG2 (p2 / person
+                  :ARG0-of (c3 / capitulate-01)
+                  :ARG0-of (b / betray-01
+                        :ARG1 (c2 / country :name (n / name :op1 "China")))
+                  :mod (k / kind
+                        :mod (t / this)))
+            :mod (a3 / actual))
+      :ARG2 (a / authority
+            :ARG0-of (r2 / rule-01)))
+
+# ::id PROXY_AFP_ENG_20080526_0379.7 ::date 2013-07-08T04:25:05 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt The identity of the trafficker was not revealed.
+# ::save-date Mon Jul 8, 2013 ::file PROXY_AFP_ENG_20080526_0379_7.txt
+(r / reveal-01 :polarity -
+      :ARG1 (i / identity
+            :poss (p / person
+                  :ARG0-of (t / traffic-00))))
+
+# ::id NATHANS_EXAMPLE ::date 2017-06-06T04:25:05 ::snt-type body ::annotator SDL-AMR-09 ::preferred
+# ::snt In the story, evildoer Cruella de Vil makes no attempt to conceal her glee and lack of conscience.
+# ::save-date Tue Jun 6, 2017
+(a / attempt-01 :polarity -
+      :location (s / story)
+      :ARG0 (p / person
+            :ARG0-of (d / do-02 :ARG1 (t / thing :mod (e / evil)))
+            :name (n / name :op1 "Cruella" :op2 "de" :op3 "Vil"))
+      :ARG1 (c / conceal-01 
+            :ARG0 p 
+            :ARG1 (a2 / and
+                  :op1 (g / glee :poss p)
+                  :op2 (l / lack-01
+                        :ARG0 p
+                        :ARG1 (c2 / conscience)))))
+
