@@ -22,4 +22,4 @@ A python package of common operations for AMRs
 
 # Latex
 
-![latex example](latex_ex.png?raw=true)
+![latex example](latex_ex.png)
