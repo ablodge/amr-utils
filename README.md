@@ -5,4 +5,4 @@ A python package of common operations for AMRs
 
 # Latex
 
-![latex example](../master/latex_ex.png)
+![latex example](https://github.com/ablodge/amr-utils/blob/master/latex_ex.PNG)
