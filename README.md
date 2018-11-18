@@ -18,7 +18,8 @@ Input should contain AMR strings separated by a blank line. Lines starting with 
 # HTML
 Amr-utils allows you to read AMRs from a text file and output them as html. You can look in `style.css` for an example of styling. 
 ### Instructions
-Run
+Run as follows:
+
 `python amr_html.py [input file] > [output file]`
 
 # Latex
@@ -26,5 +27,6 @@ Amr-utils allows you to read AMRs from a text file and output them as latex diag
 ![latex example](https://github.com/ablodge/amr-utils/blob/master/latex_ex.PNG)
 
 ### Instructions
-Run
+Run as follows:
+
 `python amr_latex.py [input file] > [output file]`
