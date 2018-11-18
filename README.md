@@ -22,3 +22,4 @@ A python package of common operations for AMRs
 
 # Latex
 
+![latex example](https://github.com/ablodge/amr-utils/edit/master/latex_ex.jpg)
