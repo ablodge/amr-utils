@@ -8,7 +8,7 @@ I wrote amr-utils to store operations that I often need when doing research with
 Amr-utils allows you to read AMRs from a text file and output them as html. You can look in `style.css` for an example of styling. 
 ![latex example](https://github.com/ablodge/amr-utils/blob/master/html_ex.PNG)
 
-The html above is generated from the following output.
+The above AMR is generated from the following html.
 
 ```
 <pre>
