@@ -26,6 +26,9 @@ Run as follows:
 Amr-utils allows you to read AMRs from a text file and output them as latex diagrams, such as the following.
 ![latex example](https://github.com/ablodge/amr-utils/blob/master/latex_ex.PNG)
 
+### Colors
+The default coloring assigns a different color to each node in a given row. To change a color by hand, just rewrite `\node[red]` as `\node[purple]`, etc.
+
 ### Instructions
 Run as follows:
 
