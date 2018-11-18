@@ -1,6 +1,6 @@
 
 from amr import AMR
-import re
+import re, sys
 
 class AMR_HTML:
 
@@ -20,7 +20,7 @@ class AMR_HTML:
                 id = edges.pop(0)
                 elems[i] = f'<span class="amr-edge" tok-id="{id}">{e}</span>'
         text = ''.join(elems)
-        return '\n<pre>\n'+text+'\n</pre>\n'
+        return '\n<div class="amr-container">\n<pre>\n'+text+'\n</pre>\n</div>\n'
 
     @staticmethod
     def html_with_links(text):
@@ -46,7 +46,7 @@ class AMR_HTML:
                 else:
                     elems[i] = f'<span class="amr-edge" tok-id="{id}">{e}</span>'
         text = ''.join(elems)
-        return '\n<pre>\n' + text + '\n</pre>\n'
+        return '\n<div class="amr-container">\n<pre>\n'+text+'\n</pre>\n</div>\n'
 
     @staticmethod
     def propbank_link(frame):
@@ -7698,12 +7698,15 @@ class AMR_HTML:
     "zoom",
     ]
 def main():
-    test_file = r'data/aligned_amrs.txt'
+    input_file = r'test-data/amrs.txt'
+    if len(sys.argv) > 1:
+        input_file = sys.argv[1]
 
-    with open(test_file, 'r', encoding='utf8') as f:
+    with open(input_file, 'r', encoding='utf8') as f:
         for amr in AMR.amr_iter(f.read()):
-            amr = AMR_HTML.html_with_links(amr)
+            amr = AMR_HTML.html(amr)
             print(amr)
+            print()
 
 
 if __name__ == "__main__":

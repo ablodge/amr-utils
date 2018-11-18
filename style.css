@@ -1,7 +1,13 @@
+
+div.amr-container {
+    font-family: "Cambria Math", sans-serif;
+    font-size: 14px;
+}
+
 .amr-node {
-    color:blue;
+    color : black;
 }
 
 .amr-edge {
-    color:grey;
+    color : grey;
 }

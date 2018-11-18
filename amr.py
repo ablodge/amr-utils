@@ -1,4 +1,4 @@
-import re, paren_utils
+import re, paren_utils, sys
 
 
 class AMR:
@@ -98,13 +98,15 @@ class AMR:
         return ''.join(e for e in self.elements())
 
 def main():
-    test_file = r'data/aligned_amrs.txt'
+    input_file = r'test-data/amrs.txt'
+    if len(sys.argv)>1:
+        input_file = sys.argv[1]
 
-    with open(test_file, 'r', encoding='utf8') as f:
+    with open(input_file, 'r', encoding='utf8') as f:
         for amr in AMR.amr_iter(f.read()):
             amr = AMR(amr)
-            if 'd/differ-02' in str(amr):
-                print(amr)
+            print(amr)
+            print()
 
 if __name__ == "__main__":
     main()

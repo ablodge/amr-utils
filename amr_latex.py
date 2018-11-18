@@ -1,6 +1,6 @@
 
 from amr import AMR
-import re, paren_utils
+import re, paren_utils, sys
 
 class AMR_Latex:
 
@@ -81,9 +81,8 @@ class AMR_Latex:
             if node_depth[source] == node_depth[target]:
                 dir1 = 'north'
                 dir2 = 'north'
-            elems.append(f'\t\draw[->, thick, grey] ({source}.{dir1}) -- ({target}.{dir2}) node[midway, above, sloped] {{{edge}}};')
-        latex = '\\begin{center}'
-        latex += '\n\\begin{tikzpicture}[\n'
+            elems.append(f'\t\draw[->, thick] ({source}.{dir1}) -- ({target}.{dir2}) node[midway, above, sloped] {{{edge}}};')
+        latex = '\n\\begin{tikzpicture}[\n'
         latex += 'red/.style={ellipse, draw=red!60, fill=red!5, very thick, minimum size=7mm},\n'
         latex += 'blue/.style={ellipse, draw=blue!60, fill=blue!5, very thick, minimum size=7mm},\n'
         latex += 'green/.style={ellipse, draw=green!60, fill=green!5, very thick, minimum size=7mm},\n'
@@ -92,17 +91,19 @@ class AMR_Latex:
         latex += ']\n'
         latex += '\n'.join(elems)
         latex += '\n\end{tikzpicture}\n'
-        latex += '\end{center}'
 
         return latex
 
 def main():
-    test_file = r'data/aligned_amrs.txt'
+    input_file = r'test-data/amrs.txt'
+    if len(sys.argv) > 1:
+        input_file = sys.argv[1]
 
-    with open(test_file, 'r', encoding='utf8') as f:
+    with open(input_file, 'r', encoding='utf8') as f:
         for amr in AMR.amr_iter(f.read()):
             amr = AMR_Latex.latex(amr)
             print(amr)
+            print()
 
 
 if __name__ == "__main__":
