@@ -6,11 +6,11 @@ class AMR_Latex:
 
     '''
     \begin{tikzpicture}[
-    red/.style={ellipse, draw=red!60, fill=red!5, very thick, minimum size=7mm},
-    blue/.style={ellipse, draw=blue!60, fill=blue!5, very thick, minimum size=7mm},
-    green/.style={ellipse, draw=green!60, fill=green!5, very thick, minimum size=7mm},
-    purple/.style={ellipse, draw=purple!60, fill=purple!5, very thick, minimum size=7mm},
-    orange/.style={ellipse, draw=orange!60, fill=orange!5, very thick, minimum size=7mm},
+    red/.style={rectangle, draw=red!60, fill=red!5, very thick, minimum size=7mm},
+    blue/.style={rectangle, draw=blue!60, fill=blue!5, very thick, minimum size=7mm},
+    green/.style={rectangle, draw=green!60, fill=green!5, very thick, minimum size=7mm},
+    purple/.style={rectangle, draw=purple!60, fill=purple!5, very thick, minimum size=7mm},
+    orange/.style={rectangle, draw=orange!60, fill=orange!5, very thick, minimum size=7mm},
     ]
         %Nodes
         \node[red]   (r)       at (5,4) {read-01};
@@ -83,11 +83,11 @@ class AMR_Latex:
                 dir2 = 'north'
             elems.append(f'\t\draw[->, thick] ({source}.{dir1}) -- ({target}.{dir2}) node[midway, above, sloped] {{{edge}}};')
         latex = '\n\\begin{tikzpicture}[\n'
-        latex += 'red/.style={ellipse, draw=red!60, fill=red!5, very thick, minimum size=7mm},\n'
-        latex += 'blue/.style={ellipse, draw=blue!60, fill=blue!5, very thick, minimum size=7mm},\n'
-        latex += 'green/.style={ellipse, draw=green!60, fill=green!5, very thick, minimum size=7mm},\n'
-        latex += 'purple/.style={ellipse, draw=purple!60, fill=purple!5, very thick, minimum size=7mm},\n'
-        latex += 'orange/.style={ellipse, draw=orange!60, fill=orange!5, very thick, minimum size=7mm},\n'
+        latex += 'red/.style={rectangle, draw=red!60, fill=red!5, very thick, minimum size=7mm},\n'
+        latex += 'blue/.style={rectangle, draw=blue!60, fill=blue!5, very thick, minimum size=7mm},\n'
+        latex += 'green/.style={rectangle, draw=green!60, fill=green!5, very thick, minimum size=7mm},\n'
+        latex += 'purple/.style={rectangle, draw=purple!60, fill=purple!5, very thick, minimum size=7mm},\n'
+        latex += 'orange/.style={rectangle, draw=orange!60, fill=orange!5, very thick, minimum size=7mm},\n'
         latex += ']\n'
         latex += '\n'.join(elems)
         latex += '\n\end{tikzpicture}\n'
