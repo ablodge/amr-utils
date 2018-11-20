@@ -33,3 +33,10 @@ The default coloring assigns a different color to each node in a given row. To c
 Run as follows:
 
 `python amr_latex.py [input file] > [output file]`
+
+Add these lines to your latex file:
+
+```
+\usepackage{tikz}
+\usetikzlibrary{shapes}
+```
