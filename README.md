@@ -15,13 +15,6 @@ Python 3.6 or higher
 ### Input
 Input should contain AMR strings separated by a blank line. Lines starting with `#` will be ignored.
 
-# HTML
-Amr-utils allows you to read AMRs from a text file and output them as html. You can look in `style.css` for an example of styling. 
-### Instructions
-Run as follows:
-
-`python amr_html.py [input file] > [output file]`
-
 # Latex
 Amr-utils allows you to read AMRs from a text file and output them as latex diagrams, such as the following.
 ![latex example](https://github.com/ablodge/amr-utils/blob/master/latex_ex.PNG)
@@ -40,3 +33,12 @@ Add these lines to your latex file:
 \usepackage{tikz}
 \usetikzlibrary{shapes}
 ```
+
+
+# HTML
+Amr-utils allows you to read AMRs from a text file and output them as html. You can look in `style.css` for an example of styling. 
+![html example](https://github.com/ablodge/amr-utils/blob/master/html_ex.PNG)
+### Instructions
+Run as follows:
+
+`python amr_html.py [input file] > [output file]`

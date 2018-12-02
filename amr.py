@@ -10,6 +10,9 @@ class AMR:
         # remove comments
         self.text = '\n'.join([l for l in text.split('\n') if not l.strip().startswith('#')])
         self.text_elements = []
+        # meomoize edge triples
+        self.edge_triples_memoized = []
+        self.edges_are_memoized = False
         i = 0
         for e in self.ELEM_RE.finditer(self.text):
             e = e.group()
@@ -27,6 +30,7 @@ class AMR:
         for e,i in zip(self.elements(),self.element_ids()):
             if not re.match('^[a-z][0-9]*$', e):
                 self.names[i] = e
+
 
     def root(self):
         return self.NODE_RE.search(self.text).group().replace(' / ', '/')
@@ -81,6 +85,9 @@ class AMR:
         return self.names[id]
 
     def edge_triples(self):
+        if self.edges_are_memoized:
+            return self.edge_triples_memoized
+        memo = []
         text = str(self)
         idx = [(e.start(), e.group()) for e in self.EDGE_RE.finditer(text)]
 
@@ -94,14 +101,17 @@ class AMR:
                     x = Target_RE.match(t, pos=pos)
                     if x:
                         target = x.group('id')
-                        yield (source, rel, target)
+                        memo.append((source, rel, target))
                     else:
                         print('Missing target node! ', rel, re.sub('\s+', ' ', t))
-                        yield (source, rel, '?')
+                        memo.append((source, rel, '?'))
                     break
+        self.edge_triples_memoized = memo
+        self.edges_are_memoized = True
+        return memo
 
     def named_entities(self):
-        NE_RE = re.compile(f'(?P<root>{self.NODE_RE.pattern})\s.*:name\s+<1>(?P<name>.*?)</1>')
+        NE_RE = re.compile(f'(?P<root>{self.NODE_RE.pattern}).*:name\s+<1>(?P<name>.*?)</1>', re.DOTALL)
         for t in paren_utils.paren_iter(str(self)):
             t = paren_utils.mark_depth(t)
             x = NE_RE.match(t)

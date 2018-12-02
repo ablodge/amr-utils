@@ -3,35 +3,14 @@ from amr import AMR
 import nltk
 from nltk.stem import WordNetLemmatizer
 from collections import Counter
+from rules import Align_Edge_RE, Align_Node_RE, Align_Triple_Rules, AMR_Triple_AddOns
+
+print('#amr-utils Rule-based Aligner')
+print('#Loading Rules:',len(Align_Node_RE)+len(Align_Edge_RE)+len(Align_Triple_Rules)+len(AMR_Triple_AddOns))
+print()
 
 # nltk.download('wordnet')
 lemma = WordNetLemmatizer()
-
-Align_Edge_Re = {
-    ':location': re.compile('^(in|at|on)$',flags=re.IGNORECASE),
-    ':time': re.compile('^(in|at|when|during)$',flags=re.IGNORECASE),
-    ':domain': re.compile('^(be|is|are|was|were|am)$',flags=re.IGNORECASE),
-    ':poss': re.compile('^(\'s|of)$',flags=re.IGNORECASE),
-    ':condition': re.compile('^if$',flags=re.IGNORECASE),
-    ':purpose': re.compile('^for$',flags=re.IGNORECASE),
-    ':beneficiary': re.compile('^(for|against)$',flags=re.IGNORECASE),
-}
-
-Align_Node_RE = {
-    'amr-unknown': re.compile('^(wh\w+|how)$',flags=re.IGNORECASE),
-    # modals and conjunctions
-    'cause-01': re.compile('^(caus(e|ed|es|ing)|because|thus|so|hence)$',flags=re.IGNORECASE),
-    'contrast-01': re.compile('^(but|yet|while|however)$',flags=re.IGNORECASE),
-    # 'ever': re.compile('^(ever|never)$',flags=re.IGNORECASE),
-    'obligate-01': re.compile('^(need(s|ed|ing)?|must)$',flags=re.IGNORECASE),
-    'possible-01': re.compile('^(can|could|might|maybe|possibl[ey]|perhaps)$',flags=re.IGNORECASE),
-    'possible': re.compile('^(can|could|might|maybe|possibl[ey]|perhaps)$',flags=re.IGNORECASE),
-    'recommend-01': re.compile('^(should)$',flags=re.IGNORECASE),
-    'expect-01': re.compile('^(should)$',flags=re.IGNORECASE),
-    'a/allow-01': re.compile('^(let)$',flags=re.IGNORECASE),
-    'kilometer': re.compile('^(kilometers?|kms?)$',flags=re.IGNORECASE),
-
-}
 
 class Alignment:
 
@@ -45,7 +24,7 @@ class Alignment:
         return ' '.join(self.amr_elems)+' ~ '+' '.join(self.words)
 
     def __str__(self):
-        return ' '.join(self.amr_ids) + ' ~ ' + ' '.join(self.word_ids)
+        return ' '.join(self.amr_ids) + ' ~ ' + ' '.join(str(i) for i in self.word_ids)
 
     def __bool__(self):
         return bool(self.amr_ids or self.word_ids)
@@ -65,206 +44,12 @@ class Alignment:
         self.word_ids.append(word_id)
         self.words.append(word)
 
-    def remove_from_list(self, amr_list:list, word_list:list):
-        for a in self.amr_elems:
-            if a in amr_list:
-                j = amr_list.index(a)
-                amr_list.pop(j)
-        for w in self.word_ids:
-            if w in word_list:
-                j = word_list.index(w)
-                word_list.pop(j)
-        return amr_list, word_list
-
-
-def align_amr(amr, words):
-    alignments = []
-    amr_unaligned = [e for e in amr.elements() if not re.match('^[a-z][0-9]*$', e)]
-    words_unaligned = [j for j,w in enumerate(words)]
-    for j, w in enumerate(words):
-        if w.lower() in ['the', 'a', 'an', '.', '?', '!', ',', '-', '"', ';', ':']:
-            a = Alignment()
-            a.add_word(j, w)
-            alignments.append(a)
-            words_unaligned.remove(j)
-    for ne in amr.named_entities():
-        a = named_entity_align(ne, amr, words, words_unaligned)
-        if not a: continue
-        amr_unaligned, words_unaligned = a.remove_from_list(amr_unaligned, words_unaligned)
-        alignments.append(a)
-    for frame in amr.nodes():
-        if frame not in amr_unaligned: continue
-        id, f = frame.split('/')
-        a = frame_align(f, id, amr, words, words_unaligned)
-        if not a: continue
-        amr_unaligned, words_unaligned = a.remove_from_list(amr_unaligned, words_unaligned)
-        alignments.append(a)
-    for edge, id in zip(amr.edges(),amr.edge_ids()):
-        a = edge_align(edge, id, amr, words, words_unaligned)
-        if not a: continue
-        amr_unaligned, words_unaligned = a.remove_from_list(amr_unaligned, words_unaligned)
-        alignments.append(a)
-    return sorted(alignments, key = lambda a: a.word_ids[0] if a.word_ids else 1000), amr_unaligned, [words[j] for j in words_unaligned]
-
-
-def named_entity_align(named_entity, amr, words, word_indices):
-    alignment = Alignment()
-    for e, i in zip(named_entity.elements(), named_entity.element_ids()):
-        alignment.add_amr(i, e)
-
-    name = []
-    for n,i in zip(named_entity.nodes(), named_entity.node_ids()):
-        if any(re.search(f'op[0-9]+_{i}$',e) for e in named_entity.edge_ids()):
-            n = n.split('/')[-1].strip()
-            n = n.replace('"','')
-            name.append(n)
-    if len(name) == 1:
-        name = name[0]
-        word_index = Match.exact_or_fuzzy(name,words, word_indices)
-        if word_index:
-            alignment.add_word(word_index, words[word_index])
-            return alignment
-    name = ''.join(name)
-    possible_spans = [[]]
-    name_left = name
-    for i in word_indices:
-        w = words[i].rstrip('-')
-        if w[0:3] in name_left:
-            possible_spans[-1].append(i)
-            if w in name_left:
-                name_left = name_left.replace(w,'',1)
-            else:
-                prefix = [j for j, ch in enumerate(w) if w[:j] in name_left]
-                prefix = w[:prefix[-1]]
-                name_left = name_left.replace(prefix, '', 1)
-        else:
-            possible_spans.append([])
-            name_left = name
-    match = max(possible_spans, key=lambda x: len(x))
-    for w in match:
-        alignment.add_word(w, words[w])
-    for tr, id in zip(amr.edge_triples(),amr.edge_ids()):
-        source, rel, target = tr
-        source_frame = amr.get_name(source).split('/')[-1]
-        target_frame = amr.get_name(target).split('/')[-1]
-        # (government-organization :ARG0-of (govern-01 :ARG1 (*country* :name China)))
-        if target == named_entity.root().split('/')[0] and rel==':ARG1' and source_frame=='govern-01':
-            alignment.amr_ids.insert(0, id)
-            alignment.amr_elems.insert(0, rel)
-            alignment.amr_ids.insert(0, source)
-            alignment.amr_elems.insert(0, amr.get_name(source))
-            for tr2, id2 in zip(amr.edge_triples(), amr.edge_ids()):
-                source2, rel2, target2 = tr2
-                source_frame2 = amr.get_name(source2).split('/')[-1]
-                if target2 == source and rel2 == ':ARG0-of' and source_frame2 == 'government-organization':
-                    alignment.amr_ids.insert(0, id2)
-                    alignment.amr_elems.insert(0, rel2)
-                    alignment.amr_ids.insert(0, source2)
-                    alignment.amr_elems.insert(0, amr.get_name(source2))
-                    break
-        # (person :mod (*country* :name China) )
-        if target == named_entity.root().split('/')[0] and rel==':mod' and source_frame=='person':
-            alignment.amr_ids.insert(0, id)
-            alignment.amr_elems.insert(0, rel)
-            alignment.amr_ids.insert(0, source)
-            alignment.amr_elems.insert(0, amr.get_name(source))
-
-    return alignment
-
-
-def frame_align(frame, frame_id, amr, words, word_indices):
-    alignment = Alignment()
-    alignment.add_amr(frame_id,frame_id+'/'+frame)
-    word_index = -1
-    # check rules
-    if frame in Align_Node_RE:
-        regex = Align_Node_RE[frame]
-        ws = [j for j in word_indices if regex.match(words[j])]
-        if len(ws) > 0:
-            word_index = ws[0]
-            alignment.add_word(word_index, words[word_index])
-    # look for matches
-    frame = re.sub('-[0-9]+$', '', frame)
-    if word_index < 0:
-        word_index = Match.any(frame, words, word_indices)
-        if word_index < 0:
-            return None
-        alignment.add_word(word_index, words[word_index])
-    for tr, id in zip(amr.edge_triples(), amr.edge_ids()):
-        source, rel, target = tr
-        if source==frame_id and re.match('^:ARG[0-9]+$',rel):
-            alignment.add_amr(id, rel)
-        elif source==frame_id and re.match('^:op[0-9]+$',rel):
-            alignment.add_amr(id, rel)
-        elif target==frame_id and re.match('^:ARG[0-9]+-of$',rel):
-            alignment.amr_ids.insert(0, id)
-            alignment.amr_elems.insert(0, rel)
-        elif target==frame_id and rel in [':mod', ':quant']:
-            alignment.amr_ids.insert(0, id)
-            alignment.amr_elems.insert(0, rel)
-        # polarity
-        elif source==frame_id and rel == ':polarity' and amr.get_name(target).endswith('-'):
-            if re.match('^(non[\w-]+|un[\w-]+|il[\w-]+)$', frame, flags=re.IGNORECASE):
-                alignment.add_amr(id, rel)
-                alignment.add_amr(target, amr.get_name(target))
-        # *-quantity
-        elif target == frame_id and amr.get_name(source).endswith('-quantity') and rel == ':unit':
-            alignment.amr_ids.insert(0, id)
-            alignment.amr_elems.insert(0, rel)
-            alignment.amr_ids.insert(0, source)
-            alignment.amr_elems.insert(0, amr.get_name(source))
-
-    return alignment
-
-
-def edge_align(edge, edge_id, amr, words, word_indices):
-    alignment = Alignment()
-    alignment.add_amr(edge_id, edge)
-    source = amr.get_name(edge_id.split('_')[0])
-    target = amr.get_name(edge_id.split('_')[-1])
-    if edge in Align_Edge_Re:
-        regex = Align_Edge_Re[edge]
-        ws = [j for j in word_indices if regex.match(words[j])]
-        if len(ws) > 0:
-            word_index = ws[0]
-            alignment.add_word(word_index, words[word_index])
-            return alignment
-        else:
-            return None
-    if edge == ':polarity' and target.split('/')[-1] == '-':
-        Pol_RE = re.compile('^(no|not|never)$')
-        word_index = -1
-        ws = [j for j in word_indices if Pol_RE.match(words[j])]
-        if len(ws) > 0:
-            word_index = ws[0]
-            alignment.add_word(word_index, words[word_index])
-        else:
-            return None
-        alignment.add_word(word_index, words[word_index])
-        alignment.add_amr(edge_id.split('_')[-1], target)
-    # prep-*
-    if edge.startswith(':prep-'):
-        prep = edge.replace(':prep-','',1)
-        word_index = Match.exact(prep, words, word_indices)
-        if word_index < 0:
-            return None
-        alignment.add_word(word_index, words[word_index])
-        return alignment
-
-
-def modify_align(align, amr, amr_unaligned, words, word_indices):
-    for tr, id in zip(amr.edge_triples(),amr.edge_ids()):
-        source, rel, target = tr
-        source_frame = amr.get_name(source).split('/')[-1]
-        target_frame = amr.get_name(target).split('/')[-1]
-        # (person :arg0 (have-org-role-91 :arg2 *president*) )
-        # (have-rel-role-91 :ARG0 John :ARG1 Mary :ARG2 *husband*)
 
 
 class Match:
 
     @staticmethod
-    def any(elem, words, word_indices):
+    def exact_lemma_or_fuzzy(elem, words, word_indices):
         if not word_indices: return -1
         word_index = Match.exact(elem, words, word_indices)
         if word_index < 0:
@@ -326,7 +111,217 @@ class Match:
         return prefix
 
 
+
+def align_amr(amr, words):
+    alignments = []
+    amr_unaligned = set(e for e in amr.element_ids())
+    words_unaligned = [j for j,w in enumerate(words)]
+
+    # null alignments
+    for j, w in enumerate(words):
+        if w.lower() in ['the', 'a', 'an', '.', '?', '!', ',', '-', '"', ';', ':']:
+            align = Alignment()
+            align.add_word(j, w)
+            alignments.append(align)
+            words_unaligned.remove(j)
+
+    # named entities
+    for ne in amr.named_entities():
+        align = named_entity_align(ne, amr, words, words_unaligned)
+        if align:
+            alignments.append(align)
+            for a in align.amr_ids:
+                if a in amr_unaligned:
+                    amr_unaligned.remove(a)
+            for j in align.word_ids: words_unaligned.remove(j)
+
+    # edge rules
+    for edge, id in zip(amr.edges(), amr.edge_ids()):
+        if edge in Align_Edge_RE:
+            regex = Align_Edge_RE[edge]
+            for j in words_unaligned:
+                if regex.match(words[j]):
+                    align = Alignment()
+                    align.add_word(j, words[j])
+                    align.add_amr(id, edge)
+                    alignments.append(align)
+                    for a in align.amr_ids:
+                        if a in amr_unaligned:
+                            amr_unaligned.remove(a)
+                    for j in align.word_ids: words_unaligned.remove(j)
+                    break
+
+    # node rules
+    for node, id in zip(amr.nodes(), amr.node_ids()):
+        frame = node.split('/')[-1]
+        if frame in Align_Node_RE:
+            regex = Align_Node_RE[frame]
+            for j in words_unaligned:
+                if regex.match(words[j]):
+                    align = Alignment()
+                    align.add_word(j, words[j])
+                    align.add_amr(id, node)
+                    alignments.append(align)
+                    for a in align.amr_ids:
+                        if a in amr_unaligned:
+                            amr_unaligned.remove(a)
+                    for j in align.word_ids: words_unaligned.remove(j)
+                    break
+
+    # amr subgraph rules
+    for rule in Align_Triple_Rules:
+        ws = [w for j,w in enumerate(words) if j in words_unaligned]
+        x = rule(amr, ws)
+        if not x: continue
+        amr_elems, word = x
+        align = Alignment()
+        align.add_word(words_unaligned[ws.index(word)], word)
+        for id in amr_elems:
+            align.add_amr(id, amr.get_name(id))
+        alignments.append(align)
+        for a in align.amr_ids:
+            if a in amr_unaligned:
+                 amr_unaligned.remove(a)
+        for j in align.word_ids: words_unaligned.remove(j)
+
+    # node matching
+    for node, id in zip(amr.nodes(), amr.node_ids()):
+        if not '/' in node: continue
+        frame = re.sub('-[0-9]+$', '', node.split('/')[-1])
+        match = Match.exact_lemma_or_fuzzy(frame, words, words_unaligned)
+        if match < 0: continue
+        align = Alignment()
+        align.add_word(match, words[match])
+        align.add_amr(id, node)
+        alignments.append(align)
+        for a in align.amr_ids:
+            if a in amr_unaligned:
+                amr_unaligned.remove(a)
+        for j in align.word_ids: words_unaligned.remove(j)
+
+    # amr subgraph addons
+    for align in alignments:
+        if not align.amr_ids: continue
+        if not any('_' not in i for i in align.amr_ids): continue
+        frame_id = [i for i in align.amr_ids if not '_' in i][0]
+        for rule in AMR_Triple_AddOns:
+            x = rule(amr, frame_id)
+            if not x: continue
+            amr_elems = x
+            for id in reversed(amr_elems):
+                align.amr_ids.insert(0, id)
+                align.amr_elems.insert(0, amr.get_name(id))
+            for a in amr_elems:
+                if a in amr_unaligned:
+                     amr_unaligned.remove(a)
+
+    # attach :ARGX, :ARGX-of, :opX
+    for align in alignments:
+        if not align.amr_ids: continue
+        if not any('_' not in i for i in align.amr_ids): continue
+        frame_id = [i for i in align.amr_ids if not '_' in i][0]
+        for tr, id in zip(amr.edge_triples(), amr.edge_ids()):
+            source, rel, target = tr
+            if source == frame_id and re.match('^:ARG[0-9]+$', rel):
+                align.add_amr(id, rel)
+            elif source == frame_id and re.match('^:op[0-9]+$', rel):
+                align.add_amr(id, rel)
+            elif target == frame_id and re.match('^:ARG[0-9]+-of$', rel):
+                align.amr_ids.insert(0, id)
+                align.amr_ids.insert(0, rel)
+        for a in align.amr_ids:
+            if a in amr_unaligned:
+                amr_unaligned.remove(a)
+
+    alignments = sorted(alignments, key = lambda a: a.word_ids[0] if a.word_ids else 1000)
+    amr_unaligned = [amr.get_name(a) for a in amr_unaligned]
+    words_unaligned = [words[j] for j in words_unaligned]
+    return alignments, amr_unaligned, words_unaligned
+
+
+def named_entity_align(named_entity, amr, words, word_indices):
+    alignment = Alignment()
+    for e, i in zip(named_entity.elements(), named_entity.element_ids()):
+        alignment.add_amr(i, e)
+
+    name = []
+    for n,i in zip(named_entity.nodes(), named_entity.node_ids()):
+        x = [x for x in named_entity.edge_ids()]
+        if any(re.search(f'op[0-9]+_{i}$',e) for e in named_entity.edge_ids()):
+            n = n.split('/')[-1].strip()
+            n = n.replace('"','')
+            name.append(n)
+    if len(name) == 1:
+        name = name[0]
+        word_index = Match.exact_or_fuzzy(name, words, word_indices)
+        if word_index > 0:
+            alignment.add_word(word_index, words[word_index])
+            return alignment
+    name = ''.join(name)
+    possible_spans = [[]]
+    name_left = name
+    for i in word_indices:
+        w = words[i].rstrip('-')
+        if w[0:3] in name_left:
+            possible_spans[-1].append(i)
+            if w in name_left:
+                name_left = name_left.replace(w,'',1)
+            else:
+                prefix = [j for j, ch in enumerate(w) if w[:j] in name_left]
+                prefix = w[:prefix[-1]]
+                name_left = name_left.replace(prefix, '', 1)
+        elif len(possible_spans[-1])>0:
+            possible_spans.append([])
+            name_left = name
+    match = max(possible_spans, key=lambda x: len(x))
+    if not match:
+        return None
+    for w in match:
+        alignment.add_word(w, words[w])
+    for tr, id in zip(amr.edge_triples(),amr.edge_ids()):
+        source, rel, target = tr
+        source_frame = amr.get_name(source).split('/')[-1]
+        target_frame = amr.get_name(target).split('/')[-1]
+        # (government-organization :ARG0-of (govern-01 :ARG1 (*country* :name China)))
+        if target == named_entity.root().split('/')[0] and rel==':ARG1' and source_frame=='govern-01':
+            alignment.amr_ids.insert(0, id)
+            alignment.amr_elems.insert(0, rel)
+            alignment.amr_ids.insert(0, source)
+            alignment.amr_elems.insert(0, amr.get_name(source))
+            for tr2, id2 in zip(amr.edge_triples(), amr.edge_ids()):
+                source2, rel2, target2 = tr2
+                source_frame2 = amr.get_name(source2).split('/')[-1]
+                if target2 == source and rel2 == ':ARG0-of' and source_frame2 == 'government-organization':
+                    alignment.amr_ids.insert(0, id2)
+                    alignment.amr_elems.insert(0, rel2)
+                    alignment.amr_ids.insert(0, source2)
+                    alignment.amr_elems.insert(0, amr.get_name(source2))
+                    break
+        # (person :mod (*country* :name China) )
+        if target == named_entity.root().split('/')[0] and rel==':mod' and source_frame=='person':
+            alignment.amr_ids.insert(0, id)
+            alignment.amr_elems.insert(0, rel)
+            alignment.amr_ids.insert(0, source)
+            alignment.amr_elems.insert(0, amr.get_name(source))
+
+    return alignment
+
+
+def test_rules(amr, words):
+    for source, rel, target in amr.edge_triples():
+        if 'h/have-degree' in amr.get_name(target):
+            print(amr.get_name(source), rel, amr.get_name(target), ':', ' '.join(words))
+
+
+def output_failed_alignments(failed_amrs, failed_words):
+
+    for a in failed_amrs.most_common():
+        print(a)
+    # for w in failed_words.most_common():
+    #     print(w)
+
 def main():
+
     amr_file = r'test-data/amrs.txt'
     sentence_file = r'test-data/sentences.txt'
     if len(sys.argv)>2:
@@ -339,27 +334,21 @@ def main():
         sentences = [s for s in re.split('\n\s*\n',f1.read()) if s]
         with open(amr_file, 'r', encoding='utf8') as f2:
             for i,amr in enumerate(AMR.amr_iter(f2.read())):
-                # print(i)
+                print('#'+str(i+1))
                 words = sentences[i].strip().split()
                 amr = AMR(amr)
+                # test_rules(amr, words)
                 alignments, amr_unal, words_unal = align_amr(amr, words)
-                a = '\n'.join(a.readible() for a in alignments)
-                # for source, rel, target in amr.edge_triples():
-                #     if amr.get_name(source).endswith('expect-01'):
-                #         print(amr.get_name(source), rel, amr.get_name(target), ':', ' '.join(words))
-                # print(amr)
-                print(words)
-                print(a)
-                print('unaligned', amr_unal)
-                print('unaligned', words_unal)
+                print('# AMR:')
+                print('\n'.join('# '+l for l in str(amr).split('\n')))
+                print('# Sentence:')
+                print('# '+' '.join(words))
+                print('# Alignments:')
+                for a in alignments:
+                    print('#',a.readible())
+                for a in alignments:
+                    print(a)
                 print()
-                # for a in amr_unal:
-                #     failed_amrs[a]+=1
-    #             for w in words_unal:
-    #                 failed_words[w]+=1
-    # for a in failed_amrs.most_common():
-    #     print(a)
-    # for w in failed_words.most_common():
-    #     print(w)
+
 if __name__ == "__main__":
     main()
