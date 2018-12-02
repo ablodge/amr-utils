@@ -8,6 +8,7 @@ I wrote amr-utils to store operations that I often need when doing research with
 - iterate through nodes, edges, or named entities
 - output AMRs to useful formats: html (AMR string) or latex (AMR graph)
 - associates a unique id to each node or edge (can be used for styling a particular element in a webpage or web app)
+- a rule-based Aligner which aligns AMR nodes and edges to words in a sentence.
 
 ### Requirements
 Python 3.6 or higher
@@ -44,6 +45,8 @@ Run as follows:
 `python amr_html.py [input file] > [output file]`
 
 # Rule-Based Alignment
+Aligns AMR nodes and edges to words in its reference sentence. The aligner handles named-entity alignment, alignment of frames, and relations. A single alignment looks like `broaden-01 :ARG0 :ARG1 ~ broadened` (readible);  `b b_ARG0_i b_ARG1_r ~ 1` (machine-readible).
+
 ### Instructions
 Run as follows:
 
