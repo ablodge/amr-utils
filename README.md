@@ -37,7 +37,7 @@ Add these lines to your latex file:
 
 # HTML
 Amr-utils allows you to read AMRs from a text file and output them as html. You can look in `style.css` for an example of styling. 
-![html example](https://github.com/ablodge/amr-utils/blob/master/html_ex.PNG)
+![html example](https://github.com/ablodge/amr-utils/blob/master/html_ex.png)
 ### Instructions
 Run as follows:
 
