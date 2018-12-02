@@ -42,3 +42,9 @@ Amr-utils allows you to read AMRs from a text file and output them as html. You 
 Run as follows:
 
 `python amr_html.py [input file] > [output file]`
+
+# Rule-Based Alignment
+### Instructions
+Run as follows:
+
+`python alignment.py [amr file] [sentence file] > [output file]`
