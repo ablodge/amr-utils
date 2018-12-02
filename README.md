@@ -8,7 +8,7 @@ I wrote amr-utils to store operations that I often need when doing research with
 - iterate through nodes, edges, or named entities
 - output AMRs to useful formats: html (AMR string) or latex (AMR graph)
 - associates a unique id to each node or edge (can be used for styling a particular element in a webpage or web app)
-- a rule-based Aligner which aligns AMR nodes and edges to words in a sentence.
+- use a Rule-Based Aligner to align AMR nodes and edges with words in a sentence.
 
 ### Requirements
 Python 3.6 or higher
