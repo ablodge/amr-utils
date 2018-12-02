@@ -45,7 +45,9 @@ Run as follows:
 `python amr_html.py [input file] > [output file]`
 
 # Rule-Based Alignment
-Aligns AMR nodes and edges to words in its reference sentence. The aligner handles named-entity alignment, alignment of frames, and relations. A single alignment looks like `broaden-01 :ARG0 :ARG1 ~ broadened` (readible);  `b b_ARG0_i b_ARG1_r ~ 1` (machine-readible).
+Aligns AMR nodes and edges to words in its reference sentence. The aligner handles named-entity alignment, alignment of frames, and relations. A single alignment looks like:
+
+`broaden-01 :ARG0 :ARG1 ~ broadened` (readible);  `b b_ARG0_i b_ARG1_r ~ 1` (machine-readible).
 
 ### Instructions
 Run as follows:
