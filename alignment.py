@@ -24,7 +24,7 @@ class Alignment:
         return ' '.join(self.amr_elems)+' ~ '+' '.join(self.words)
 
     def __str__(self):
-        return ' '.join(self.amr_ids) + ' ~ ' + ' '.join(str(i) for i in self.word_ids)
+        return ' '.join(str(i) for i in self.word_ids) + ' ~ ' + ' '.join(self.amr_ids)
 
     def __bool__(self):
         return bool(self.amr_ids or self.word_ids)
