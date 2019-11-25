@@ -24,7 +24,7 @@ The default coloring assigns blue to each node, but the parameter `assign_color`
 ### Instructions
 Run as follows:
 
-`python amr_latex.py [input file] > [output file]`
+`python style.py --latex [input file] [output file]`
 
 Add these lines to your latex file:
 
@@ -40,4 +40,4 @@ Amr-utils allows you to read AMRs from a text file and output them as html. You 
 ### Instructions
 Run as follows:
 
-`python amr_html.py [input file] > [output file]`
+`python style.py --html [input file] [output file]`
