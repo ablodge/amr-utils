@@ -1,157 +1,322 @@
-import re, paren_utils, sys
+
+import re, sys
+import style
+
+from penman import PENMANCodec
+from penman.surface import Alignment, RoleAlignment
 
 
 class AMR:
-    NODE_RE = re.compile('(?P<id>[a-z][0-9]*|none[0-9]+)( ?/ ?(?P<concept>[^\s()]+))?(?![a-z])')
-    EDGE_RE = re.compile('(?P<rel>:[A-Za-z0-9-]+(-of)?)')
-    ELEM_RE = re.compile(fr'({NODE_RE.pattern}|{EDGE_RE.pattern}|[()]|[^\s()]+|\s+)')
 
-    def __init__(self, text):
-        # remove comments
-        self.text = '\n'.join([l for l in text.split('\n') if not l.strip().startswith('#')])
-        self.text_elements = []
-        # meomoize edge triples
-        self.edge_triples_memoized = []
-        self.edges_are_memoized = False
-        i = 0
-        for e in self.ELEM_RE.finditer(self.text):
-            e = e.group()
-            if self.NODE_RE.match(e):
-                self.text_elements.append(e.replace(' / ', '/'))
-            elif not self.EDGE_RE.match(e) and not re.match('[()]|\s+', e):
-                self.text_elements.append(f'x{i}/' + e)
-                i += 1
-            elif re.match('x[0-9]+( ?/ ?[A-Za-z-]+[0-9]*)', e):
-                self.text_elements.append(f'x{i}/' + e.split('/')[1].strip())
-                i += 1
-            else:
-                self.text_elements.append(e)
-        self.names = {}
-        for e,i in zip(self.elements(),self.element_ids()):
-            if not re.match('^[a-z][0-9]*$', e):
-                self.names[i] = e
+    def __init__(self, tokens=None, root='', nodes=None, edges=None, alignments=None):
 
+        if edges is None: edges = []
+        if nodes is None: nodes = {}
+        if tokens is None: tokens = []
 
-    def root(self):
-        return self.NODE_RE.search(self.text).group().replace(' / ', '/')
+        self.tokens = tokens
+        self.root = root
+        self.nodes = nodes
+        self.edges = edges
+        self.id = None
+        self.alignments = alignments if alignments else []
+        self.alignments = list(sorted(self.alignments,key = lambda x:x.tokens[0]))
 
-    def elements(self):
-        for e in self.text_elements:
-            if e in ['(',')'] or not e.strip():
+    def add_alignment(self, tokens, nodes=None, edges=None):
+        for align in self.alignments:
+            if align.tokens==tokens:
+                if nodes:
+                    for n in nodes:
+                        if n not in align.nodes:
+                            align.nodes.append(n)
+                if edges:
+                    for e in edges:
+                        if e not in align.edges:
+                            align.edges.append(e)
+                return
+        self.alignments.append(AMR_Alignment(tokens=tokens, nodes=nodes, edges=edges))
+
+    def get_alignment(self, token_id=None, node_id=None, edge=None):
+        for align in self.alignments:
+            if token_id and token_id not in align.tokens:
                 continue
-            yield e
+            if node_id and node_id not in align.nodes:
+                continue
+            if edge and edge not in align.edges:
+                continue
+            return align
+        return AMR_Alignment()
 
+    def copy(self):
+        return AMR(self.tokens.copy(), self.root, self.nodes.copy(), self.edges.copy(), [a.copy() for a in self.alignments])
 
-    def nodes(self):
-        for e in self.elements():
-            if self.NODE_RE.match(e):
-                yield e
-
-
-    def edges(self):
-        for e in self.elements():
-            if self.EDGE_RE.match(e):
-                yield e
-
-    def node_indices(self):
-        for i,e in enumerate(self.elements()):
-            if self.NODE_RE.match(e):
-                yield i
-
-    def edge_indices(self):
-        for i,e in enumerate(self.elements()):
-            if self.EDGE_RE.match(e):
-                yield i
-
-    def element_ids(self):
-        nodes = self.node_ids()
-        edges = self.edge_ids()
-        for e in self.elements():
-            if self.EDGE_RE.match(e):
-                yield next(edges, None)
-            else:
-                yield next(nodes, None)
-
-    def node_ids(self):
-        for n in self.nodes():
-            yield n.split('/')[0].strip()
-
-    def edge_ids(self):
-        for source,rel,target in self.edge_triples():
-            rel = rel.replace(':', '')
-            yield source+'_'+rel+'_'+target
-
-    def get_name(self, id):
-        return self.names[id]
-
-    def edge_triples(self):
-        if self.edges_are_memoized:
-            return self.edge_triples_memoized
-        memo = []
-        text = str(self)
-        idx = [(e.start(), e.group()) for e in self.EDGE_RE.finditer(text)]
-
-        for rel_position, rel in idx:
-            Target_RE = re.compile(f'{rel}\s*[(]?\s*{self.NODE_RE.pattern}')
-            for t in paren_utils.paren_iter(text):
-                pos = rel_position - text.index(t)
-                if t.startswith(rel, pos) and paren_utils.depth_at(t, pos) == 0:
-                    root = self.NODE_RE.match(t)
-                    source = root.group().split('/')[0].strip()
-                    x = Target_RE.match(t, pos=pos)
-                    if x:
-                        target = x.group('id')
-                        memo.append((source, rel, target))
-                    else:
-                        print('Missing target node! ', rel, re.sub('\s+', ' ', t))
-                        memo.append((source, rel, '?'))
-                    break
-        self.edge_triples_memoized = memo
-        self.edges_are_memoized = True
-        return memo
-
-    def named_entities(self):
-        NE_RE = re.compile(f'(?P<root>{self.NODE_RE.pattern}).*:name\s+<1>(?P<name>.*?)</1>', re.DOTALL)
-        for t in paren_utils.paren_iter(str(self)):
-            t = paren_utils.mark_depth(t)
-            x = NE_RE.match(t)
-            if x:
-                root = x.group('root')
-                name = x.group('name')
-                yield AMR(f'({root} :name ({name}) )')
-
-    def sub_amrs(self):
-        for t in paren_utils.paren_iter(self.text):
-            yield AMR('('+t+')')
-
-
-    @staticmethod
-    def test(text):
-        # ignore comments
-        text = '\n'.join([l for l in text.split('\n') if not l.strip().startswith('#')])
-        return text.strip().startswith('(') and paren_utils.test_parens(text)
-
-    @staticmethod
-    def amr_iter(text):
-        Split_RE = re.compile('\n\s*\n')
-        for text in Split_RE.split(text):
-            text = text.strip()
-            if text and AMR.test(text):
-                yield text
+    def get_subgraph(self, node_ids):
+        if not node_ids:
+            return AMR()
+        potential_root = node_ids.copy()
+        sg_edges = []
+        for x, r, y in self.edges:
+            if x in node_ids and y in node_ids:
+                sg_edges.append((x, r, y))
+                if y in potential_root:
+                    potential_root.remove(y)
+        root = potential_root[0] if len(potential_root) > 0 else node_ids[0]
+        return AMR(root=root,
+                   edges=sg_edges,
+                   nodes={n: self.nodes[n] for n in node_ids})
 
     def __str__(self):
-        return ''.join(e for e in self.text_elements)
+        return style.default_string(self)
+
+    def graph_string(self):
+        return style.graph_string(self)
+
+    def jamr_string(self):
+        return style.jamr_string(self)
+
+
+class AMR_Alignment:
+
+    def __init__(self, tokens:list=None, nodes:list=None, edges:list=None):
+        self.tokens = tokens if tokens else []
+        self.nodes = nodes if nodes else []
+        self.edges = edges if edges else []
+
+    def __bool__(self):
+        return bool(self.tokens) and (bool(self.nodes) or bool(self.edges))
+
+    def __str__(self):
+        return f'<AMR_Alignment>: tokens {self.tokens} nodes {self.nodes} edges {self.edges}'
+
+    def __copy__(self):
+        return AMR_Alignment(tokens=self.tokens.copy(), nodes=self.nodes.copy(), edges=self.edges.copy())
+
+    def test(self, amr):
+        # test if connected
+        # test if tokens contiuous
+        # test if no intersection of tokens with other alignments
+        pass
+
+class JAMR_AMR_Reader:
+
+    special_tokens = []
+
+    def __init__(self):
+        pass
+
+    '''
+    Reads AMR Graphs file in JAMR format. If Training==true, it is reading training data set and it will affect the dictionaries.
+
+    JAMR format is ...
+    # ::id sentence id
+    # ::tok tokens...
+    # ::node node_id node alignments
+    # ::root root_id root
+    # ::edge src label trg src_id trg_id alignments
+    amr graph
+    '''
+
+    def load(self, amr_file_name, training=True, verbose=False, remove_wiki=False):
+        print('[amr]', 'Start reading data')
+
+        amr = AMR()
+        amrs = [amr]
+
+        with open(amr_file_name, encoding='utf8') as f:
+            for line in f:
+                # empty line, prepare to read next amr
+                if not line.strip():
+                    if verbose:
+                        print(amr)
+                    amr = AMR()
+                    amrs.append(amr)
+                # amr id
+                elif line.startswith('# ::id'):
+                    amr.id = line.split()[2]
+                # amr tokens
+                elif line.startswith("# ::tok"):
+                    toks = line[len('# ::tok '):]
+                    amr.tokens = toks.split()
+                # amr root
+                elif line.startswith("# ::root"):
+                    root = line.split("\t")[1].strip()
+                    amr.root = root
+                # an amr node
+                elif line.startswith("# ::node"):
+                    node_id = ''
+                    in_quotes = False
+                    quote_offset = 0
+                    for col, val in enumerate(line.split("\t")):
+                        val = val.strip()
+                        if val.startswith('"'):
+                            in_quotes = True
+                        if val.endswith('"'):
+                            in_quotes = False
+                        # node id
+                        if col == 1:
+                            node_id = val
+                        # node label
+                        elif col == 2 + (quote_offset):
+                            amr.nodes[node_id] = val
+                        # alignment
+                        elif col == 3 + (quote_offset):
+                            if '-' in val:
+                                start, end = val.split("-")
+                                word_idxs = list(range(int(start), int(end)))
+                                amr.add_alignment(tokens=word_idxs, nodes=[node_id])
+                        if in_quotes:
+                            quote_offset += 1
+                # an amr edge
+                elif line.startswith("# ::edge"):
+                    s,r,t = '', '', ''
+                    in_quotes = False
+                    quote_offset = 0
+                    for col, val in enumerate(line.split("\t")):
+                        val = val.strip()
+                        if val.startswith('"'):
+                            in_quotes = True
+                        if val.endswith('"'):
+                            in_quotes = False
+                        # edge label
+                        if col == 2 + (quote_offset):
+                            r = ':'+ val
+                        # edge source id
+                        elif col == 4 + (quote_offset):
+                            s = val
+                        # edge target id
+                        elif col == 5 + (quote_offset):
+                            t = val
+                        # alignment
+                        elif col == 6 + (quote_offset):
+                            if '-' in val:
+                                start, end = val.split("-")
+                                word_idxs = list(range(int(start), int(end)))
+                                amr.add_alignment(tokens=word_idxs, edges=[(s,r,t)])
+                        if in_quotes:
+                            quote_offset += 1
+                    amr.edges.append((s,r,t))
+
+        if len(amr.nodes) == 0:
+            amrs.pop()
+        if remove_wiki:
+            for amr in amrs:
+                wiki_nodes = []
+                for s,r,t in amr.edges.copy():
+                    if r==':wiki':
+                        amr.edges.remove((s,r,t))
+                        del amr.nodes[t]
+                        wiki_nodes.append(t)
+                for align in amr.alignments:
+                    for n in wiki_nodes:
+                        if n in align.nodes:
+                            align.nodes.remove(n)
+        print('[amr]', "Training Data" if training else "Dev Data")
+        print('[amr]', "Number of sentences: " + str(len(amrs)))
+        return amrs
+
+
+class Graph_AMR_Reader:
+
+    def __init__(self):
+        pass
+
+    def parse_amr_(self, tokens, amr_string):
+        amr = AMR(tokens=tokens)
+
+        g = PENMANCodec().decode(amr_string)
+        triples = g.triples() if callable(g.triples) else g.triples
+        new_node = 0
+
+        amr.root = g.top
+        for tr in triples:
+            s, r, t = tr
+            if not r.startswith(':'):
+                r = ':'+r
+            # an amr node
+            if r == ':instance':
+                amr.nodes[s] = t
+                if s.startswith('x'):
+                    new_node+=1
+                # alignment
+                if tr in g.epidata:
+                    for x in g.epidata[tr]:
+                        if isinstance(x, Alignment):
+                            amr.add_alignment(tokens=[int(j) for j in x.indices], nodes=[s])
+            # an amr edge
+            else:
+                amr.edges.append((s,r,t))
+                if s != amr.root and not any(s == t2 for s2, r2, t2 in amr.edges):
+                    amr.edges[-1] = (t, r + '-of', s)
+                # alignment
+                if tr in g.epidata:
+                    for x in g.epidata[tr]:
+                        if isinstance(x, RoleAlignment):
+                            amr.add_alignment(tokens=[int(j) for j in x.indices], edges=[amr.edges[-1]])
+        # attributes
+        for i,e in enumerate(amr.edges):
+            s,r,t = e
+            if t not in amr.nodes:
+                amr.nodes[f'x{new_node}'] = str(t)
+                amr.edges[i] = (s, r, f'x{new_node}')
+                new_node += 1
+        return amr
+
+    def load(self, amr_file_name, training=True, verbose=False, remove_wiki=False):
+        print('[amr]', 'Start reading data')
+        amrs = []
+
+        with open(amr_file_name, 'r', encoding='utf8') as f:
+            sents = f.read().replace('\r','').split('\n\n')
+            for sent in sents:
+                prefix = '\n'.join(line for line in sent.split('\n') if line.strip().startswith('#'))
+                amr_string = ''.join(line for line in sent.split('\n') if not line.strip().startswith('#'))
+                amr_string = re.sub(' +',' ',amr_string)
+
+                tokens = []
+                id = None
+                for line in prefix.split('\n'):
+                    if line.startswith('# ::tok '):
+                        tokens = line[len('# ::tok '):].split()
+                    elif line.startswith('# ::id'):
+                        id = line.split()[2]
+                if amr_string.strip():
+                    amr = self.parse_amr_(tokens, amr_string)
+                    amr.id = id
+                    amrs.append(amr)
+                    if verbose:
+                        print(amr)
+        if remove_wiki:
+            for amr in amrs:
+                wiki_nodes = []
+                for s,r,t in amr.edges.copy():
+                    if r==':wiki':
+                        amr.edges.remove((s,r,t))
+                        del amr.nodes[t]
+                        wiki_nodes.append(t)
+                for align in amr.alignments:
+                    for n in wiki_nodes:
+                        if n in align.nodes:
+                            align.nodes.remove(n)
+        print('[amr]', "Training Data" if training else "Dev Data")
+        print('[amr]', "Number of sentences: " + str(len(amrs)))
+        return amrs
+
 
 def main():
-    input_file = r'test-data/amrs.txt'
-    if len(sys.argv)>1:
-        input_file = sys.argv[1]
+    file = sys.argv[1] if len(sys.argv) > 1 else "data/test_amrs.txt"
+    outfile = sys.argv[2] if len(sys.argv)>2 else ''
 
-    with open(input_file, 'r', encoding='utf8') as f:
-        for amr in AMR.amr_iter(f.read()):
-            amr = AMR(amr)
-            print(amr)
-            print()
+    cr = Graph_AMR_Reader()
+    amrs = cr.load(file, verbose=False)
 
-if __name__ == "__main__":
+    if outfile:
+        with open(outfile, 'w+', encoding='utf8') as f:
+            for amr in amrs:
+                f.write(amr.jamr_string())
+    else:
+        for amr in amrs:
+            print(amr.jamr_string())
+
+
+if __name__ == '__main__':
     main()

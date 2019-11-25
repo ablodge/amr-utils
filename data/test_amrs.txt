@@ -1,0 +1,21 @@
+# ::id 1
+# ::tok The boy wants to go to New York
+(w/want-01 :ARG0 (b/boy)
+	:ARG1 (g/go-02 :ARG0 b
+		:ARG4 (c/city :name (n/name :op1 "New" 
+			:op2 "York" 
+			:op3 "City"))))
+
+# ::id 2
+# ::tok dogs chase cats
+(c/chase-01 :ARG0 (d/dog)
+	:ARG1 (c2/cat))
+
+# ::id 3
+# ::tok .
+(a/amr-empty)
+
+# ::id 4
+# ::tok peanut butter and jelly
+(a/and :op1 (b/butter :mod (p/peanut))
+	:op2 (j/jelly))
