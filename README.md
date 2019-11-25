@@ -5,10 +5,8 @@ A python package of common operations for AMRs
 I wrote amr-utils to store operations that I often need when doing research with AMRs. 
 ### Features:
 - Load multiple AMRs from a text file
-- iterate through nodes, edges, or named entities
+- iterate through nodes, edges, or alignments
 - output AMRs to useful formats: html (AMR string) or latex (AMR graph)
-- associates a unique id to each node or edge (can be used for styling a particular element in a webpage or web app)
-- use a Rule-Based Aligner to align AMR nodes and edges with words in a sentence.
 
 ### Requirements
 Python 3.6 or higher
@@ -21,7 +19,7 @@ Amr-utils allows you to read AMRs from a text file and output them as latex diag
 ![latex example](https://github.com/ablodge/amr-utils/blob/master/latex_ex.PNG)
 
 ### Colors
-The default coloring assigns a different color to each node in a given row. To change a color by hand, just rewrite `\node[red]` as `\node[purple]`, etc.
+The default coloring assigns blue to each node, but the parameter `assign_color` can be used to assign colors using a function. To change a color by hand, just rewrite `\node[red]` as `\node[purple]`, etc.
 
 ### Instructions
 Run as follows:
@@ -43,15 +41,3 @@ Amr-utils allows you to read AMRs from a text file and output them as html. You 
 Run as follows:
 
 `python amr_html.py [input file] > [output file]`
-
-# Rule-Based Alignment
-Aligns AMR nodes and edges to words in its reference sentence. The aligner handles named-entity alignment, alignment of frames, and relations. A single alignment looks like:
-
-`broaden-01 :ARG0 :ARG1 ~ broadened` (readable)
-
-`b b_ARG0_i b_ARG1_r ~ 1` (machine-readable)
-
-### Instructions
-Run as follows:
-
-`python alignment.py [amr file] [sentence file] > [output file]`
