@@ -1,3 +1,4 @@
+import html
 import sys
 
 
@@ -10,6 +11,9 @@ def default_string(amr):
         # ::edge src label trg src_id trg_id alignments
     '''
     output = ''
+    # id
+    if amr.id:
+        output += f'# ::id {amr.id}\n'
     # tokens
     output += '# ::tok ' + (' '.join(amr.tokens)) + '\n'
     # nodes
@@ -17,24 +21,24 @@ def default_string(amr):
         alignment = amr.get_alignment(node_id=n)
         align_string = ''
         if alignment:
-            align_string = f'\t{alignment.tokens[0]}-{alignment.tokens[-1] + 1}'
+            align_string = f'\t{alignment.write_span()}'
         output += f'# ::node\t{n}\t{amr.nodes[n] if n in amr.nodes else "None"}' + align_string + '\n'
     # root
     root = amr.root
     alignment = amr.get_alignment(node_id=root)
     align_string = ''
     if alignment:
-        align_string = f'\t{alignment.tokens[0]}-{alignment.tokens[-1] + 1}'
+        align_string = f'\t{alignment.write_span()}'
     if amr.root:
         output += f'# ::root\t{root}\t{amr.nodes[root] if root in amr.nodes else "None"}' + align_string + '\n'
     # edges
     for i, e in enumerate(amr.edges):
         s, r, t = e
         r = r.replace(':', '')
-        alignment = amr.get_alignment(edge=i)
+        alignment = amr.get_alignment(edge=e)
         align_string = ''
         if alignment:
-            align_string = f'\t{alignment.tokens[0]}-{alignment.tokens[-1] + 1}'
+            align_string = f'\t{alignment.write_span()}'
         output += f'# ::edge\t{amr.nodes[s] if s in amr.nodes else "None"}\t{r}\t{amr.nodes[t] if t in amr.nodes else "None"}\t{s}\t{t}' \
                   + align_string + '\n'
     return output
@@ -223,6 +227,7 @@ class HTML_AMR:
 
     @staticmethod
     def span(text, type, id, desc=''):
+        desc = html.escape(desc)
         return f'<span class="{type}" tok-id="{id}"' + (f' title="{desc}"' if desc else '') +f'>{text}</span>'
 
     @staticmethod
@@ -263,8 +268,9 @@ class HTML_AMR:
 '''
 
     @staticmethod
-    def html(amr, assign_node_color=None, assign_edge_color=None, assign_token_color=None):
-        from propbank_frames import propbank_frames_dictionary
+    def html(amr, assign_node_color=None, assign_edge_color=None, assign_token_color=None,
+             assign_node_desc=None, assign_edge_desc=None, assign_token_desc=None):
+        from amr_utils.propbank_frames import propbank_frames_dictionary
         amr_string = f'[[{amr.root}]]'
         new_ids = {}
         for n in amr.nodes:
@@ -298,7 +304,8 @@ class HTML_AMR:
                     else:
                         color = False
                     type = 'amr-edge' + (f' {color}' if color else '')
-                    edge_spans.append(f'{HTML_AMR.span(r, type, f"{s}-{t}")} [[{t}]]')
+                    desc = assign_edge_desc(amr, (s,r,t)) if assign_edge_desc else ''
+                    edge_spans.append(f'{HTML_AMR.span(r, type, f"{s}-{t}", desc)} [[{t}]]')
                 children = f'\n{tab}'.join(edge_spans)
                 if children:
                     children = f'\n{tab}' + children
@@ -312,17 +319,21 @@ class HTML_AMR:
                                                                  'interrogative']) or targets or depth==1:
                         desc = HTML_AMR.get_description_(concept, propbank_frames_dictionary)
                         type = 'amr-frame' if desc else "amr-node"
+                        if assign_node_desc:
+                            desc = assign_node_desc(amr, n)
                         if color:
                             type += f' {color}'
                         span = HTML_AMR.span(f'{id}/{concept}', type, id, desc)
                         amr_string = amr_string.replace(f'[[{n}]]', f'({span}{children})', 1)
                     else:
                         type = 'amr-node' + (f' {color}' if color else '')
-                        span = HTML_AMR.span(f'{concept}', type, id)
+                        desc = assign_node_desc(amr, n) if assign_node_desc else ''
+                        span = HTML_AMR.span(f'{concept}', type, id, desc)
                         amr_string = amr_string.replace(f'[[{n}]]', f'{span}')
                     completed.add(n)
                 type = 'amr-node' + (f' {color}' if color else '')
-                span = HTML_AMR.span(f'{id}', type, id)
+                desc = assign_node_desc(amr, n) if assign_node_desc else ''
+                span = HTML_AMR.span(f'{id}', type, id, desc)
                 amr_string = amr_string.replace(f'[[{n}]]', f'{span}')
                 nodes.remove(n)
                 nodes.update(targets)
@@ -341,13 +352,15 @@ class HTML_AMR:
         if assign_token_color:
             for i,t in enumerate(toks):
                 color = assign_token_color(amr,i)
-                if color:
-                    toks[i] = HTML_AMR.span(t, color, f'tok{i}')
+                desc = assign_token_desc(amr, i) if assign_token_desc else ''
+                if color or desc:
+                    toks[i] = HTML_AMR.span(t, color, f'tok{i}', desc)
         output = f'<div class="amr-container">\n<pre>\n{" ".join(toks)}\n\n{amr_string}</pre>\n</div>\n\n'
         return output
 
     @staticmethod
-    def style(amrs, assign_node_color=None, assign_edge_color=None, assign_token_color=None):
+    def style(amrs, assign_node_color=None, assign_edge_color=None, assign_token_color=None,
+              assign_node_desc=None, assign_edge_desc=None, assign_token_desc=None):
         output = '<!DOCTYPE html>\n'
         output += '<html>\n'
         output += '<style>\n'
@@ -355,7 +368,8 @@ class HTML_AMR:
         output += '</style>\n\n'
         output += '<body>\n'
         for amr in amrs:
-            output += HTML_AMR.html(amr, assign_node_color, assign_edge_color, assign_token_color)
+            output += HTML_AMR.html(amr, assign_node_color, assign_edge_color, assign_token_color,
+                                    assign_node_desc, assign_edge_desc, assign_token_desc)
         output += '</body>\n'
         output += '</html>\n'
         return output
@@ -373,7 +387,7 @@ class HTML_AMR:
 #     return '' if align else 'red'
 
 def main():
-    from amr import JAMR_AMR_Reader
+    from amr_utils.amr import JAMR_AMR_Reader
     file = sys.argv[-2] if len(sys.argv) > 1 else "data/test.txt"
     outfile = sys.argv[-1]
 

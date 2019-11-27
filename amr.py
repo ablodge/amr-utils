@@ -1,9 +1,9 @@
 
 import re, sys
-import style
+from amr_utils import style
 
 from penman import PENMANCodec
-from penman.surface import Alignment, RoleAlignment
+from penman.surface import Alignment, RoleAlignment, AlignmentMarker
 
 
 class AMR:
@@ -23,6 +23,9 @@ class AMR:
         self.alignments = list(sorted(self.alignments,key = lambda x:x.tokens[0]))
 
     def add_alignment(self, tokens, nodes=None, edges=None):
+        for t in tokens:
+            if t>=len(self.tokens):
+                print(f'Tokens out of range: {t} {" ".join(self.tokens)}', file=sys.stderr)
         for align in self.alignments:
             if align.tokens==tokens:
                 if nodes:
@@ -38,11 +41,11 @@ class AMR:
 
     def get_alignment(self, token_id=None, node_id=None, edge=None):
         for align in self.alignments:
-            if token_id and token_id not in align.tokens:
+            if token_id is not None and token_id not in align.tokens:
                 continue
-            if node_id and node_id not in align.nodes:
+            if node_id is not None and node_id not in align.nodes:
                 continue
-            if edge and edge not in align.edges:
+            if edge is not None and edge not in align.edges:
                 continue
             return align
         return AMR_Alignment()
@@ -90,6 +93,30 @@ class AMR_Alignment:
 
     def __copy__(self):
         return AMR_Alignment(tokens=self.tokens.copy(), nodes=self.nodes.copy(), edges=self.edges.copy())
+
+    def write_span(self):
+        if len(self.tokens)==0:
+            return ''
+        elif len(self.tokens)==1:
+            return f'{self.tokens[0]}-{self.tokens[0]+1}'
+        elif all(self.tokens[i]==self.tokens[i+1]-1 for i in range(0,len(self.tokens)-1)):
+            return f'{self.tokens[0]}-{self.tokens[-1]+1}'
+        else:
+            return ','.join(str(t) for t in self.tokens)
+
+    @staticmethod
+    def read_span(span):
+        if '-' in span:
+            start, end = span.split('-')
+            return list(range(int(start),int(end)))
+        elif ',' in span:
+            return [int(t) for t in span.split(',')]
+        elif span.isdigit():
+            return [int(span)]
+        elif not span.strip():
+            return []
+        else:
+            raise ValueError(f'Invalid Argument: {span}')
 
     def test(self, amr):
         # test if connected
@@ -160,9 +187,8 @@ class JAMR_AMR_Reader:
                             amr.nodes[node_id] = val
                         # alignment
                         elif col == 3 + (quote_offset):
-                            if '-' in val:
-                                start, end = val.split("-")
-                                word_idxs = list(range(int(start), int(end)))
+                            if val.strip():
+                                word_idxs = AMR_Alignment.read_span(val)
                                 amr.add_alignment(tokens=word_idxs, nodes=[node_id])
                         if in_quotes:
                             quote_offset += 1
@@ -188,9 +214,8 @@ class JAMR_AMR_Reader:
                             t = val
                         # alignment
                         elif col == 6 + (quote_offset):
-                            if '-' in val:
-                                start, end = val.split("-")
-                                word_idxs = list(range(int(start), int(end)))
+                            if val.strip():
+                                word_idxs = AMR_Alignment.read_span(val)
                                 amr.add_alignment(tokens=word_idxs, edges=[(s,r,t)])
                         if in_quotes:
                             quote_offset += 1
@@ -223,9 +248,12 @@ class Graph_AMR_Reader:
     def parse_amr_(self, tokens, amr_string):
         amr = AMR(tokens=tokens)
 
+        num_alignments = 0
+
         g = PENMANCodec().decode(amr_string)
         triples = g.triples() if callable(g.triples) else g.triples
-        new_node = 0
+        new_alignments = {}
+        new_idx = 0
 
         amr.root = g.top
         for tr in triples:
@@ -236,12 +264,13 @@ class Graph_AMR_Reader:
             if r == ':instance':
                 amr.nodes[s] = t
                 if s.startswith('x'):
-                    new_node+=1
+                    new_idx+=1
                 # alignment
                 if tr in g.epidata:
-                    for x in g.epidata[tr]:
-                        if isinstance(x, Alignment):
-                            amr.add_alignment(tokens=[int(j) for j in x.indices], nodes=[s])
+                    for align in g.epidata[tr]:
+                        if isinstance(align, Alignment):
+                            amr.add_alignment(tokens=[int(j) for j in align.indices], nodes=[s])
+                            num_alignments+=1
             # an amr edge
             else:
                 amr.edges.append((s,r,t))
@@ -249,16 +278,29 @@ class Graph_AMR_Reader:
                     amr.edges[-1] = (t, r + '-of', s)
                 # alignment
                 if tr in g.epidata:
-                    for x in g.epidata[tr]:
-                        if isinstance(x, RoleAlignment):
-                            amr.add_alignment(tokens=[int(j) for j in x.indices], edges=[amr.edges[-1]])
+                    for align in g.epidata[tr]:
+                        if isinstance(align, RoleAlignment):
+                            amr.add_alignment(tokens=[int(j) for j in align.indices], edges=[amr.edges[-1]])
+                            num_alignments += 1
+                        elif isinstance(align, Alignment):
+                            new_alignments[amr.edges[-1]] = align.indices
         # attributes
         for i,e in enumerate(amr.edges):
             s,r,t = e
             if t not in amr.nodes:
-                amr.nodes[f'x{new_node}'] = str(t)
-                amr.edges[i] = (s, r, f'x{new_node}')
-                new_node += 1
+                amr.nodes[f'x{new_idx}'] = str(t)
+                amr.edges[i] = (s, r, f'x{new_idx}')
+                if (s, r, t) in new_alignments:
+                    align = new_alignments[(s, r, t)]
+                    amr.add_alignment(tokens=[int(j) for j in align], nodes=[f'x{new_idx}'])
+                    num_alignments += 1
+                new_idx += 1
+            elif (s, r, t) in new_alignments:
+                align = new_alignments[(s, r, t)]
+                amr.add_alignment(tokens=[int(j) for j in align], nodes=[t])
+                num_alignments += 1
+        if num_alignments!=amr_string.count('~e'):
+            print(f'Missing alignment: {num_alignments}/{amr_string.count("~e")}\n{amr}', file=sys.stderr)
         return amr
 
     def load(self, amr_file_name, training=True, verbose=False, remove_wiki=False):
