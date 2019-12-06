@@ -88,10 +88,9 @@ def graph_string(amr):
     if len(completed) < len(amr.nodes):
         print('[amr]', 'Failed to print AMR, '
               + str(len(completed)) + ' of ' + str(len(amr.nodes)) + ' nodes printed:\n '
-              + ' '.join(amr.tokens) + '\n'
-              + amr_string, file=sys.stderr)
-    if amr_string.startswith('"') or amr_string[0].isdigit() or amr_string[0] == '-':
-        amr_string = '(x/' + amr_string + ')'
+              + str(amr.id) +':\n'
+              + amr_string + ':\n'
+              + default_string(amr), file=sys.stderr)
     if not amr_string.startswith('('):
         amr_string = '(' + amr_string + ')'
     if len(amr.nodes) == 0:
@@ -265,12 +264,17 @@ class HTML_AMR:
                 background: gainsboro; 
                 color : black;
             }
+            
+            .green {
+                background: yellowgreen; 
+                color : black;
+            }
 '''
 
     @staticmethod
-    def html(amr, assign_node_color=None, assign_edge_color=None, assign_token_color=None,
-             assign_node_desc=None, assign_edge_desc=None, assign_token_desc=None):
-        from amr_utils.propbank_frames import propbank_frames_dictionary
+    def html(amr, assign_node_color=None, assign_node_desc=None, assign_edge_color=None, assign_edge_desc=None,
+             assign_token_color=None, assign_token_desc=None):
+        from propbank_frames import propbank_frames_dictionary
         amr_string = f'[[{amr.root}]]'
         new_ids = {}
         for n in amr.nodes:
@@ -359,8 +363,8 @@ class HTML_AMR:
         return output
 
     @staticmethod
-    def style(amrs, assign_node_color=None, assign_edge_color=None, assign_token_color=None,
-              assign_node_desc=None, assign_edge_desc=None, assign_token_desc=None):
+    def style(amrs, assign_node_color=None, assign_node_desc=None, assign_edge_color=None, assign_edge_desc=None,
+             assign_token_color=None, assign_token_desc=None):
         output = '<!DOCTYPE html>\n'
         output += '<html>\n'
         output += '<style>\n'
@@ -368,8 +372,10 @@ class HTML_AMR:
         output += '</style>\n\n'
         output += '<body>\n'
         for amr in amrs:
-            output += HTML_AMR.html(amr, assign_node_color, assign_edge_color, assign_token_color,
-                                    assign_node_desc, assign_edge_desc, assign_token_desc)
+            output += HTML_AMR.html(amr,
+                                    assign_node_color, assign_node_desc,
+                                    assign_edge_color, assign_edge_desc,
+                                    assign_token_color, assign_token_desc)
         output += '</body>\n'
         output += '</html>\n'
         return output

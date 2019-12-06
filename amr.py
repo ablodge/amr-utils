@@ -1,6 +1,6 @@
 
 import re, sys
-from amr_utils import style
+import style
 
 from penman import PENMANCodec
 from penman.surface import Alignment, RoleAlignment, AlignmentMarker
@@ -8,7 +8,7 @@ from penman.surface import Alignment, RoleAlignment, AlignmentMarker
 
 class AMR:
 
-    def __init__(self, tokens=None, root='', nodes=None, edges=None, alignments=None):
+    def __init__(self, id=None, tokens:list=None, root=None, nodes:dict=None, edges:list=None, alignments:list=None):
 
         if edges is None: edges = []
         if nodes is None: nodes = {}
@@ -18,9 +18,10 @@ class AMR:
         self.root = root
         self.nodes = nodes
         self.edges = edges
-        self.id = None
+        self.id = 'None' if id is None else id
         self.alignments = alignments if alignments else []
         self.alignments = list(sorted(self.alignments,key = lambda x:x.tokens[0]))
+        self.duplicates = []
 
     def add_alignment(self, tokens, nodes=None, edges=None):
         for t in tokens:
@@ -51,9 +52,9 @@ class AMR:
         return AMR_Alignment()
 
     def copy(self):
-        return AMR(self.tokens.copy(), self.root, self.nodes.copy(), self.edges.copy(), [a.copy() for a in self.alignments])
+        return AMR(self.id, self.tokens.copy(), self.root, self.nodes.copy(), self.edges.copy(), [a.copy() for a in self.alignments])
 
-    def get_subgraph(self, node_ids):
+    def get_subgraph(self, node_ids:list):
         if not node_ids:
             return AMR()
         potential_root = node_ids.copy()
@@ -77,6 +78,31 @@ class AMR:
     def jamr_string(self):
         return style.jamr_string(self)
 
+    def iterate_nodes(self):
+        node = self.root
+        complete = [self.root]
+        children = [(s,r,t) for s,r,t in self.edges if s==self.root]
+        children += [(t, r.replace('-of', '') if r.endswith('-of') else r + '-of', s) for s, r, t in self.edges if t in complete and s not in complete]
+        children = sorted(children, key=lambda x:(x[1]+' '+self.nodes[x[2]]).lower())
+
+        prev_size = 1
+        yield node
+        while len(complete)<len(self.nodes):
+            for s,r,t in children:
+                if t in complete:
+                    continue
+                yield t
+                complete.append(t)
+            children = [(s,r,t) for s,r,t in self.edges if s in complete and t not in complete]
+            children += [(t,r.replace('-of','') if r.endswith('-of') else r+'-of',s) for s,r,t in self.edges if t in complete and s not in complete]
+            children = sorted(children, key=lambda x: (x[1] + ' ' + self.nodes[x[2]]).lower())
+            if prev_size==len(complete):
+                break
+            prev_size = len(complete)
+        if len(complete)!=len(self.nodes):
+            raise Exception('Failed to print AMR, '
+              + str(len(complete)) + ' of ' + str(len(self.nodes)) + ' nodes printed:\n '
+              + self.id)
 
 class AMR_Alignment:
 
@@ -91,7 +117,7 @@ class AMR_Alignment:
     def __str__(self):
         return f'<AMR_Alignment>: tokens {self.tokens} nodes {self.nodes} edges {self.edges}'
 
-    def __copy__(self):
+    def copy(self):
         return AMR_Alignment(tokens=self.tokens.copy(), nodes=self.nodes.copy(), edges=self.edges.copy())
 
     def write_span(self):
@@ -118,11 +144,18 @@ class AMR_Alignment:
         else:
             raise ValueError(f'Invalid Argument: {span}')
 
-    def test(self, amr):
-        # test if connected
-        # test if tokens contiuous
-        # test if no intersection of tokens with other alignments
-        pass
+    def is_connected(self, amr):
+        import networkx as nx
+        G = nx.Graph()
+        nodes = self.nodes
+        for n in nodes:
+            G.add_node(n)
+        edges = [(s,r,t) for s,r,t in amr.edges if s in nodes and t in nodes]
+        for s,r,t in edges:
+            G.add_edge(s,t)
+        return nx.is_connected(G)
+
+
 
 class JAMR_AMR_Reader:
 
