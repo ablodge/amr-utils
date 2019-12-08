@@ -1,5 +1,4 @@
 import sys
-from collections import Counter
 
 from amr import JAMR_AMR_Reader
 from style import HTML_AMR
@@ -51,6 +50,25 @@ def is_correct_edge(amr, e):
     return 'red'
 
 
+def is_correct_node_desc(amr, n):
+    amr1, amr2 = amr_pairs[amr.id]
+    node = amr.nodes[n]
+    amr1_nodes = [amr1.nodes[m] for m in amr1.nodes]
+    amr2_nodes = [amr2.nodes[m] for m in amr2.nodes]
+    if node in amr1_nodes and node in amr2_nodes:
+        return f'node ({amr.nodes[n]} in AMR 1 and AMR 2'
+    return f'node ({amr.nodes[n]} missing from other AMR'
+
+def is_correct_edge_desc(amr, e):
+    amr1, amr2 = amr_pairs[amr.id]
+    s,r,t = e
+    edge = (amr.nodes[s],r,amr.nodes[t])
+    amr1_edges = [(amr1.nodes[s2],r2,amr1.nodes[t2]) for s2,r2,t2 in amr1.edges]
+    amr2_edges = [(amr2.nodes[s2],r2,amr2.nodes[t2]) for s2,r2,t2 in amr2.edges]
+    if edge in amr1_edges and edge in amr2_edges:
+        return f'edge ({amr.nodes[s]},{r},{amr.nodes[t]}) in AMR 1 and AMR 2'
+    return f'edge ({amr.nodes[s]},{r},{amr.nodes[t]}) missing from other AMR'
+
 def main():
     global amr_pairs
     file1 = sys.argv[1]
@@ -64,7 +82,9 @@ def main():
         amr2.id = amr1.id
         amr_pairs[amr1.id] = (amr1,amr2)
     output = style(assign_node_color=is_correct_node,
-                   assign_edge_color=is_correct_edge)
+                   assign_node_desc=is_correct_node_desc,
+                   assign_edge_color=is_correct_edge,
+                   assign_edge_desc=is_correct_edge_desc)
 
     with open(outfile, 'w+', encoding='utf8') as f:
         f.write(output)

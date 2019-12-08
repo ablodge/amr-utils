@@ -86,11 +86,17 @@ def graph_string(amr):
             nodes.update(targets)
         depth += 1
     if len(completed) < len(amr.nodes):
+        missing_nodes = [n for n in amr.nodes if n not in completed]
+        missing_nodes= ', '.join(f'{n}/{amr.nodes[n]}' for n in missing_nodes)
+        missing_edges= [(s,r,t) for s,r,t in amr.edges if s in missing_nodes or t in missing_nodes]
+        missing_edges = ', '.join(f'{s}/{amr.nodes[s]} {r} {t}/{amr.nodes[t]}' for s,r,t in missing_edges)
         print('[amr]', 'Failed to print AMR, '
               + str(len(completed)) + ' of ' + str(len(amr.nodes)) + ' nodes printed:\n '
               + str(amr.id) +':\n'
               + amr_string + ':\n'
-              + default_string(amr), file=sys.stderr)
+              + 'Missing nodes: ' + missing_nodes
+              + 'Missing edges: ' + missing_edges,
+              file=sys.stderr)
     if not amr_string.startswith('('):
         amr_string = '(' + amr_string + ')'
     if len(amr.nodes) == 0:
@@ -393,7 +399,7 @@ class HTML_AMR:
 #     return '' if align else 'red'
 
 def main():
-    from amr_utils.amr import JAMR_AMR_Reader
+    from amr import JAMR_AMR_Reader
     file = sys.argv[-2] if len(sys.argv) > 1 else "data/test.txt"
     outfile = sys.argv[-1]
 

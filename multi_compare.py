@@ -70,6 +70,36 @@ def is_correct_edge(amr, e):
     return ''
 
 
+def is_correct_node_desc(amr, n):
+    if version == 3:
+        return ''
+    amr1, amr2, gold_amr = amr_triples[amr.id]
+    other_amr = amr1 if version == 2 else amr2
+    node = amr.nodes[n]
+    gold_nodes = [gold_amr.nodes[m] for m in gold_amr.nodes]
+    other_nodes = [other_amr.nodes[m] for m in other_amr.nodes]
+    if node in gold_nodes and node not in other_nodes:
+        return f'node ({amr.nodes[n]} in gold AMR'
+    if node not in gold_nodes:
+        return f'node ({amr.nodes[n]} not in gold AMR'
+    return ''
+
+def is_correct_edge_desc(amr, e):
+    if version == 3:
+        return ''
+    amr1, amr2, gold_amr = amr_triples[amr.id]
+    other_amr = amr1 if version == 2 else amr2
+    s, r, t = e
+    edge = (amr.nodes[s], r, amr.nodes[t])
+    gold_edges = [(gold_amr.nodes[s2], r2, gold_amr.nodes[t2]) for s2, r2, t2 in gold_amr.edges]
+    other_edges = [(other_amr.nodes[s2], r2, other_amr.nodes[t2]) for s2, r2, t2 in other_amr.edges]
+    if edge in gold_edges and edge not in other_edges:
+        return f'edge ({amr.nodes[s]},{r},{amr.nodes[t]}) in gold AMR'
+    if edge not in gold_edges:
+        return f'edge ({amr.nodes[s]},{r},{amr.nodes[t]}) not in gold AMR'
+    return ''
+
+
 def main():
     global amr_triples
     file1 = sys.argv[1]
@@ -87,8 +117,11 @@ def main():
         amr2.id = gold_amr.id
         amr_triples[amr1.id] = (amr1, amr2, gold_amr)
 
-    output = style(file1, file2, assign_node_color=is_correct_node,
-                   assign_edge_color=is_correct_edge)
+    output = style(file1, file2,
+                   assign_node_color=is_correct_node,
+                   assign_node_desc=is_correct_node_desc,
+                   assign_edge_color=is_correct_edge,
+                   assign_edge_desc=is_correct_edge_desc)
 
     with open(outfile, 'w+', encoding='utf8') as f:
         f.write(output)
