@@ -399,21 +399,31 @@ class HTML_AMR:
 #     return '' if align else 'red'
 
 def main():
-    from amr import JAMR_AMR_Reader
-    file = sys.argv[-2] if len(sys.argv) > 1 else "data/test.txt"
-    outfile = sys.argv[-1]
+    import argparse
+    from amr_readers import JAMR_AMR_Reader
+
+    parser = argparse.ArgumentParser(description='Style AMRs as HTML or Latex')
+    parser.add_argument('files', type=str, nargs=2, required=True,
+                        help='input and output files (AMRs in JAMR format)')
+    parser.add_argument('--latex', action='store_true', help='style as latex')
+    parser.add_argument('--html', action='store_true', help='style as html')
+
+    args = parser.parse_args()
+    file = args.files[0]
+    outfile = args.files[1]
 
     cr = JAMR_AMR_Reader()
     amrs = cr.load(file, verbose=False, remove_wiki=True)
 
-    if '--latex' in sys.argv or len(sys.argv)==3:
-        output = Latex_AMR.style(amrs)
-        with open(outfile, 'w+', encoding='utf8') as f:
-            f.write(output)
-    elif '--html' in sys.argv:
+    if args.html:
         output = HTML_AMR.style(amrs)
         with open(outfile, 'w+', encoding='utf8') as f:
             f.write(output)
+    else:
+        output = Latex_AMR.style(amrs)
+        with open(outfile, 'w+', encoding='utf8') as f:
+            f.write(output)
+
 
 
 if __name__=='__main__':

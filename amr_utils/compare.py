@@ -71,9 +71,18 @@ def is_correct_edge_desc(amr, e):
 
 def main():
     global amr_pairs
-    file1 = sys.argv[1]
-    file2 = sys.argv[2]
-    outfile = sys.argv[3]
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Visually compare two AMR files')
+    parser.add_argument('files', type=str, nargs=2, required=True,
+                        help='input files (AMRs in JAMR format)')
+    parser.add_argument('output', type=str, required=True,
+                        help='output file (html)')
+    args = parser.parse_args()
+
+    file1 = args.files[0]
+    file2 = args.files[1]
+    outfile = args.output
 
     cr = JAMR_AMR_Reader()
     amrs1 = cr.load(file1, verbose=False, remove_wiki=True)
