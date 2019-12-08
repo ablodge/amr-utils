@@ -78,32 +78,6 @@ class AMR:
     def jamr_string(self):
         return style.jamr_string(self)
 
-    def iterate_nodes(self):
-        node = self.root
-        complete = [self.root]
-        children = [(s,r,t) for s,r,t in self.edges if s==self.root]
-        children += [(t, r.replace('-of', '') if r.endswith('-of') else r + '-of', s) for s, r, t in self.edges if t in complete and s not in complete]
-        children = sorted(children, key=lambda x:(x[1]+' '+self.nodes[x[2]]).lower())
-
-        prev_size = 1
-        yield node
-        while len(complete)<len(self.nodes):
-            for s,r,t in children:
-                if t in complete:
-                    continue
-                yield t
-                complete.append(t)
-            children = [(s,r,t) for s,r,t in self.edges if s in complete and t not in complete]
-            children += [(t,r.replace('-of','') if r.endswith('-of') else r+'-of',s) for s,r,t in self.edges if t in complete and s not in complete]
-            children = sorted(children, key=lambda x: (x[1] + ' ' + self.nodes[x[2]]).lower())
-            if prev_size==len(complete):
-                break
-            prev_size = len(complete)
-        if len(complete)!=len(self.nodes):
-            raise Exception('Failed to print AMR, '
-              + str(len(complete)) + ' of ' + str(len(self.nodes)) + ' nodes printed:\n '
-              + self.id)
-
 class AMR_Alignment:
 
     def __init__(self, tokens:list=None, nodes:list=None, edges:list=None):
@@ -143,18 +117,6 @@ class AMR_Alignment:
             return []
         else:
             raise ValueError(f'Invalid Argument: {span}')
-
-    def is_connected(self, amr):
-        import networkx as nx
-        G = nx.Graph()
-        nodes = self.nodes
-        for n in nodes:
-            G.add_node(n)
-        edges = [(s,r,t) for s,r,t in amr.edges if s in nodes and t in nodes]
-        for s,r,t in edges:
-            G.add_edge(s,t)
-        return nx.is_connected(G)
-
 
 
 class JAMR_AMR_Reader:
