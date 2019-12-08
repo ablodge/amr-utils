@@ -72,6 +72,7 @@ def simple_node_map(amr1, amr2):
             if score > max_score:
                 node_map[n] = n2
                 max_score = score
-        taken.append(node_map[n])
+        if max_score>0:
+            taken.append(node_map[n])
     return node_map
 

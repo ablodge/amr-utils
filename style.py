@@ -93,9 +93,9 @@ def graph_string(amr):
         print('[amr]', 'Failed to print AMR, '
               + str(len(completed)) + ' of ' + str(len(amr.nodes)) + ' nodes printed:\n '
               + str(amr.id) +':\n'
-              + amr_string + ':\n'
-              + 'Missing nodes: ' + missing_nodes
-              + 'Missing edges: ' + missing_edges,
+              + amr_string + '\n'
+              + 'Missing nodes: ' + missing_nodes +'\n'
+              + 'Missing edges: ' + missing_edges +'\n',
               file=sys.stderr)
     if not amr_string.startswith('('):
         amr_string = '(' + amr_string + ')'
