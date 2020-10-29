@@ -18,30 +18,32 @@ def default_string(amr):
     output += '# ::tok ' + (' '.join(amr.tokens)) + '\n'
     # nodes
     for n in amr.nodes:
-        alignment = amr.get_alignment(node_id=n)
+        # alignment = amr.get_alignment(node_id=n)
         align_string = ''
-        if alignment:
-            align_string = f'\t{alignment.write_span()}'
+        # if alignment:
+        #     align_string = f'\t{alignment.write_span()}\t({",".join(amr.tokens[t] for t in alignment.tokens)})'
         output += f'# ::node\t{n}\t{amr.nodes[n] if n in amr.nodes else "None"}' + align_string + '\n'
     # root
     root = amr.root
-    alignment = amr.get_alignment(node_id=root)
+    # alignment = amr.get_alignment(node_id=root)
     align_string = ''
-    if alignment:
-        align_string = f'\t{alignment.write_span()}'
+    # if alignment:
+    #     align_string = f'\t{alignment.write_span()}\t({",".join(amr.tokens[t] for t in alignment.tokens)})'
     if amr.root:
         output += f'# ::root\t{root}\t{amr.nodes[root] if root in amr.nodes else "None"}' + align_string + '\n'
     # edges
     for i, e in enumerate(amr.edges):
         s, r, t = e
         r = r.replace(':', '')
-        alignment = amr.get_alignment(edge=e)
+        # alignment = amr.get_alignment(edge=e)
         align_string = ''
-        if alignment:
-            align_string = f'\t{alignment.write_span()}'
+        # if alignment:
+        #     align_string = f'\t{alignment.write_span()}\t({",".join(amr.tokens[t] for t in alignment.tokens)})'
         output += f'# ::edge\t{amr.nodes[s] if s in amr.nodes else "None"}\t{r}\t{amr.nodes[t] if t in amr.nodes else "None"}\t{s}\t{t}' \
                   + align_string + '\n'
+
     return output
+
 
 
 def graph_string(amr):
@@ -87,8 +89,8 @@ def graph_string(amr):
         depth += 1
     if len(completed) < len(amr.nodes):
         missing_nodes = [n for n in amr.nodes if n not in completed]
+        missing_edges = [(s, r, t) for s, r, t in amr.edges if s in missing_nodes or t in missing_nodes]
         missing_nodes= ', '.join(f'{n}/{amr.nodes[n]}' for n in missing_nodes)
-        missing_edges= [(s,r,t) for s,r,t in amr.edges if s in missing_nodes or t in missing_nodes]
         missing_edges = ', '.join(f'{s}/{amr.nodes[s]} {r} {t}/{amr.nodes[t]}' for s,r,t in missing_edges)
         print('[amr]', 'Failed to print AMR, '
               + str(len(completed)) + ' of ' + str(len(amr.nodes)) + ' nodes printed:\n '
@@ -233,6 +235,7 @@ class HTML_AMR:
     @staticmethod
     def span(text, type, id, desc=''):
         desc = html.escape(desc)
+        text = html.escape(text)
         return f'<span class="{type}" tok-id="{id}"' + (f' title="{desc}"' if desc else '') +f'>{text}</span>'
 
     @staticmethod
@@ -280,7 +283,7 @@ class HTML_AMR:
     @staticmethod
     def html(amr, assign_node_color=None, assign_node_desc=None, assign_edge_color=None, assign_edge_desc=None,
              assign_token_color=None, assign_token_desc=None):
-        from propbank_frames import propbank_frames_dictionary
+        from amr_utils.propbank_frames import propbank_frames_dictionary
         amr_string = f'[[{amr.root}]]'
         new_ids = {}
         for n in amr.nodes:
@@ -349,10 +352,16 @@ class HTML_AMR:
                 nodes.update(targets)
             depth += 1
         if len(completed) < len(amr.nodes):
+            missing_nodes = [n for n in amr.nodes if n not in completed]
+            missing_edges = [(s, r, t) for s, r, t in amr.edges if s in missing_nodes or t in missing_nodes]
+            missing_nodes = ', '.join(f'{n}/{amr.nodes[n]}' for n in missing_nodes)
+            missing_edges = ', '.join(f'{s}/{amr.nodes[s]} {r} {t}/{amr.nodes[t]}' for s, r, t in missing_edges)
             print('[amr]', 'Failed to print AMR, '
                   + str(len(completed)) + ' of ' + str(len(amr.nodes)) + ' nodes printed:\n '
-                  + ' '.join(amr.tokens) + '\n'
-                  + amr_string, file=sys.stderr)
+                  + str(amr.id) + ':\n'
+                  + 'Missing nodes: ' + missing_nodes + '\n'
+                  + 'Missing edges: ' + missing_edges + '\n',
+                  file=sys.stderr)
         if not amr_string.startswith('('):
             amr_string = '(' + amr_string + ')'
         if len(amr.nodes) == 0:
@@ -400,10 +409,10 @@ class HTML_AMR:
 
 def main():
     import argparse
-    from amr_readers import JAMR_AMR_Reader
+    from amr_utils.amr_readers import Graph_AMR_Reader
 
     parser = argparse.ArgumentParser(description='Style AMRs as HTML or Latex')
-    parser.add_argument('files', type=str, nargs=2, required=True,
+    parser.add_argument('-f', '--files', type=str, nargs=2, required=True,
                         help='input and output files (AMRs in JAMR format)')
     parser.add_argument('--latex', action='store_true', help='style as latex')
     parser.add_argument('--html', action='store_true', help='style as html')
@@ -412,7 +421,7 @@ def main():
     file = args.files[0]
     outfile = args.files[1]
 
-    cr = JAMR_AMR_Reader()
+    cr = Graph_AMR_Reader()
     amrs = cr.load(file, verbose=False, remove_wiki=True)
 
     if args.html:
