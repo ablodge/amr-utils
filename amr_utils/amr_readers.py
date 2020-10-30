@@ -27,7 +27,7 @@ class JAMR_AMR_Reader:
     '''
 
     def load(self, amr_file_name, training=True, verbose=False, remove_wiki=False, output_alignments=False):
-        print('[amr]', 'Start reading data')
+        print('[amr]', 'Reading AMRs:', amr_file_name)
 
         amr = AMR()
         amrs = [amr]
@@ -129,7 +129,6 @@ class JAMR_AMR_Reader:
                     for n in wiki_nodes:
                         if n in align.nodes:
                             align.nodes.remove(n)
-        print('[amr]', "Training Data" if training else "Dev Data")
         print('[amr]', "Number of sentences: " + str(len(amrs)))
         if output_alignments:
             return amrs, alignments_json
@@ -235,7 +234,7 @@ class LDC_AMR_Reader:
 
     def load(self, amr_file_name, training=True, verbose=False, remove_wiki=False, output_alignments=False, alignment_style='isi'):
         self.alignment_style = alignment_style
-        print('[amr]', 'Start reading data')
+        print('[amr]', 'Reading AMRs:', amr_file_name)
         amrs = []
         alignments_all = {}
         # alignments_json = {}
@@ -288,7 +287,6 @@ class LDC_AMR_Reader:
                     for n in wiki_nodes:
                         if n in align.nodes:
                             align.nodes.remove(n)
-        print('[amr]', "Training Data" if training else "Dev Data")
         print('[amr]', "Number of sentences: " + str(len(amrs)))
 
         if output_alignments:
