@@ -27,7 +27,7 @@ class JAMR_AMR_Reader:
     '''
 
     def load(self, amr_file_name, training=True, verbose=False, remove_wiki=False, output_alignments=False):
-        print('[amr]', 'Reading AMRs:', amr_file_name)
+        print('[amr]', 'Loading AMRs from file:', amr_file_name)
 
         amr = AMR()
         amrs = [amr]
@@ -234,7 +234,7 @@ class LDC_AMR_Reader:
 
     def load(self, amr_file_name, training=True, verbose=False, remove_wiki=False, output_alignments=False, alignment_style='isi'):
         self.alignment_style = alignment_style
-        print('[amr]', 'Reading AMRs:', amr_file_name)
+        print('[amr]', 'Loading AMRs from file:', amr_file_name)
         amrs = []
         alignments_all = {}
         # alignments_json = {}
