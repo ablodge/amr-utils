@@ -368,9 +368,9 @@ class HTML_AMR:
             span = HTML_AMR.span('a/amr-empty', "amr-node", 'a')
             amr_string = f'({span})'
         toks = [t for t in amr.tokens]
-        if assign_token_color:
+        if assign_token_color or assign_token_desc:
             for i,t in enumerate(toks):
-                color = assign_token_color(amr,i)
+                color = assign_token_color(amr,i) if assign_token_color else ''
                 desc = assign_token_desc(amr, i) if assign_token_desc else ''
                 if color or desc:
                     toks[i] = HTML_AMR.span(t, color, f'tok{i}', desc)

@@ -283,10 +283,11 @@ class LDC_AMR_Reader:
                         amr.edges.remove((s,r,t))
                         del amr.nodes[t]
                         wiki_nodes.append(t)
-                for align in alignments:
-                    for n in wiki_nodes:
-                        if n in align.nodes:
-                            align.nodes.remove(n)
+                if amr.id in alignments_all:
+                    for align in alignments_all[amr.id]:
+                        for n in wiki_nodes:
+                            if n in align.nodes:
+                                align.nodes.remove(n)
         print('[amr]', "Number of sentences: " + str(len(amrs)))
 
         if output_alignments:
@@ -475,6 +476,114 @@ def parse_isi_alignments(amr, line, edge_labels):
             alignments.append(align)
     return alignments
 
+
+class Graph_AMR_Reader:
+
+    def __init__(self):
+        pass
+
+    def parse_amr_(self, tokens, amr_string):
+        amr = AMR(tokens=tokens)
+
+        g = penman.decode(amr_string, model=TreePenmanModel())
+        triples = g.triples() if callable(g.triples) else g.triples
+        node_map = {}
+        new_idx = 0
+
+        rename_nodes = {g.top:g.top}
+        edge_idx = {g.top:0}
+        amr.root = g.top
+        last_node_id = None
+        for tr in triples:
+            s, r, t = tr
+            if not r.startswith(':'):
+                r = ':'+r
+            # an amr node
+            if r == ':instance':
+                if last_node_id != rename_nodes[s]:
+                    old_node = rename_nodes[s]
+                    new_node = s
+                    rename_nodes[s] = new_node
+                    for i,e in enumerate(amr.edges):
+                        s2,r,t2 = e
+                        if s2==old_node:
+                            amr.edges[i] = (new_node,r,t2)
+                        if t2==old_node:
+                            amr.edges[i] = (s2,r,new_node)
+                new_s = rename_nodes[s]
+                node_map[s] = new_s
+                s = new_s
+                amr.nodes[s] = t
+                if s.startswith('x'):
+                    new_idx+=1
+            # an amr edge
+            else:
+                parent, child = s,t
+                if child not in rename_nodes:
+                    if len(t)>5 or not t[0].isalpha():
+                        # attribute
+                        edge_idx[parent] += 1
+                        letter = 'x'
+                        taken = set(rename_nodes.values())
+                        if letter in taken:
+                            i = 2
+                            while f'{letter}{i}' in taken:
+                                i+=1
+                            letter = f'{letter}{i}'
+                        rename_nodes[tr] = letter
+                        new_t = rename_nodes[tr]
+                        amr.nodes[new_t] = str(t)
+                        node_map[tr] = new_t
+                    else:
+                        # edge
+                        edge_idx[child] = 0
+                        edge_idx[parent] += 1
+                        rename_nodes[child] = child
+                        last_node_id = rename_nodes[child]
+                else:
+                    # reentrancy
+                    edge_idx[parent] += 1
+                    last_node_id = child
+                new_s = rename_nodes[s]
+                new_t = rename_nodes[t] if t in rename_nodes else rename_nodes[tr]
+                amr.edges.append((new_s,r,new_t))
+        return amr, triples, node_map
+
+    def load(self, amr_file_name, verbose=False, remove_wiki=False):
+        print('[amr]', 'Loading AMRs from file:', amr_file_name)
+        amrs = []
+
+        with open(amr_file_name, 'r', encoding='utf8') as f:
+            sents = f.read().replace('\r','').split('\n\n')
+            for sent in sents:
+                prefix = '\n'.join(line for line in sent.split('\n') if line.strip().startswith('#'))
+                amr_string = ''.join(line for line in sent.split('\n') if not line.strip().startswith('#'))
+                amr_string = re.sub(' +',' ',amr_string)
+
+                tokens = []
+                id = None
+                for line in prefix.split('\n'):
+                    if line.startswith('# ::tok '):
+                        tokens = list(line.split()[2:])
+                    elif line.startswith('# ::id'):
+                        id = line.split()[2]
+                if amr_string.strip():
+                    amr, triples, node_map = self.parse_amr_(tokens, amr_string)
+                    amr.id = id
+                    amrs.append(amr)
+                    if verbose:
+                        print(amr)
+        if remove_wiki:
+            for amr in amrs:
+                wiki_nodes = []
+                for s,r,t in amr.edges.copy():
+                    if r==':wiki':
+                        amr.edges.remove((s,r,t))
+                        del amr.nodes[t]
+                        wiki_nodes.append(t)
+        print('[amr]', "Number of sentences: " + str(len(amrs)))
+
+        return amrs
 
 
 def main():
