@@ -47,7 +47,7 @@ def load_from_json(json_file, amrs=None):
     with open(json_file, 'r', encoding='utf8') as f:
         alignments = json.load(f)
     for k in alignments:
-        alignments[k] = [AMR_Alignment(a['type'], a['tokens'], a['nodes'], a['edges']) for a in alignments[k]]
+        alignments[k] = [AMR_Alignment(a['type'], a['tokens'], a['nodes'], [tuple(e) for e in a['edges']]) for a in alignments[k]]
     if amrs:
         amrs = {amr.id:amr for amr in amrs}
         for k in alignments:

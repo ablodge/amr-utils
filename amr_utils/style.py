@@ -409,7 +409,7 @@ class HTML_AMR:
 
 def main():
     import argparse
-    from amr_utils.amr_readers import Graph_AMR_Reader
+    from amr_utils.amr_readers import AMR_Reader
 
     parser = argparse.ArgumentParser(description='Style AMRs as HTML or Latex')
     parser.add_argument('-f', '--files', type=str, nargs=2, required=True,
@@ -421,8 +421,8 @@ def main():
     file = args.files[0]
     outfile = args.files[1]
 
-    cr = Graph_AMR_Reader()
-    amrs = cr.load(file, verbose=False, remove_wiki=True)
+    cr = AMR_Reader(style='letters')
+    amrs = cr.load(file, remove_wiki=True)
 
     if args.html:
         output = HTML_AMR.style(amrs)

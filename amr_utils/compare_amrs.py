@@ -1,6 +1,6 @@
 import sys
 
-from amr_readers import JAMR_AMR_Reader
+from amr_readers import AMR_Reader
 from style import HTML_AMR
 
 from graph_utils import simple_node_map
@@ -107,9 +107,9 @@ def main():
     file2 = sys.argv[2]
     outfile = sys.argv[3]
 
-    cr = JAMR_AMR_Reader()
-    amrs1 = cr.load(file1, verbose=False, remove_wiki=True)
-    amrs2 = cr.load(file2, verbose=False, remove_wiki=True)
+    reader = AMR_Reader()
+    amrs1 = reader.load(file1, remove_wiki=True)
+    amrs2 = reader.load(file2, remove_wiki=True)
     for amr1, amr2 in zip(amrs1, amrs2):
         amr1.id = amr2.id
         node_maps[amr1.id] = (simple_node_map(amr1, amr2), simple_node_map(amr2, amr1))

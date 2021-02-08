@@ -1,6 +1,6 @@
 import sys
 
-from amr_utils.amr_readers import JAMR_AMR_Reader
+from amr_utils.amr_readers import AMR_Reader
 from amr_utils.graph_utils import is_rooted_dag
 from amr_utils.style import HTML_AMR
 
@@ -72,8 +72,8 @@ def main():
     file = sys.argv[-2]
     outfile = sys.argv[-1]
 
-    cr = JAMR_AMR_Reader()
-    amrs = cr.load(file, verbose=False, remove_wiki=True)
+    reader = AMR_Reader()
+    amrs = reader.load(file, remove_wiki=True)
     style(amrs[:5000], outfile)
 
 
