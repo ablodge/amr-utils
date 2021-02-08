@@ -25,13 +25,6 @@ from amr_utils.amr_readers import AMR_Reader
 reader = AMR_Reader()
 amrs = reader.load(amr_file, remove_wiki=True)
 ```
-or
-```
-from amr_utils.amr_readers import AMR_Reader
-
-reader = AMR_Reader()
-amrs, alignments = reader.load(amr_file, remove_wiki=True, output_alignments=True)
-```
 
 AMRs must be separated by empty lines, but otherwise can take various formats.
 Simplified:
@@ -56,6 +49,7 @@ JAMR-style tab seperated metdata format:
 	:ARG1 (c2/cat))
 ```
 
+### Loading Alignments from LDC, JAMR, or ISI
 AMR Alignments can also be loaded from different formats:
 LDC:
 `# ::alignments 0-1.1 1-1 1-1.1.r 1-1.2.r 2-1.2`
@@ -64,7 +58,16 @@ JAMR:
 ISI:
 `(c/chase-01~e.1 :ARG0~e.1 (d/dog~e.0) :ARG1~e.1 (c2/cat~e.2))`
 
-Just set the parameter `output_alignments` to `True`. By default, `AMR_Reader` uses the LDC/ISI style of node ids where 1.n is the nth child of the root with indices starting at 1. 
+Just set the parameter `output_alignments` to `True`. 
+
+```
+from amr_utils.amr_readers import AMR_Reader
+
+reader = AMR_Reader()
+amrs, alignments = reader.load(amr_file, remove_wiki=True, output_alignments=True)
+```
+
+By default, `AMR_Reader` uses the LDC/ISI style of node ids where 1.n is the nth child of the root with indices starting at 1. 
 Any alignments are automatically converted to this format for data consistency. 
 
 # Versatile AMR Alignments JSON Format
