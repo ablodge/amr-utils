@@ -65,7 +65,7 @@ ISI:
 `(c/chase-01~e.1 :ARG0~e.1 (d/dog~e.0) :ARG1~e.1 (c2/cat~e.2))`
 
 Just set the parameter `output_alignments` to `True`. By default, `AMR_Reader` uses the LDC/ISI style of node ids where 1.n is the nth child of the root with indices starting at 1. 
-Any alignments are automatically converted to this format for data consistency. 
+Any alignments are automatically converted to this format for data consistency. Other formats are available using the parameter `style` which can take values `letters`, `jamr`, or `isi`.
 
 # Versatile AMR Alignments JSON Format
 The package includes tools for converting AMR alignemnts from and to JSON like the following.
