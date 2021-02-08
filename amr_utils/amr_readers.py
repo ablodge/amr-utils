@@ -319,7 +319,7 @@ class AMR_Reader:
         return load_from_json(json_file, amrs=amrs)
 
     @staticmethod
-    def write_alignments_to_json(json_file, alignments):
+    def save_alignments_to_json(json_file, alignments):
         write_to_json(json_file, alignments)
 
     @staticmethod
@@ -443,7 +443,7 @@ def main():
     amrs, alignments = reader.load_from_dir(dir, output_alignments=True)
 
     reader.write_to_file(output_file, amrs)
-    reader.write_alignments_to_json(output_file.replace('.txt','.alignments.json'), alignments)
+    reader.save_alignments_to_json(output_file.replace('.txt','.alignments.json'), alignments)
 
 
 

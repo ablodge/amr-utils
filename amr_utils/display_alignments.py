@@ -56,7 +56,10 @@ def get_token_aligned_subgraph(amr, tok):
         return out
     return ''
 
-def style(amrs, outfile):
+def style(amrs, alignments, outfile):
+    for amr in amrs:
+        amr.alignments = alignments[amr.id]
+        
     output = HTML_AMR.style(amrs[:5000],
                             assign_node_color=is_aligned_node,
                             assign_edge_color=is_aligned_edge,
@@ -69,12 +72,14 @@ def style(amrs, outfile):
         f.write(output)
 
 def main():
-    file = sys.argv[-2]
-    outfile = sys.argv[-1]
+    file = sys.argv[1]
+    align_file = sys.argv[2]
+    outfile = sys.argv[3]
 
     reader = AMR_Reader()
     amrs = reader.load(file, remove_wiki=True)
-    style(amrs[:5000], outfile)
+    alignments = reader.load_alignments_from_json(align_file, amrs)
+    style(amrs[:5000], alignments, outfile)
 
 
 if __name__=='__main__':
