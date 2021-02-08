@@ -10,8 +10,8 @@ I wrote amr-utils to store operations that I often need when doing research with
 - output AMRs to useful display formats: html (AMR string) or latex (AMR graph)
 
 ### Requirements
-Python 3.6 or higher
-PENMAN library
+- Python 3.6 or higher
+- [PENMAN library](https://github.com/goodmami/penman)
 
 ### Input
 Input should contain AMR strings separated by a blank line. Lines starting with `#` will be ignored.
@@ -71,7 +71,7 @@ By default, `AMR_Reader` uses the LDC/ISI style of node ids where 1.n is the nth
 Any alignments are automatically converted to this format for data consistency. 
 
 # Versatile AMR Alignments JSON Format
-The package includes tools for converting AMR alignemnts from and to JSON like the following.
+The package includes tools for converting AMR alignments from and to JSON like the following.
 ```
 [{'type':'isi', 'tokens':[0], 'nodes':['1.1'], 'edges':[]},
 {'type':'isi', 'tokens':[1], 'nodes':['1'], 'edges':[['1',':ARG0','1.1'],['1',':ARG1','1.2']]},
@@ -85,15 +85,15 @@ The advantages of using JSON are:
 - Can easily store multiple sets of alignments seperately for comparison without needing to modify an AMR file. 
 
 
-To read alignemnts from a JSON file do:
+To read alignments from a JSON file do:
 ```
 reader = AMR_Reader()
-alignments = reader.load_alignemnts_from_json(alignments_file)
+alignments = reader.load_alignments_from_json(alignments_file)
 ```
-To save alignemnts to a JSON file do:
+To save alignments to a JSON file do:
 ```
 reader = AMR_Reader()
-reader.save_alignemnts_to_json(alignments_file, alignments)
+reader.save_alignments_to_json(alignments_file, alignments)
 ```
 
 # Latex
