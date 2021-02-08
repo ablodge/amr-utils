@@ -51,11 +51,11 @@ JAMR-style tab seperated metdata format:
 
 ### Loading Alignments from LDC, JAMR, or ISI
 AMR Alignments can also be loaded from different formats:
-LDC:
+- LDC:
 `# ::alignments 0-1.1 1-1 1-1.1.r 1-1.2.r 2-1.2`
-JAMR:
+- JAMR:
 `# ::alignments 0-1|0.0 1-2|0 2-3|0.1`
-ISI:
+- ISI:
 `(c/chase-01~e.1 :ARG0~e.1 (d/dog~e.0) :ARG1~e.1 (c2/cat~e.2))`
 
 Just set the parameter `output_alignments` to `True`. 
