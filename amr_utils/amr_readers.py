@@ -30,6 +30,8 @@ class Matedata_Parser:
         labels = {label for label,_ in rows}
         for label in labels:
             metadata[label] = [val for l,val in rows if label==l]
+        if 'snt' not in metadata and 'tok' not in metadata:
+            metadata['snt'] = ['']
         return metadata
 
     def readline_(self, line):
@@ -211,9 +213,16 @@ class AMR_Reader:
         with open(amr_file_name, 'r', encoding='utf8') as f:
             sents = f.read().replace('\r', '').split('\n\n')
             amr_idx = 0
+            no_tokens = False
+            if all(sent.strip().startswith('(') for sent in sents):
+                no_tokens = True
+
             for sent in sents:
-                prefix = '\n'.join(line for line in sent.split('\n') if line.strip().startswith('#'))
-                amr_string = ''.join(line for i, line in enumerate(sent.split('\n')) if not line.strip().startswith('#') and i>0).strip()
+                prefix_lines = [line for i,line in enumerate(sent.split('\n')) if line.strip().startswith('#') or (i==0 and not no_tokens)]
+                prefix = '\n'.join(prefix_lines)
+                amr_string_lines = [line for i, line in enumerate(sent.split('\n'))
+                                    if not line.strip().startswith('#') and (i>0 or no_tokens)]
+                amr_string = ''.join(amr_string_lines).strip()
                 amr_string = re.sub(' +', ' ', amr_string)
                 if not amr_string: continue
                 if not amr_string.startswith('(') or not amr_string.endswith(')'):
@@ -257,13 +266,14 @@ class AMR_Reader:
                         del amr.nodes[t]
                         wiki_nodes.append(t)
                         wiki_edges.append((s,r,t))
-                for align in alignments:
-                    for n in wiki_nodes:
-                        if n in align.nodes:
-                            align.nodes.remove(n)
-                    for e in wiki_edges:
-                        if e in align.edges:
-                            align.edges.remove(e)
+                if alignments and amr.id in alignments:
+                    for align in alignments[amr.id]:
+                        for n in wiki_nodes:
+                            if n in align.nodes:
+                                align.nodes.remove(n)
+                        for e in wiki_edges:
+                            if e in align.edges:
+                                align.edges.remove(e)
         if output_alignments:
             return amrs, alignments
         return amrs
