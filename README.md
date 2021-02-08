@@ -66,7 +66,7 @@ ISI:
 Just set the parameter `output_alignments` to `True`. By default, `AMR_Reader` uses the LDC/ISI style of node ids where 1.n is the nth child of the root with indices starting at 1. 
 Any alignments are automatically converted to this format for data consistency. 
 
-# Versatile AMR ALignments JSON Format
+# Versatile AMR Alignments JSON Format
 The package includes tools for converting AMR alignemnts from and to JSON like the following.
 ```
 [{'type':'isi', 'tokens':[0], 'nodes':['1.1'], 'edges':[]},
@@ -80,6 +80,17 @@ The advantages of using JSON are:
 - Can store additional information in a `type` to distinguish different types of alignments
 - Can easily store multiple sets of alignments seperately for comparison without needing to modify an AMR file. 
 
+
+To read alignemnts from a JSON file do:
+```
+reader = AMR_Reader()
+alignments = reader.load_alignemnts_from_json(alignments_file)
+```
+To save alignemnts to a JSON file do:
+```
+reader = AMR_Reader()
+reader.save_alignemnts_to_json(alignments_file, alignments)
+```
 
 # Latex
 Amr-utils allows you to read AMRs from a text file and output them as latex diagrams, such as the following.
