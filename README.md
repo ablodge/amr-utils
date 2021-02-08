@@ -4,9 +4,10 @@ A python package of common operations for AMRs
 
 I wrote amr-utils to store operations that I often need when doing research with AMRs. 
 ### Features:
-- Load multiple AMRs from a text file
-- iterate through nodes, edges, or alignments
-- output AMRs to useful formats: html (AMR string) or latex (AMR graph)
+- Load AMRs from a file or directory, with support for multiple formats
+- Load AMR alignments, with support for LDC, JAMR, and ISI alignment formats
+- iterate through nodes, edges, or alignments in an AMR
+- output AMRs to useful display formats: html (AMR string) or latex (AMR graph)
 
 ### Requirements
 Python 3.6 or higher
