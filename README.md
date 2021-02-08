@@ -7,7 +7,7 @@ I wrote amr-utils to store operations that I often need when doing research with
 - Load AMRs from a file or directory, with support for multiple formats
 - Load AMR alignments, with support for LDC, JAMR, and ISI alignment formats
 - iterate through nodes, edges, or alignments in an AMR
-- output AMRs to useful display formats: html (AMR string) or latex (AMR graph)
+- Tools for AMR Visualization using HTML (AMR string) or Latex (AMR graph)
 
 ### Requirements
 - Python 3.6 or higher
@@ -95,8 +95,9 @@ To save alignments to a JSON file do:
 reader = AMR_Reader()
 reader.save_alignments_to_json(alignments_file, alignments)
 ```
+# AMR Visualization
 
-# Latex
+## Latex
 Amr-utils allows you to read AMRs from a text file and output them as latex diagrams, such as the following.
 ![latex example](https://github.com/ablodge/amr-utils/blob/master/latex_ex.PNG)
 
@@ -116,7 +117,7 @@ Add these lines to your latex file:
 ```
 
 
-# HTML
+## HTML
 Amr-utils allows you to read AMRs from a text file and output them as html. You can look in `style.css` for an example of styling. 
 ![html example](https://github.com/ablodge/amr-utils/blob/master/html_ex.png)
 ### Instructions
