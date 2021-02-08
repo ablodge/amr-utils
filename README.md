@@ -10,8 +10,8 @@ I wrote amr-utils to store operations that I often need when doing research with
 - output AMRs to useful display formats: html (AMR string) or latex (AMR graph)
 
 ### Requirements
-Python 3.6 or higher
-PENMAN library
+- Python 3.6 or higher
+- [PENMAN library](https://github.com/goodmami/penman)
 
 ### Input
 Input should contain AMR strings separated by a blank line. Lines starting with `#` will be ignored.
