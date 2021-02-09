@@ -127,7 +127,7 @@ Run as follows:
 
 ## AMR Diff
 
-![html example](https://github.com/ablodge/amr-utils/blob/master/amr_diff_ex.png)
+![amr diff example](https://github.com/ablodge/amr-utils/blob/master/amr_diff_ex.PNG)
 ### Instructions
 Run as follows:
 
