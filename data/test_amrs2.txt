@@ -1,0 +1,21 @@
+# ::id 1
+# ::tok The student wants to go to Washington D.C.
+(w/want-01 :ARG0 (p/person 
+		:ARG0-of (s/study-01))
+	:ARG1 (g/go-02 :ARG0 p
+		:ARG4 (c/city :name (n/name :op1 "Washington" 
+			:op2 "D.C."))))
+
+# ::id 2
+# ::tok cats and dogs
+(a/and :op1 (c/cat)
+	:op2 (d/dog))
+
+# ::id 3
+# ::tok pizza
+(p/pizza)
+
+# ::id 4
+# ::tok peanut butter and jelly
+(a/and :op1 (b/butter :mod (p/peanut))
+	:op2 (j/jelly))

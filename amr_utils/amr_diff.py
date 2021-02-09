@@ -3,16 +3,14 @@ import sys
 from amr_readers import AMR_Reader
 from style import HTML_AMR
 
-from graph_utils import simple_node_aligner
 
-amr_pairs = {}
-node_maps = {}
-version = 1
+from amr_utils.graph_utils import get_node_alignment
 
+phase = 1
 
-def style(assign_node_color=None, assign_node_desc=None, assign_edge_color=None, assign_edge_desc=None,
+def style(amr_pairs, other_args, assign_node_color=None, assign_node_desc=None, assign_edge_color=None, assign_edge_desc=None,
           assign_token_color=None, assign_token_desc=None, limit=None):
-    global version
+    global phase
     output = '<!DOCTYPE html>\n'
     output += '<html>\n'
     output += '<style>\n'
@@ -20,20 +18,25 @@ def style(assign_node_color=None, assign_node_desc=None, assign_edge_color=None,
     output += '</style>\n\n'
     output += '<body>\n'
     i = 0
-    for id  in amr_pairs:
+    for id in amr_pairs:
         amr1, amr2 = amr_pairs[id]
-        output += '1:\n'
-        version = 1
+        prec, rec, f1 = other_args[id][-3:]
+        output += f'AMR 1:\n'
+        phase = 1
         output += HTML_AMR.html(amr1,
                                 assign_node_color, assign_node_desc,
                                 assign_edge_color, assign_edge_desc,
-                                assign_token_color, assign_token_desc)
-        output += '2:\n'
-        version = 2
+                                assign_token_color, assign_token_desc,
+                                other_args)
+        output += 'AMR 2:\n'
+        phase = 2
         output += HTML_AMR.html(amr2,
                                 assign_node_color, assign_node_desc,
                                 assign_edge_color, assign_edge_desc,
-                                assign_token_color, assign_token_desc)
+                                assign_token_color, assign_token_desc,
+                                other_args)
+        output += f'precision {100*prec:.1f} recall {100*rec:.1f} f1 {100*f1:.1f}\n'
+        output += '<hr>\n'
         i+=1
         if limit and i>limit:
             break
@@ -42,58 +45,62 @@ def style(assign_node_color=None, assign_node_desc=None, assign_edge_color=None,
     return output
 
 
-def is_correct_node(amr, n, other_args=None):
-    amr1, amr2 = amr_pairs[amr.id]
-    if version==1:
+def is_correct_node(amr, n, other_args):
+    amr1, amr2, map1, map2 = other_args[amr.id][:4]
+    if phase==1:
         other_amr = amr2
-        node_map = node_maps[amr.id][0]
+        node_map = map1
     else:
         other_amr = amr1
-        node_map = node_maps[amr.id][1]
+        node_map = map2
     if amr.nodes[n] == other_amr.nodes[node_map[n]]:
-        return 'green'
+        return ''
     return 'red'
 
 
 def is_correct_edge(amr, e, other_args=None):
-    amr1, amr2 = amr_pairs[amr.id]
+    amr1, amr2, map1, map2 = other_args[amr.id][:4]
     s,r,t = e
-    if version == 1:
+    if phase == 1:
         other_amr = amr2
-        node_map = node_maps[amr.id][0]
+        node_map = map1
     else:
         other_amr = amr1
-        node_map = node_maps[amr.id][1]
+        node_map = map2
     if (node_map[s],r,node_map[t]) in other_amr.edges:
-        return 'green'
+        return ''
     return 'red'
 
 
 def is_correct_node_desc(amr, n, other_args=None):
-    amr1, amr2 = amr_pairs[amr.id]
-    if version == 1:
+    amr1, amr2, map1, map2 = other_args[amr.id][:4]
+    if phase == 1:
         other_amr = amr2
-        node_map = node_maps[amr.id][0]
+        node_map = map1
     else:
         other_amr = amr1
-        node_map = node_maps[amr.id][1]
+        node_map = map2
     if amr.nodes[n] == other_amr.nodes[node_map[n]]:
         return ''
     return f'{amr.nodes[n]} != {other_amr.nodes[node_map[n]]}'
 
 
 def is_correct_edge_desc(amr, e, other_args=None):
-    amr1, amr2 = amr_pairs[amr.id]
+    amr1, amr2, map1, map2 = other_args[amr.id][:4]
     s, r, t = e
-    if version == 1:
+    if phase == 1:
         other_amr = amr2
-        node_map = node_maps[amr.id][0]
+        node_map = map1
     else:
         other_amr = amr1
-        node_map = node_maps[amr.id][1]
+        node_map = map2
     if (node_map[s], r, node_map[t]) in other_amr.edges:
         return ''
-    return f'({other_amr.nodes[node_map[s]]} {r} {other_amr.nodes[node_map[t]]}) not in other AMR'
+    # attribute
+    if not amr.nodes[t][0].isalpha() or amr.nodes[t] in ['imperative', 'expressive', 'interrogative']:
+        return f'No corresponding attribute {other_amr.nodes[node_map[s]]} {r} {amr.nodes[t]}'
+    # relation
+    return f'No corresponding relation {other_amr.nodes[node_map[s]]} {r} {other_amr.nodes[node_map[t]]}'
 
 def main():
     global amr_pairs
@@ -113,11 +120,18 @@ def main():
     reader = AMR_Reader()
     amrs1 = reader.load(file1, remove_wiki=True)
     amrs2 = reader.load(file2, remove_wiki=True)
+
+    other_args = {}
+    amr_pairs = {}
     for amr1, amr2 in zip(amrs1, amrs2):
-        amr1.id = amr2.id
-        node_maps[amr1.id] = (simple_node_aligner(amr1, amr2), simple_node_aligner(amr2, amr1))
-        amr_pairs[amr1.id] = (amr1,amr2)
-    output = style(assign_node_color=is_correct_node,
+        map1, prec, rec, f1 = get_node_alignment(amr1, amr2)
+        map2, _, _, _ = get_node_alignment(amr2, amr1)
+        amr2.id = amr1.id
+        other_args[amr1.id] = (amr1, amr2, map1, map2, prec, rec, f1)
+        amr_pairs[amr1.id] = (amr1, amr2)
+    output = style(amr_pairs,
+                   other_args,
+                   assign_node_color=is_correct_node,
                    assign_node_desc=is_correct_node_desc,
                    assign_edge_color=is_correct_edge,
                    assign_edge_desc=is_correct_edge_desc,

@@ -1,5 +1,6 @@
 
 from amr_utils.amr import AMR
+from amr_utils.smatch import get_best_match
 
 
 def get_subgraph(amr, nodes: list, edges: list):
@@ -167,77 +168,78 @@ def breadth_first_edges(amr, ignore_reentrancies=False):
             break
 
 
-def simple_node_aligner(amr1, amr2):
-    parents1 = {n:set() for n in amr1.nodes}
-    parents2 = {n: set() for n in amr2.nodes}
-    children1 = {n:set() for n in amr1.nodes}
-    children2 = {n: set() for n in amr2.nodes}
-    edges1 = {n: set() for n in amr1.nodes}
-    edges2 = {n: set() for n in amr2.nodes}
-
-    for s,r,t in amr1.edges:
-        if r.endswith('-of'):
-            s,r,t = t,r.replace('-of',''),s
-        parents1[t].add(amr1.nodes[s].lower())
-        children1[s].add(amr1.nodes[t].lower())
-        edges1[t].add(f'in {r}')
-        edges1[s].add(f'out {r}')
-    for s, r, t in amr2.edges:
-        if r.endswith('-of'):
-            s,r,t = t,r.replace('-of',''),s
-        parents2[t].add(amr2.nodes[s].lower())
-        children2[s].add(amr2.nodes[t].lower())
-        edges2[t].add(f'in {r}')
-        edges2[s].add(f'out {r}')
-
-    test1 = lambda x,y: amr1.nodes[x].lower()==amr2.nodes[y].lower()
-    test2 = lambda x,y: parents1[x]==parents2[y]
-    test3 = lambda x,y: children1[x] == children2[y]
-    test4 = lambda x, y: edges1[x] == edges2[y]
-
-    node_map = {n:amr2.root for n in amr1.nodes}
-    taken = {}
-    scores = {}
-    replaced = set()
-    for n in amr1.nodes:
-        max_score = 0
-        best = amr2.root
-        for n2 in amr2.nodes:
-            score = 0
-            for test in [test1,test2,test3,test4]:
-                if test(n,n2):
-                    score+=1
-            if score > max_score:
-                if n2 in taken:
-                    other_score = scores[n2]
-                    if score<=other_score:
-                        continue
-                best = n2
-                max_score = score
-        if best in taken:
-            other = taken[best]
-            node_map[n] = best
-            node_map[other] = amr2.root
-            replaced.add(other)
+def get_node_alignment(amr1:AMR, amr2:AMR):
+    prefix1 = "a"
+    prefix2 = "b"
+    node_map1 = {}
+    node_map2 = {}
+    idx = 0
+    for n in amr1.nodes.copy():
+        amr1._rename_node(n, prefix1+str(idx))
+        node_map1[prefix1+str(idx)] = n
+        idx+=1
+    idx = 0
+    for n in amr2.nodes.copy():
+        amr2._rename_node(n, prefix2+str(idx))
+        node_map2[prefix2 + str(idx)] = n
+        idx += 1
+    instance1 = []
+    attributes1 = []
+    relation1 = []
+    for s,r,t in amr1.triples(normalize_inverse_edges=True):
+        if r==':instance':
+            instance1.append((r,s,t))
+        elif t not in amr1.nodes:
+            attributes1.append((r,s,t))
         else:
-            node_map[n] = best
-        if max_score>0:
-            taken[node_map[n]] = n
-            scores[node_map[n]] = max_score
-    # for n in amr1.nodes:
-    #     max_score = 0
-    #     if n in replaced:
-    #         for n2 in amr2.nodes:
-    #             if n2 in taken:
-    #                 continue
-    #             score = 0
-    #             for test in [test1, test2, test3, test4]:
-    #                 if test(n, n2):
-    #                     score += 1
-    #             if score > max_score:
-    #                 node_map[n]  = n2
-    #                 max_score = score
-    return node_map
+            relation1.append((r,s,t))
+    instance2 = []
+    attributes2 = []
+    relation2 = []
+    for s,r,t in amr2.triples(normalize_inverse_edges=True):
+        if r==':instance':
+            instance2.append((r,s,t))
+        elif t not in amr2.nodes:
+            attributes2.append((r,s,t))
+        else:
+            relation2.append((r,s,t))
+    # optionally turn off some of the node comparison
+    doinstance = doattribute = dorelation = True
+    (best_mapping, best_match_num) = get_best_match(instance1, attributes1, relation1,
+                                                    instance2, attributes2, relation2,
+                                                    prefix1, prefix2, doinstance=doinstance,
+                                                    doattribute=doattribute, dorelation=dorelation)
+    test_triple_num = len(instance1) + len(attributes1) + len(relation1)
+    gold_triple_num = len(instance2) + len(attributes2) + len(relation2)
+    for n in amr1.nodes.copy():
+        amr1._rename_node(n, node_map1[n])
+    for n in amr2.nodes.copy():
+        amr2._rename_node(n, node_map2[n])
+
+    align_map = {}
+    for i,j in enumerate(best_mapping):
+        a = prefix1 + str(i)
+        if j==-1:
+            continue
+        b = prefix2 + str(j)
+        align_map[node_map1[a]] = node_map2[b]
+    for s,r,t in amr1.edges:
+        if t not in align_map:
+            for s2,r2,t2 in amr2.edges:
+                if align_map[s]==s2 and r==r2 and amr1.nodes[t]==amr2.nodes[t2]:
+                    align_map[t] = t2
+            if t not in align_map:
+                align_map[t] = align_map[s]
+    if amr1.root not in align_map:
+        align_map[amr1.root] = amr2.root
+
+    if not all(n in align_map for n in amr1.nodes):
+        raise Exception('Failed to build node alignment:', amr1.id, amr2.id)
+    prec = best_match_num / test_triple_num if test_triple_num>0 else 0
+    rec = best_match_num / gold_triple_num if gold_triple_num>0 else 0
+    f1 = 2*(prec*rec)/(prec+rec) if (prec+rec)>0 else 0
+    return align_map, prec, rec, f1
+
 
 
 # def is_cycle(amr, nodes):

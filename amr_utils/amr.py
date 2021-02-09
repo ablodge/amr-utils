@@ -1,6 +1,5 @@
 import sys
 
-from amr_utils import style
 from amr_utils.alignments import AMR_Alignment
 
 
@@ -43,6 +42,35 @@ class AMR:
             if edge is not None and edge in align.edges:
                 return align
         return AMR_Alignment()
+
+    def triples(self, normalize_inverse_edges=False):
+        taken_nodes = {self.root}
+        yield self.root, ':instance', self.nodes[self.root]
+        for s,r,t in self.edges:
+            if not self.nodes[t][0].isalpha() or self.nodes[t] in ['imperative', 'expressive', 'interrogative']:
+                yield s, r, self.nodes[t]
+                continue
+            if normalize_inverse_edges and r.endswith('-of') and r not in [':consist-of', ':prep-out-of', ':prep-on-behalf-of']:
+                yield t, r[:-len('-of')], s
+            else:
+                yield s, r, t
+            if t not in taken_nodes:
+                yield t, ':instance', self.nodes[t]
+                taken_nodes.add(t)
+
+    def _rename_node(self, a, b):
+        if b in self.nodes:
+            raise Exception('Rename Node: Tried to use existing node name:', b)
+        self.nodes[b] = self.nodes[a]
+        del self.nodes[a]
+        if self.root == a:
+            self.root = b
+        for i, e in enumerate(self.edges):
+            s,r,t = e
+            if a in [s, t]:
+                if s==a: s=b
+                if t==a: t=b
+                self.edges[i] = (s,r,t)
 
 
 

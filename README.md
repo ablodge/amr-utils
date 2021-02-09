@@ -121,3 +121,12 @@ Amr-utils allows you to read AMRs from a text file and output them as html. You 
 Run as follows:
 
 `python style.py --html -f [input file] [output file]`
+
+
+## AMR Diff
+
+![html example](https://github.com/ablodge/amr-utils/blob/master/amr_diff_ex.png)
+### Instructions
+Run as follows:
+
+`python amr_diff.py [amr file1] [amr file2] [output file]`
