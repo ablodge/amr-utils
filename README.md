@@ -125,6 +125,7 @@ Run as follows:
 `python style.py --html -f [input file] [output file]`
 
 
+
 ## AMR Diff
 
 ![amr diff example](https://github.com/ablodge/amr-utils/blob/master/amr_diff_ex.PNG)
@@ -132,3 +133,12 @@ Run as follows:
 Run as follows:
 
 `python amr_diff.py [amr file1] [amr file2] [output file]`
+
+
+## Display Alignments
+
+![display alignments example](https://github.com/ablodge/amr-utils/blob/master/display_align_ex.PNG)
+### Instructions
+Run as follows:
+
+`python display_alignments.py [amr file] [alignment file] [output file]`
