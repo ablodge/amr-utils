@@ -6,7 +6,8 @@ AMR Utils is a python package for working with AMR data, working with AMR alignm
 - Tools for AMR Visualization
 	- Convert AMR graphs to Latex (using the tikz library)
 	- Display AMR strings as HTML, with overridable display settings for nodes, tokens, and edges
-	- AMR Diff, Display differnces between AMRs
+	- AMR Diff, Display differnces between AMRs as HTML
+	- Display AMR Alignments as HTML
 
 ### Requirements
 - Python 3.6 or higher
