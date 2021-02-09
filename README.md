@@ -67,7 +67,7 @@ amrs, alignments = reader.load(amr_file, remove_wiki=True, output_alignments=Tru
 By default, `AMR_Reader` uses the LDC/ISI style of node ids where 1.n is the nth child of the root with indices starting at 1. 
 Any alignments are automatically converted to this format for data consistency. 
 
-# Versatile AMR Alignments JSON Format
+# AMR Alignments JSON Format
 The package includes tools for converting AMR alignments from and to JSON like the following.
 ```
 [{'type':'isi', 'tokens':[0], 'nodes':['1.1'], 'edges':[]},
