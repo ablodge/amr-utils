@@ -56,6 +56,7 @@ def load_from_json(json_file, amrs=None):
                     align.amr = amrs[k]
     return alignments
 
+
 def write_to_json(json_file, alignments):
     new_alignments = {}
     for k in alignments:
@@ -64,18 +65,3 @@ def write_to_json(json_file, alignments):
         json.dump(new_alignments, f)
 
 
-def convert_alignment_to_subgraph(align, amr):
-    nodes = align.nodes
-    sub = amr.get_subgraph(nodes) if nodes else None
-    if sub is None:
-        return None
-    for s,r,t in align.edges:
-        if s not in nodes:
-            sub.nodes[s] = '<var>'
-        if t not in nodes:
-            sub.nodes[t] = '<var>'
-        if (s,r,t) not in sub.edges:
-            sub.edges.append((s,r,t))
-        if not sub.root or sub.root==t:
-            sub.root = s
-    return sub

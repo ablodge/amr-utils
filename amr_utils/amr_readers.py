@@ -12,6 +12,7 @@ from amr_utils.amr import AMR
 class Matedata_Parser:
 
     token_range_re = re.compile('^(\d-\d|\d(,\d)+)$')
+    metadata_re = re.compile('(?<=[^#]) ::')
 
     def __init__(self):
         pass
@@ -25,14 +26,19 @@ class Matedata_Parser:
             return [int(i) for i in string.split(',')]
 
     def readlines(self, lines):
+        lines = self.metadata_re.sub('\n# ::', lines)
         metadata = {}
+        graph_metadata = {}
         rows = [self.readline_(line) for line in lines.split('\n')]
         labels = {label for label,_ in rows}
         for label in labels:
-            metadata[label] = [val for l,val in rows if label==l]
+            if label in ['root','node','edge']:
+                graph_metadata[label] = [val for l,val in rows if label==l]
+            else:
+                metadata[label] = [val for l,val in rows if label==l][0]
         if 'snt' not in metadata and 'tok' not in metadata:
             metadata['snt'] = ['']
-        return metadata
+        return metadata, graph_metadata
 
     def readline_(self, line):
         if not line.startswith('#'):
@@ -40,7 +46,7 @@ class Matedata_Parser:
             metadata = line.strip()
         elif line.startswith('# ::id'):
             label = 'id'
-            metadata = line[len('# ::id '):].strip().split()[0]
+            metadata = line[len('# ::id '):].strip()
         elif line.startswith("# ::tok"):
             label = 'tok'
             metadata = line[len('# ::tok '):].strip().split()
@@ -49,15 +55,19 @@ class Matedata_Parser:
             metadata = line[len('# ::snt '):].strip()
         elif line.startswith('# ::alignments'):
             label = 'alignments'
-            metadata = line[len('# ::alignments '):].strip().split()
+            metadata = line[len('# ::alignments '):].strip()
+        elif line.startswith('# ::node') or line.startswith('# ::root') or line.startswith('# ::edge'):
+            label = line[len('# ::'):].split()[0]
+            line = line[len(f'# ::{label} '):]
+            rows = [row for row in csv.reader([line], delimiter='\t', quotechar='"')]
+            metadata = rows[0]
+            for i, s in enumerate(metadata):
+                if self.token_range_re.match(s):
+                    metadata[i] = self.get_token_range(s)
         elif line.startswith('# ::'):
             label = line[len('# ::'):].split()[0]
             line = line[len(f'# ::{label} '):]
-            rows = [row for row in csv.reader([line],  delimiter='\t', quotechar='"')]
-            metadata = rows[0]
-            for i,s in enumerate(metadata):
-                if self.token_range_re.match(s):
-                    metadata[i] = self.get_token_range(s)
+            metadata = line
         else:
             label = 'snt'
             metadata = line[len('# '):].strip()
@@ -227,24 +237,24 @@ class AMR_Reader:
                 if not amr_string: continue
                 if not amr_string.startswith('(') or not amr_string.endswith(')'):
                     raise Exception('Could not parse AMR from: ', amr_string)
-                metadata = metadata_parser.readlines(prefix)
-                tokens = metadata['tok'][0] if 'tok' in metadata else metadata['snt'][0].split()
+                metadata, graph_metadata = metadata_parser.readlines(prefix)
+                tokens = metadata['tok'] if 'tok' in metadata else metadata['snt'].split()
                 tokens = self._clean_tokens(tokens)
-                if 'node' in metadata and False:
-                    amr, aligns = self._parse_amr_from_metadata(tokens, metadata)
-                    amr.id = metadata['id'][0]
+                if graph_metadata:
+                    amr, aligns = self._parse_amr_from_metadata(tokens, graph_metadata)
+                    amr.id = metadata['id']
                     if output_alignments:
                         alignments[amr.id] = aligns
                 else:
                     amr, other_stuff = penman_wrapper.parse_amr(tokens, amr_string)
-                    if 'id' in amr.id:
-                        amr.id = metadata['id'][0]
+                    if 'id' in metadata:
+                        amr.id = metadata['id']
                     else:
                         amr.id = str(amr_idx)
                     if output_alignments:
                         alignments[amr.id] = []
                         if 'alignments' in metadata:
-                            aligns = metadata['alignments'][0]
+                            aligns = metadata['alignments'].split()
                             if any('|' in a for a in aligns):
                                 jamr_labels = other_stuff[1]
                                 alignments[amr.id] = self._parse_jamr_alignments(amr, amr_file_name, aligns, jamr_labels, metadata_parser)
@@ -254,6 +264,7 @@ class AMR_Reader:
                         else:
                             aligns = other_stuff[4]
                             alignments[amr.id] = aligns
+                amr.metadata = {k:v for k,v in metadata.items() if k not in ['tok','id']}
                 amrs.append(amr)
                 amr_idx += 1
         if remove_wiki:
@@ -312,7 +323,7 @@ class AMR_Reader:
     def write_to_file(output_file, amrs):
         with open(output_file, 'w+', encoding='utf8') as f:
             for amr in amrs:
-                f.write(amr.jamr_string())
+                f.write(amr.amr_string())
 
     @staticmethod
     def load_alignments_from_json(json_file, amrs=None):
@@ -390,8 +401,6 @@ class AMR_Reader:
            amr graph
            '''
         amr = AMR(tokens)
-        if 'id' in metadata:
-            amr.id = metadata['id'][0]
         alignments = []
 
         nodes = metadata['node']

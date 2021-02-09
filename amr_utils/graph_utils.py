@@ -1,6 +1,27 @@
 
 from amr_utils.amr import AMR
 
+
+def get_subgraph(amr, nodes: list, edges: list):
+    if not nodes:
+        return AMR()
+    potential_root = nodes.copy()
+    for x, r, y in amr.edges:
+        if x in nodes and y in nodes:
+            if y in potential_root:
+                potential_root.remove(y)
+    root = potential_root[0] if len(potential_root) > 0 else nodes[0]
+    sub = AMR(root=root,
+               edges=edges,
+               nodes={n: amr.nodes[n] for n in nodes})
+    for s,r,t in edges:
+        if s not in nodes:
+            sub.nodes[s] = '<var>'
+        if t not in nodes:
+            sub.nodes[t] = '<var>'
+    return sub
+
+
 def is_rooted_dag(amr):
     if not amr.nodes:
         return False
@@ -105,7 +126,6 @@ def is_projective(amr):
     return False, culprits
 
 
-
 def breadth_first_nodes(amr):
     if amr.root is None:
         return
@@ -146,7 +166,8 @@ def breadth_first_edges(amr, ignore_reentrancies=False):
         if not children:
             break
 
-def simple_node_map(amr1, amr2):
+
+def simple_node_aligner(amr1, amr2):
     parents1 = {n:set() for n in amr1.nodes}
     parents2 = {n: set() for n in amr2.nodes}
     children1 = {n:set() for n in amr1.nodes}

@@ -1,3 +1,4 @@
+import sys
 
 from amr_utils import style
 from amr_utils.alignments import AMR_Alignment
@@ -5,48 +6,33 @@ from amr_utils.alignments import AMR_Alignment
 
 class AMR:
 
-    def __init__(self, id=None, tokens:list=None, root=None, nodes:dict=None, edges:list=None):
+    def __init__(self, id=None, tokens:list=None, root=None, nodes:dict=None, edges:list=None, metadata:dict=None):
 
         if edges is None: edges = []
         if nodes is None: nodes = {}
         if tokens is None: tokens = []
+        if metadata is None: metadata = {}
 
         self.tokens = tokens
         self.root = root
         self.nodes = nodes
         self.edges = edges
         self.id = 'None' if id is None else id
+        self.metadata = metadata
 
     def copy(self):
-        return AMR(self.id, self.tokens.copy(), self.root, self.nodes.copy(), self.edges.copy())
-
-    def get_subgraph(self, node_ids:list):
-        if not node_ids:
-            return AMR()
-        potential_root = node_ids.copy()
-        sg_edges = []
-        for x, r, y in self.edges:
-            if x in node_ids and y in node_ids:
-                sg_edges.append((x, r, y))
-                if y in potential_root:
-                    potential_root.remove(y)
-        root = potential_root[0] if len(potential_root) > 0 else node_ids[0]
-        return AMR(root=root,
-                   edges=sg_edges,
-                   nodes={n: self.nodes[n] for n in node_ids})
+        return AMR(self.id, self.tokens.copy(), self.root, self.nodes.copy(), self.edges.copy(), self.metadata.copy())
 
     def __str__(self):
-        return style.default_string(self)
+        return metadata_string(self)
 
     def graph_string(self):
-        return style.graph_string(self)
+        return graph_string(self)
 
-    def jamr_string(self):
-        return style.jamr_string(self)
+    def amr_string(self):
+        return metadata_string(self) + graph_string(self)+'\n\n'
 
-    def get_alignment(self, alignments=None, token_id=None, node_id=None, edge=None):
-        if alignments is None:
-            alignments = {self.id : self.alignments}
+    def get_alignment(self, alignments, token_id=None, node_id=None, edge=None):
         if self.id not in alignments:
             return AMR_Alignment()
         for align in alignments[self.id]:
@@ -57,3 +43,99 @@ class AMR:
             if edge is not None and edge in align.edges:
                 return align
         return AMR_Alignment()
+
+
+
+def metadata_string(amr):
+    '''
+        # ::id sentence id
+        # ::tok tokens...
+        # ::node node_id node alignments
+        # ::root root_id root
+        # ::edge src label trg src_id trg_id alignments
+    '''
+    output = ''
+    # id
+    if amr.id:
+        output += f'# ::id {amr.id}\n'
+    # tokens
+    output += '# ::tok ' + (' '.join(amr.tokens)) + '\n'
+    # metadata
+    for label in amr.metadata:
+        if label not in ['tok','id','node','root','edge','alignments']:
+            output += f'# ::{label} {str(amr.metadata[label])}\n'
+    # nodes
+    for n in amr.nodes:
+        output += f'# ::node\t{n}\t{amr.nodes[n] if n in amr.nodes else "None"}\n'
+    # root
+    root = amr.root
+    if amr.root:
+        output += f'# ::root\t{root}\t{amr.nodes[root] if root in amr.nodes else "None"}\n'
+    # edges
+    for i, e in enumerate(amr.edges):
+        s, r, t = e
+        r = r.replace(':', '')
+        output += f'# ::edge\t{amr.nodes[s] if s in amr.nodes else "None"}\t{r}\t{amr.nodes[t] if t in amr.nodes else "None"}\t{s}\t{t}\n'
+
+    return output
+
+
+def graph_string(amr):
+    amr_string = f'[[{amr.root}]]'
+    new_ids = {}
+    for n in amr.nodes:
+        new_id = amr.nodes[n][0] if amr.nodes[n] else 'x'
+        if new_id.isalpha() and new_id.islower():
+            if new_id in new_ids.values():
+                j = 2
+                while f'{new_id}{j}' in new_ids.values():
+                    j += 1
+                new_id = f'{new_id}{j}'
+        else:
+            j = 0
+            while f'x{j}' in new_ids.values():
+                j += 1
+            new_id = f'x{j}'
+        new_ids[n] = new_id
+    depth = 1
+    nodes = {amr.root}
+    completed = set()
+    while '[[' in amr_string:
+        tab = '\t' * depth
+        for n in nodes.copy():
+            id = new_ids[n] if n in new_ids else 'x91'
+            concept = amr.nodes[n] if n in new_ids and amr.nodes[n] else 'None'
+            edges = sorted([e for e in amr.edges if e[0] == n], key=lambda x: x[1])
+            targets = set(t for s, r, t in edges)
+            edges = [f'{r} [[{t}]]' for s, r, t in edges]
+            children = f'\n{tab}'.join(edges)
+            if children:
+                children = f'\n{tab}' + children
+            if n not in completed:
+                if (concept[0].isalpha() and concept not in ['imperative', 'expressive', 'interrogative']) or targets:
+                    amr_string = amr_string.replace(f'[[{n}]]', f'({id}/{concept}{children})', 1)
+                else:
+                    amr_string = amr_string.replace(f'[[{n}]]', f'{concept}')
+                completed.add(n)
+            amr_string = amr_string.replace(f'[[{n}]]', f'{id}')
+            nodes.remove(n)
+            nodes.update(targets)
+        depth += 1
+    if len(completed) < len(amr.nodes):
+        missing_nodes = [n for n in amr.nodes if n not in completed]
+        missing_edges = [(s, r, t) for s, r, t in amr.edges if s in missing_nodes or t in missing_nodes]
+        missing_nodes= ', '.join(f'{n}/{amr.nodes[n]}' for n in missing_nodes)
+        missing_edges = ', '.join(f'{s}/{amr.nodes[s]} {r} {t}/{amr.nodes[t]}' for s,r,t in missing_edges)
+        print('[amr]', 'Failed to print AMR, '
+              + str(len(completed)) + ' of ' + str(len(amr.nodes)) + ' nodes printed:\n '
+              + str(amr.id) +':\n'
+              + amr_string + '\n'
+              + 'Missing nodes: ' + missing_nodes +'\n'
+              + 'Missing edges: ' + missing_edges +'\n',
+              file=sys.stderr)
+    if not amr_string.startswith('('):
+        amr_string = '(' + amr_string + ')'
+    if len(amr.nodes) == 0:
+        amr_string = '(a/amr-empty)'
+
+    return amr_string

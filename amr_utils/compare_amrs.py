@@ -3,11 +3,12 @@ import sys
 from amr_readers import AMR_Reader
 from style import HTML_AMR
 
-from graph_utils import simple_node_map
+from graph_utils import simple_node_aligner
 
 amr_pairs = {}
 node_maps = {}
 version = 1
+
 
 def style(assign_node_color=None, assign_node_desc=None, assign_edge_color=None, assign_edge_desc=None,
           assign_token_color=None, assign_token_desc=None, limit=None):
@@ -41,7 +42,7 @@ def style(assign_node_color=None, assign_node_desc=None, assign_edge_color=None,
     return output
 
 
-def is_correct_node(amr, n):
+def is_correct_node(amr, n, other_args=None):
     amr1, amr2 = amr_pairs[amr.id]
     if version==1:
         other_amr = amr2
@@ -53,7 +54,8 @@ def is_correct_node(amr, n):
         return 'green'
     return 'red'
 
-def is_correct_edge(amr, e):
+
+def is_correct_edge(amr, e, other_args=None):
     amr1, amr2 = amr_pairs[amr.id]
     s,r,t = e
     if version == 1:
@@ -67,7 +69,7 @@ def is_correct_edge(amr, e):
     return 'red'
 
 
-def is_correct_node_desc(amr, n):
+def is_correct_node_desc(amr, n, other_args=None):
     amr1, amr2 = amr_pairs[amr.id]
     if version == 1:
         other_amr = amr2
@@ -79,7 +81,8 @@ def is_correct_node_desc(amr, n):
         return ''
     return f'{amr.nodes[n]} != {other_amr.nodes[node_map[n]]}'
 
-def is_correct_edge_desc(amr, e):
+
+def is_correct_edge_desc(amr, e, other_args=None):
     amr1, amr2 = amr_pairs[amr.id]
     s, r, t = e
     if version == 1:
@@ -112,7 +115,7 @@ def main():
     amrs2 = reader.load(file2, remove_wiki=True)
     for amr1, amr2 in zip(amrs1, amrs2):
         amr1.id = amr2.id
-        node_maps[amr1.id] = (simple_node_map(amr1, amr2), simple_node_map(amr2, amr1))
+        node_maps[amr1.id] = (simple_node_aligner(amr1, amr2), simple_node_aligner(amr2, amr1))
         amr_pairs[amr1.id] = (amr1,amr2)
     output = style(assign_node_color=is_correct_node,
                    assign_node_desc=is_correct_node_desc,
