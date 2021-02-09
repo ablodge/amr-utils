@@ -400,7 +400,7 @@ class AMR_Reader:
            # ::edge src label trg src_id trg_id alignments
            amr graph
            '''
-        amr = AMR(tokens)
+        amr = AMR(tokens=tokens)
         alignments = []
 
         nodes = metadata['node']
@@ -453,7 +453,6 @@ def main():
 
     reader.write_to_file(output_file, amrs)
     reader.save_alignments_to_json(output_file.replace('.txt','.alignments.json'), alignments)
-
 
 
 if __name__ == '__main__':

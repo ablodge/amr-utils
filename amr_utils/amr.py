@@ -6,7 +6,7 @@ from amr_utils.alignments import AMR_Alignment
 
 class AMR:
 
-    def __init__(self, id=None, tokens:list=None, root=None, nodes:dict=None, edges:list=None, metadata:dict=None):
+    def __init__(self, tokens:list=None, id=None, root=None, nodes:dict=None, edges:list=None, metadata:dict=None):
 
         if edges is None: edges = []
         if nodes is None: nodes = {}
@@ -21,7 +21,7 @@ class AMR:
         self.metadata = metadata
 
     def copy(self):
-        return AMR(self.id, self.tokens.copy(), self.root, self.nodes.copy(), self.edges.copy(), self.metadata.copy())
+        return AMR(self.tokens.copy(), self.id, self.root, self.nodes.copy(), self.edges.copy(), self.metadata.copy())
 
     def __str__(self):
         return metadata_string(self)

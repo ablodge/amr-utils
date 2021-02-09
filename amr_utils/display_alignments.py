@@ -1,7 +1,7 @@
 import sys
 
 from amr_utils.amr_readers import AMR_Reader
-from amr_utils.graph_utils import is_rooted_dag
+from amr_utils.graph_utils import is_rooted_dag, get_subgraph
 from amr_utils.style import HTML_AMR
 
 
@@ -42,18 +42,8 @@ def get_token_aligned_subgraph(amr, tok, alignments):
         elems = [amr.nodes[n] for n in align.nodes]
         elems += [r for s,r,t in align.edges]
         # return ' '.join(elems)
-        sg = amr.get_subgraph(align.nodes)
-        for e in align.edges:
-            if e not in sg.edges:
-                sg.edges.append(e)
-            s,r,t = e
-            if sg.root == t:
-                sg.root = s
-            for n in [s,t]:
-                if n not in sg.nodes:
-                    sg.nodes[n] = '<var>'
-            if not sg.root:
-                sg.root = s
+        edges = [(s,r,t) for s,r,t in amr.edges if ((s,r,t) in align.edges or (s in align.nodes and t in align.nodes))]
+        sg = get_subgraph(amr, align.nodes, edges)
         if is_rooted_dag(sg):
             out = sg.graph_string()
         else:
