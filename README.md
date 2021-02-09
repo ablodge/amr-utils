@@ -1,20 +1,17 @@
 # amr-utils
-A python package of common operations for AMRs
-
-
-I wrote amr-utils to store operations that I often need when doing research with AMRs. 
+A python package for working with AMR data, working with AMR alignments, and visualizing AMRs. This code is maintained by Austin Blodgett. I wrote amr-utils to store operations that I often need when doing research with AMRs. 
 ### Features:
 - Load AMRs from a file or directory, with support for multiple formats
 - Load AMR alignments, with support for LDC, JAMR, and ISI alignment formats
-- iterate through nodes, edges, or alignments in an AMR
-- output AMRs to useful display formats: html (AMR string) or latex (AMR graph)
+- simple class for accessing AMR nodes, edges, alignments, etc.
+- Tools for AMR Visualization using HTML (AMR string) or Latex (AMR graph)
 
 ### Requirements
 - Python 3.6 or higher
 - [PENMAN library](https://github.com/goodmami/penman)
 
 ### Input
-Input should contain AMR strings separated by a blank line. Lines starting with `#` will be ignored.
+Input should contain AMR strings separated by a blank line. Lines starting with `#` will be treated as metadata.
 
 # AMR Reader
 The class `AMR_Reader` can be used to load AMRs or AMR alignments from a number of different formats including LDC, JAMR, and ISI. An `AMR_Reader` can be used as follows.
@@ -70,7 +67,7 @@ amrs, alignments = reader.load(amr_file, remove_wiki=True, output_alignments=Tru
 By default, `AMR_Reader` uses the LDC/ISI style of node ids where 1.n is the nth child of the root with indices starting at 1. 
 Any alignments are automatically converted to this format for data consistency. 
 
-# Versatile AMR Alignments JSON Format
+# AMR Alignments JSON Format
 The package includes tools for converting AMR alignments from and to JSON like the following.
 ```
 [{'type':'isi', 'tokens':[0], 'nodes':['1.1'], 'edges':[]},
@@ -95,8 +92,9 @@ To save alignments to a JSON file do:
 reader = AMR_Reader()
 reader.save_alignments_to_json(alignments_file, alignments)
 ```
+# AMR Visualization
 
-# Latex
+## Latex
 Amr-utils allows you to read AMRs from a text file and output them as latex diagrams, such as the following.
 ![latex example](https://github.com/ablodge/amr-utils/blob/master/latex_ex.PNG)
 
@@ -116,7 +114,7 @@ Add these lines to your latex file:
 ```
 
 
-# HTML
+## HTML
 Amr-utils allows you to read AMRs from a text file and output them as html. You can look in `style.css` for an example of styling. 
 ![html example](https://github.com/ablodge/amr-utils/blob/master/html_ex.png)
 ### Instructions
