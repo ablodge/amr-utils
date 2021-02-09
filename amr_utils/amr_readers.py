@@ -315,7 +315,7 @@ class AMR_Reader:
                 f.write(amr.jamr_string())
 
     @staticmethod
-    def load_alignments_from_json(json_file, amrs):
+    def load_alignments_from_json(json_file, amrs=None):
         return load_from_json(json_file, amrs=amrs)
 
     @staticmethod
