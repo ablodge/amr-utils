@@ -57,8 +57,8 @@ class Latex_AMR:
             depth = node_depth[n]
             row = [n for n in nodes if node_depth[n]==depth]
             pos = row.index(n)
-            x = Latex_AMR.get_x_(pos, len(row))
-            y = Latex_AMR.get_y_(depth, max_depth)
+            x = Latex_AMR._get_x(pos, len(row))
+            y = Latex_AMR._get_y(depth, max_depth)
             if callable(assign_color):
                 color = assign_color(amr, n)
             else:
@@ -94,11 +94,11 @@ class Latex_AMR:
         return latex
 
     @staticmethod
-    def get_x_(i, num_nodes):
+    def _get_x(i, num_nodes):
         return (i+1)*20.0/(num_nodes+1)
 
     @staticmethod
-    def get_y_(depth, max_depth):
+    def _get_y(depth, max_depth):
         return 2.5*(max_depth - depth)
 
     @staticmethod
@@ -119,7 +119,7 @@ class HTML_AMR:
     </div>
     '''
     @staticmethod
-    def get_description_(frame, propbank_frames_dictionary):
+    def _get_description(frame, propbank_frames_dictionary):
         if frame in propbank_frames_dictionary:
             return propbank_frames_dictionary[frame].replace('\t', '\n')
         return ''
@@ -222,7 +222,7 @@ class HTML_AMR:
                 if n not in completed:
                     if (concept[0].isalpha() and concept not in ['imperative', 'expressive',
                                                                  'interrogative']) or targets or depth==1:
-                        desc = HTML_AMR.get_description_(concept, propbank_frames_dictionary)
+                        desc = HTML_AMR._get_description(concept, propbank_frames_dictionary)
                         type = 'amr-frame' if desc else "amr-node"
                         if assign_node_desc:
                             desc = assign_node_desc(amr, n, other_args)
@@ -287,18 +287,6 @@ class HTML_AMR:
         output += '</body>\n'
         output += '</html>\n'
         return output
-#
-# def is_aligned_node(amr, n):
-#     align = amr.get_alignment(node_id=n)
-#     return '' if align else 'red'
-#
-# def is_aligned_edge(amr, e):
-#     align = amr.get_alignment(edge=e)
-#     return 'grey' if align else ''
-#
-# def is_aligned_token(amr, t):
-#     align = amr.get_alignment(token_id=t)
-#     return '' if align else 'red'
 
 def main():
     import argparse
