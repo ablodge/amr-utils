@@ -1,12 +1,9 @@
 # amr-utils
-A python package of common operations for AMRs
-
-
-I wrote amr-utils to store operations that I often need when doing research with AMRs. 
+A python package for working with AMR data, working with AMR alignments, and visualizing AMRs. This code is maintained by Austin Blodgett. I wrote amr-utils to store operations that I often need when doing research with AMRs. 
 ### Features:
 - Load AMRs from a file or directory, with support for multiple formats
 - Load AMR alignments, with support for LDC, JAMR, and ISI alignment formats
-- iterate through nodes, edges, or alignments in an AMR
+- simple class for accessing AMR nodes, edges, alignments, etc.
 - Tools for AMR Visualization using HTML (AMR string) or Latex (AMR graph)
 
 ### Requirements
@@ -14,7 +11,7 @@ I wrote amr-utils to store operations that I often need when doing research with
 - [PENMAN library](https://github.com/goodmami/penman)
 
 ### Input
-Input should contain AMR strings separated by a blank line. Lines starting with `#` will be ignored.
+Input should contain AMR strings separated by a blank line. Lines starting with `#` will be treated as metadata.
 
 # AMR Reader
 The class `AMR_Reader` can be used to load AMRs or AMR alignments from a number of different formats including LDC, JAMR, and ISI. An `AMR_Reader` can be used as follows.
