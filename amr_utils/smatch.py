@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+This code is taken from https://github.com/snowblink14/smatch
+"""
+
 
 """
 This script computes smatch score between two AMRs.
