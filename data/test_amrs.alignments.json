@@ -1,0 +1,16 @@
+{"1": [{"type": "basic", "tokens": [1], "nodes": ["1.1"], "edges": []}, 
+	{"type": "basic", "tokens": [2], "nodes": ["1"], "edges": []}, 
+	{"type": "basic", "tokens": [4], "nodes": ["1.2"], "edges": []}, 
+	{"type": "basic", "tokens": [6, 7], "nodes": ["1.2.2", "1.2.2.1", "1.2.2.1.1", "1.2.2.1.2", "1.2.2.1.3"], "edges": []}
+	], 
+"2": [{"type": "basic", "tokens": [0], "nodes": ["1.1"], "edges": []}, 
+	{"type": "basic", "tokens": [1], "nodes": ["1"], "edges": []}, 
+	{"type": "basic", "tokens": [2], "nodes": ["1.2"], "edges": []}
+	], 
+"3": [{"type": "basic", "tokens": [0], "nodes": ["1.1.2", "1.1.2.1"], "edges": []}, 
+	{"type": "basic", "tokens": [1], "nodes": ["1.1.1"], "edges": []}, 
+	{"type": "basic", "tokens": [2], "nodes": ["1.1"], "edges": []}, 
+	{"type": "basic", "tokens": [3], "nodes": ["1"], "edges": []}, 
+	{"type": "basic", "tokens": [4], "nodes": ["1.2"], "edges": []}
+	]
+}

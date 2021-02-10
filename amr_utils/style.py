@@ -284,6 +284,7 @@ class HTML_AMR:
                                     assign_edge_color, assign_edge_desc,
                                     assign_token_color, assign_token_desc,
                                     other_args)
+            output += '<hr>\n'
         output += '</body>\n'
         output += '</html>\n'
         return output

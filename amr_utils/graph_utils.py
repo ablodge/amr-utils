@@ -223,15 +223,15 @@ def get_node_alignment(amr1:AMR, amr2:AMR):
             continue
         b = prefix2 + str(j)
         align_map[node_map1[a]] = node_map2[b]
-    for s,r,t in amr1.edges:
+    if amr1.root not in align_map:
+        align_map[amr1.root] = amr2.root
+    for s,r,t in breadth_first_edges(amr1, ignore_reentrancies=True):
         if t not in align_map:
             for s2,r2,t2 in amr2.edges:
                 if align_map[s]==s2 and r==r2 and amr1.nodes[t]==amr2.nodes[t2]:
                     align_map[t] = t2
             if t not in align_map:
                 align_map[t] = align_map[s]
-    if amr1.root not in align_map:
-        align_map[amr1.root] = amr2.root
 
     if not all(n in align_map for n in amr1.nodes):
         raise Exception('Failed to build node alignment:', amr1.id, amr2.id)

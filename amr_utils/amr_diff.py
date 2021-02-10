@@ -82,6 +82,9 @@ def is_correct_node_desc(amr, n, other_args=None):
         node_map = map2
     if amr.nodes[n] == other_amr.nodes[node_map[n]]:
         return ''
+    if not amr.nodes[n][0].isalpha() or amr.nodes[n] in ['imperative', 'expressive', 'interrogative']:
+        s,r,t = [(s,r,t) for s,r,t in amr.edges if t==n][0]
+        return f'No corresponding attribute {other_amr.nodes[node_map[s]]} {r} {amr.nodes[t]}'
     return f'{amr.nodes[n]} != {other_amr.nodes[node_map[n]]}'
 
 

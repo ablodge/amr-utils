@@ -7,15 +7,15 @@
 			:op3 "City"))))
 
 # ::id 2
-# ::tok dogs chase cats
+# ::tok Dogs chase cats
 (c/chase-01 :ARG0 (d/dog)
 	:ARG1 (c2/cat))
 
 # ::id 3
-# ::tok .
-(a/amr-empty)
-
-# ::id 4
-# ::tok peanut butter and jelly
-(a/and :op1 (b/butter :mod (p/peanut))
-	:op2 (j/jelly))
+# ::tok Colorless green ideas sleep furiously .
+(s/sleep-01
+	:ARG0 (i2/idea
+		:ARG1-of (g/green-02)
+		:ARG1-of (c/color-01 :polarity -))
+	:time (i3/infuriate-01
+		:ARG1 i2))
