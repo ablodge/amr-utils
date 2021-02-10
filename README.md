@@ -1,5 +1,5 @@
 # AMR-utils
-AMR-utils is a python package for working with AMR data, working with AMR alignments, and visualizing AMRs. This code is maintained by Austin Blodgett. I wrote amr-utils to store operations that I often need when doing research with AMRs. 
+AMR-utils is a python package for working with AMR data, with tools for reading AMRs and alignments, performing graph operations, and displaying and visualizing AMR data. I wrote this package to store operations that I often need or find useful when doing research with AMRs. This code is written and maintained by Austin Blodgett.
 ### Features:
 - Load AMRs from a file or directory, with support for multiple formats
 - Load AMR alignments, with support for LDC, JAMR, and ISI alignment formats
@@ -39,7 +39,7 @@ Simplified:
 	:ARG1 (c2/cat))
 ```
 
-JAMR-style tab seperated metdata format:
+JAMR-style graph metdata format:
 
 ```
 # ::id 1
@@ -103,7 +103,7 @@ reader.save_alignments_to_json(alignments_file, alignments)
 AMR-utils includes tools for visualizing AMRs and AMR aligments. See the wiki for more detail.
 
 ## Latex
-Amr-utils allows you to read AMRs from a text file and output them as latex diagrams, such as the following.
+AMR-utils allows you to read AMRs from a text file and output them as latex diagrams, such as the following.
 ![latex example](https://github.com/ablodge/amr-utils/blob/master/latex_ex.PNG)
 
 ### Colors
@@ -123,7 +123,7 @@ Add these lines to your latex file:
 
 
 ## HTML
-Amr-utils allows you to read AMRs from a text file and output them as html. You can look in `style.css` for an example of styling. 
+AMR-utils allows you to read AMRs from a text file and output them as html. You can look in `style.css` for an example of styling. 
 ![html example](https://github.com/ablodge/amr-utils/blob/master/html_ex.PNG)
 ### Instructions
 Run as follows:
@@ -161,7 +161,7 @@ from amr_utils.graph_utils import get_subgraph, is_rooted_dag, breadth_first_nod
 ```
 Functions in `graph_utils.py` allow you to
 - Traverse AMR nodes or edges in depth-first or breadth-first order
-- Retreive an AMR subgraph
+- Retrieve an AMR subgraph
 - Test an AMR or sub-AMR for DAG structure
 - Get the shortest path between two nodes
 - Seperate a subset of AMR nodes into connected components
