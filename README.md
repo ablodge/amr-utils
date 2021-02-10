@@ -21,6 +21,8 @@ git clone https://github.com//ablodge/amr-utils
 pip install ./amr-utils
 ```
 
+If you have a question that isn't answered by this document, please check the Wiki.
+
 # AMR Reader
 The class `AMR_Reader` can be used to load AMRs or AMR alignments from a number of different formats including LDC, JAMR, and ISI. An `AMR_Reader` can be used as follows.
 
