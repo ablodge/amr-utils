@@ -103,7 +103,7 @@ reader.save_alignments_to_json(alignments_file, alignments)
 AMR-utils includes tools for visualizing AMRs and AMR aligments. See the wiki for more detail.
 
 ## Latex
-Amr-utils allows you to read AMRs from a text file and output them as latex diagrams, such as the following.
+AMR-utils allows you to read AMRs from a text file and output them as latex diagrams, such as the following.
 ![latex example](https://github.com/ablodge/amr-utils/blob/master/latex_ex.PNG)
 
 ### Colors
@@ -123,7 +123,7 @@ Add these lines to your latex file:
 
 
 ## HTML
-Amr-utils allows you to read AMRs from a text file and output them as html. You can look in `style.css` for an example of styling. 
+AMR-utils allows you to read AMRs from a text file and output them as html. You can look in `style.css` for an example of styling. 
 ![html example](https://github.com/ablodge/amr-utils/blob/master/html_ex.PNG)
 ### Instructions
 Run as follows:
