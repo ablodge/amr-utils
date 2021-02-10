@@ -35,7 +35,7 @@ def style(amr_pairs, other_args, assign_node_color=None, assign_node_desc=None, 
                                 assign_edge_color, assign_edge_desc,
                                 assign_token_color, assign_token_desc,
                                 other_args)
-        output += f'precision {100*prec:.1f} recall {100*rec:.1f} f1 {100*f1:.1f}\n'
+        output += f'SMATCH: precision {100*prec:.1f} recall {100*rec:.1f} f1 {100*f1:.1f}\n'
         output += '<hr>\n'
         i+=1
         if limit and i>limit:

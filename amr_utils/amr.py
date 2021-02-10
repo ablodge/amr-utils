@@ -32,6 +32,8 @@ class AMR:
         return metadata_string(self) + graph_string(self)+'\n\n'
 
     def get_alignment(self, alignments, token_id=None, node_id=None, edge=None):
+        if not isinstance(alignments, dict):
+            raise Exception('Alignments object must be a dict.')
         if self.id not in alignments:
             return AMR_Alignment()
         for align in alignments[self.id]:
