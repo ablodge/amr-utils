@@ -23,26 +23,28 @@ def get_subgraph(amr, nodes: list, edges: list):
     return sub
 
 
-def is_rooted_dag(amr):
-    if not amr.nodes:
+def is_rooted_dag(amr, nodes):
+    if not nodes:
         return False
-    roots = [n for n in amr.nodes.keys()]
-    for s,r,t in amr.edges:
+    roots = nodes.copy()
+    edges = [(s,r,t) for s,r,t in amr.edges if s in nodes and t in nodes]
+    for s,r,t in edges:
         if t in roots:
             roots.remove(t)
-    if len(roots)==1 and roots[0]==amr.root:
+    if len(roots)==1:
         return True
     return False
 
 
-def get_rooted_components(amr):
+def get_connected_components(amr, nodes):
 
-    if not amr.nodes:
+    if not nodes:
         return []
-    descendants = {n:{n} for n in amr.nodes.keys()}
-    roots = [n for n in amr.nodes.keys()]
+    descendants = {n:{n} for n in nodes}
+    roots = [n for n in nodes]
     taken = set()
-    for s, r, t in amr.edges:
+    edges = [(s, r, t) for s, r, t in breadth_first_edges(amr, ignore_reentrancies=True) if s in nodes and t in nodes]
+    for s, r, t in edges:
         if t in taken: continue
         taken.add(t)
         if t in roots:
@@ -168,6 +170,73 @@ def breadth_first_edges(amr, ignore_reentrancies=False):
             break
 
 
+def depth_first_nodes(amr):
+    visited, stack = {amr.root}, []
+    children = [(s, r, t) for s, r, t in amr.edges if s == amr.root and t not in visited]
+    children = list(sorted(children, key=lambda x: x[1].lower(), reverse=True))
+    stack.extend(children)
+    edges = [e for e in amr.edges]
+    yield amr.root
+
+    while stack:
+        s, r, t = stack.pop()
+        if t in visited:
+            continue
+        yield t
+        edges.remove((s, r, t))
+        visited.add(t)
+        children = [(s2, r2, t2) for s2, r2, t2 in edges if s2 == t]
+        children = list(sorted(children, key=lambda x: x[1].lower(), reverse=True))
+        stack.extend(children)
+
+
+def depth_first_edges(amr, ignore_reentrancies=False):
+    visited, stack = {amr.root}, []
+    children = [(s, r, t) for s, r, t in amr.edges if s == amr.root and t not in visited]
+    children = list(sorted(children, key=lambda x: x[1].lower(), reverse=True))
+    stack.extend(children)
+    edges = [e for e in amr.edges]
+
+    while stack:
+        s,r,t = stack.pop()
+        if ignore_reentrancies and t in visited:
+            continue
+        yield (s,r,t)
+        edges.remove((s,r,t))
+        visited.add(t)
+        children = [(s2,r2,t2) for s2,r2,t2 in edges if s2==t]
+        children = list(sorted(children, key=lambda x: x[1].lower(), reverse=True))
+        stack.extend(children)
+
+
+def get_shortest_path(amr, n1, n2, ignore_reentrancies=False):
+    path = [n1]
+    for s,r,t in depth_first_edges(amr, ignore_reentrancies):
+        if s in path:
+            while path[-1]!=s:
+                path.pop()
+            path.append(t)
+            if t==n2:
+                return path
+    return None
+
+
+# def is_cycle(amr, nodes):
+#     descendants = {n: {n} for n in nodes}
+#     for s, r, t in amr.edges:
+#         if s in nodes and t in nodes:
+#             for d in descendants:
+#                 if s in descendants[d]:
+#                     descendants[d].update(descendants[t])
+#     for n in nodes:
+#         for n2 in nodes:
+#             if n==n2:
+#                 continue
+#             if n in descendants[n2] and n2 in descendants[n]:
+#                 return True
+#     return False
+
+
 def get_node_alignment(amr1:AMR, amr2:AMR):
     prefix1 = "a"
     prefix2 = "b"
@@ -239,70 +308,3 @@ def get_node_alignment(amr1:AMR, amr2:AMR):
     rec = best_match_num / gold_triple_num if gold_triple_num>0 else 0
     f1 = 2*(prec*rec)/(prec+rec) if (prec+rec)>0 else 0
     return align_map, prec, rec, f1
-
-
-
-# def is_cycle(amr, nodes):
-#     descendants = {n: {n} for n in nodes}
-#     for s, r, t in amr.edges:
-#         if s in nodes and t in nodes:
-#             for d in descendants:
-#                 if s in descendants[d]:
-#                     descendants[d].update(descendants[t])
-#     for n in nodes:
-#         for n2 in nodes:
-#             if n==n2:
-#                 continue
-#             if n in descendants[n2] and n2 in descendants[n]:
-#                 return True
-#     return False
-
-def depth_first_nodes(amr):
-    visited, stack = {amr.root}, []
-    children = [(s, r, t) for s, r, t in amr.edges if s == amr.root and t not in visited]
-    children = list(sorted(children, key=lambda x: x[1].lower(), reverse=True))
-    stack.extend(children)
-    edges = [e for e in amr.edges]
-    yield amr.root
-
-    while stack:
-        s, r, t = stack.pop()
-        if t in visited:
-            continue
-        yield t
-        edges.remove((s, r, t))
-        visited.add(t)
-        children = [(s2, r2, t2) for s2, r2, t2 in edges if s2 == t]
-        children = list(sorted(children, key=lambda x: x[1].lower(), reverse=True))
-        stack.extend(children)
-
-
-def depth_first_edges(amr, ignore_reentrancies=False):
-    visited, stack = {amr.root}, []
-    children = [(s, r, t) for s, r, t in amr.edges if s == amr.root and t not in visited]
-    children = list(sorted(children, key=lambda x: x[1].lower(), reverse=True))
-    stack.extend(children)
-    edges = [e for e in amr.edges]
-
-    while stack:
-        s,r,t = stack.pop()
-        if ignore_reentrancies and t in visited:
-            continue
-        yield (s,r,t)
-        edges.remove((s,r,t))
-        visited.add(t)
-        children = [(s2,r2,t2) for s2,r2,t2 in edges if s2==t]
-        children = list(sorted(children, key=lambda x: x[1].lower(), reverse=True))
-        stack.extend(children)
-
-
-def get_shortest_path(amr, n1, n2, ignore_reentrancies=False):
-    path = [n1]
-    for s,r,t in depth_first_edges(amr, ignore_reentrancies):
-        if s in path:
-            while path[-1]!=s:
-                path.pop()
-            path.append(t)
-            if t==n2:
-                return path
-    return None
