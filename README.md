@@ -1,4 +1,4 @@
-AMR Utils is a python package for working with AMR data, working with AMR alignments, and visualizing AMRs. This code is maintained by Austin Blodgett. I wrote amr-utils to store operations that I often need when doing research with AMRs. 
+AMR-utils is a python package for working with AMR data, working with AMR alignments, and visualizing AMRs. This code is maintained by Austin Blodgett. I wrote amr-utils to store operations that I often need when doing research with AMRs. 
 ### Features:
 - Load AMRs from a file or directory, with support for multiple formats
 - Load AMR alignments, with support for LDC, JAMR, and ISI alignment formats
@@ -96,6 +96,7 @@ reader = AMR_Reader()
 reader.save_alignments_to_json(alignments_file, alignments)
 ```
 # AMR Visualization
+AMR-utils includes tools for visualizing AMRs and AMR aligments. See the wiki for more detail.
 
 ## Latex
 Amr-utils allows you to read AMRs from a text file and output them as latex diagrams, such as the following.
