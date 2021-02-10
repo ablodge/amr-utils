@@ -39,7 +39,7 @@ Simplified:
 	:ARG1 (c2/cat))
 ```
 
-JAMR-style tab seperated metdata format:
+JAMR-style graph metdata format:
 
 ```
 # ::id 1
