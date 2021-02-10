@@ -14,6 +14,12 @@ AMR-utils is a python package for working with AMR data, working with AMR alignm
 - Python 3.6 or higher
 - [PENMAN library](https://github.com/goodmami/penman)
 
+### Install
+```
+git clone https://github.com//ablodge/amr-utils
+pip install ./amr-utils
+```
+
 ### Input
 Input should contain AMR strings separated by a blank line. Lines starting with `#` will be treated as metadata.
 
