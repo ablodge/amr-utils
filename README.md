@@ -155,7 +155,9 @@ Run as follows:
 # Graph Operations
 You can import graph operations from `graph_utils.py`:
 ```
-from amr_utils.graph_utils import get_subgraph, is_rooted_dag, breadth_first_nodes, breadth_first_edges, depth_first_nodes, depth_first_edges, get_shortest_path, get_connected_components
+from amr_utils.graph_utils import get_subgraph, is_rooted_dag, breadth_first_nodes, \
+				breadth_first_edges, depth_first_nodes, depth_first_edges, \
+				get_shortest_path, get_connected_components
 ```
 Functions in `graph_utils.py` allow you to
 - Traverse AMR nodes or edges in depth-first or breadth-first order
