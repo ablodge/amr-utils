@@ -4,6 +4,7 @@ AMR-utils is a python package for working with AMR data, working with AMR alignm
 - Load AMRs from a file or directory, with support for multiple formats
 - Load AMR alignments, with support for LDC, JAMR, and ISI alignment formats
 - A simple class for accessing AMR nodes, edges, tokens, etc.
+- Graph operations for operating on AMR data
 - Tools for AMR Visualization
 	- Convert AMR graphs to Latex (using the tikz library)
 	- Display AMR strings as HTML, with overridable display settings for nodes, tokens, and edges
@@ -149,3 +150,16 @@ AMR-utils also includes a tool for displaying alignments in an easy-to-read form
 Run as follows:
 
 `python display_alignments.py [amr file] [alignment file] [output file]`
+
+
+# Graph Operations
+You can import graph operations from `graph_utils.py`:
+```
+from amr_utils.graph_utils import get_subgraph, is_rooted_dag, breadth_first_nodes, breadth_first_edges, depth_first_nodes, depth_first_edges, get_shortest_path, get_connected_components
+```
+Functions in `graph_utils.py` allow you to
+- Traverse AMR nodes or edges in depth-first or breadth-first order
+- Retreive an AMR subgraph
+- Test an AMR or sub-AMR for DAG structure
+- Get the shortest path between two nodes
+- Seperate a subset of AMR nodes into connected components
