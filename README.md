@@ -24,6 +24,9 @@ pip install ./amr-utils
 ### Wiki
 If you have a question that isn't answered by this document, please check the Wiki.
 
+### Notes
+- A small excerpt of code is taken from [smatch](https://github.com/snowblink14/smatch) for AMR-to-AMR alignment in the AMR Diff tool, so that results from AMR Diff are directly related to the smatch score.
+
 # AMR Reader
 The class `AMR_Reader` can be used to load AMRs or AMR alignments from a number of different formats including LDC, JAMR, and ISI. An `AMR_Reader` can be used as follows.
 
