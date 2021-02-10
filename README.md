@@ -128,8 +128,9 @@ Run as follows:
 `python style.py --html -f [input file] [output file]`
 
 
-
 ## AMR Diff
+
+AMR Diff is a tool for comparing two files of AMRs. The tool is extremely useful for doing error analysis of an AMR parser, allowing users to see exactly where errors in the smatch score come from. The display includes highlighted differences and mouse-over description text explanation of the error.
 
 ![amr diff example](https://github.com/ablodge/amr-utils/blob/master/amr_diff_ex.PNG)
 ### Instructions
@@ -139,6 +140,7 @@ Run as follows:
 
 
 ## Display Alignments
+AMR-utils also includes a tool for displaying alignments in an easy-to-read format, with highlights and mouse-over description text of which tokens/nodes/edges are aligned.
 
 ![display alignments example](https://github.com/ablodge/amr-utils/blob/master/display_align_ex.PNG)
 ### Instructions
