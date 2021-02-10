@@ -20,9 +20,6 @@ git clone https://github.com//ablodge/amr-utils
 pip install ./amr-utils
 ```
 
-### Input
-Input should contain AMR strings separated by a blank line. Lines starting with `#` will be treated as metadata.
-
 # AMR Reader
 The class `AMR_Reader` can be used to load AMRs or AMR alignments from a number of different formats including LDC, JAMR, and ISI. An `AMR_Reader` can be used as follows.
 
@@ -89,8 +86,7 @@ The package includes tools for converting AMR alignments from and to JSON like t
 The advantages of using JSON are:
 - Easy to load and save (No need to write a special script for reading some esoteric format)
 - Can store additional information in a `type` to distinguish different types of alignments
-- Can easily store multiple sets of alignments separately for comparison without needing to modify an AMR file. 
-
+- Can easily store multiple sets of alignments separately, without needing to modify an AMR file. That makes it easy to compare different sets of alignments. 
 
 To read alignments from a JSON file do:
 ```
