@@ -18,6 +18,7 @@ AMR-utils is a python package for working with AMR data, with tools for reading 
 ### Install
 ```
 git clone https://github.com//ablodge/amr-utils
+pip install penman
 pip install ./amr-utils
 ```
 
