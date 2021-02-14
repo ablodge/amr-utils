@@ -44,7 +44,7 @@ def get_token_aligned_subgraph(amr, tok, alignments):
         # return ' '.join(elems)
         edges = [(s,r,t) for s,r,t in amr.edges if ((s,r,t) in align.edges or (s in align.nodes and t in align.nodes))]
         sg = get_subgraph(amr, align.nodes, edges)
-        if is_rooted_dag(sg):
+        if is_rooted_dag(amr, align.nodes):
             out = sg.graph_string()
         else:
             out = ', '.join(elems)
