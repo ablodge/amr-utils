@@ -18,8 +18,15 @@ AMR-utils is a python package for working with AMR data, with tools for reading 
 ### Install
 ```
 git clone https://github.com//ablodge/amr-utils
+pip install penman
 pip install ./amr-utils
 ```
+
+### Wiki
+If you have a question that isn't answered by this document, please check the Wiki.
+
+### Notes
+- A small excerpt of code is taken from [smatch](https://github.com/snowblink14/smatch) for AMR-to-AMR alignment in the AMR Diff tool, so that results from AMR Diff are directly related to the smatch score.
 
 # AMR Reader
 The class `AMR_Reader` can be used to load AMRs or AMR alignments from a number of different formats including LDC, JAMR, and ISI. An `AMR_Reader` can be used as follows.
@@ -133,7 +140,7 @@ Run as follows:
 
 ## AMR Diff
 
-AMR Diff is a tool for comparing two files of AMRs. The tool is extremely useful for doing error analysis of an AMR parser, allowing users to see exactly where errors in the smatch score come from. The display includes highlighted differences and mouse-over description text explanation of the error.
+AMR Diff is a tool for comparing two files of AMRs. The tool uses AMR-to-AMR alignment from [smatch](https://github.com/snowblink14/smatch) to find the differences between pairs of AMRs which contribute to a lower smatch score. AMR Diff is useful for detailed error analysis of AMR parsers. The display includes highlighted differences and mouse-over description text explanation of the error.
 
 ![amr diff example](https://github.com/ablodge/amr-utils/blob/master/amr_diff_ex.PNG)
 ### Instructions
