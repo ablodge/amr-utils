@@ -59,7 +59,7 @@ class Matedata_Parser:
         elif line.startswith('# ::node') or line.startswith('# ::root') or line.startswith('# ::edge'):
             label = line[len('# ::'):].split()[0]
             line = line[len(f'# ::{label} '):]
-            rows = [row for row in csv.reader([line], delimiter='\t', quotechar='"')]
+            rows = [row for row in csv.reader([line], delimiter='\t', quotechar='|')]
             metadata = rows[0]
             for i, s in enumerate(metadata):
                 if self.token_range_re.match(s):

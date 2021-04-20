@@ -96,7 +96,7 @@ def metadata_string(amr):
             output += f'# ::{label} {str(amr.metadata[label])}\n'
     # nodes
     for n in amr.nodes:
-        output += f'# ::node\t{n}\t{amr.nodes[n] if n in amr.nodes else "None"}\n'
+        output += f'# ::node\t{n}\t{amr.nodes[n].replace(" ","_") if n in amr.nodes else "None"}\n'
     # root
     root = amr.root
     if amr.root:
