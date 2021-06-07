@@ -43,13 +43,31 @@ class AMR_Alignment:
         return f'{type}{tokens} => {nodes}{edges}'
 
 
-def load_from_json(json_file, amrs=None):
+def load_from_json(json_file, amrs=None, unanonymize=False):
+    if amrs:
+        amrs = {amr.id:amr for amr in amrs}
     with open(json_file, 'r', encoding='utf8') as f:
         alignments = json.load(f)
     for k in alignments:
+        if unanonymize:
+            if unanonymize and not amrs:
+                raise Exception('To un-anonymize alignments, the parameter "amrs" is required.')
+            for a in alignments[k]:
+                if 'nodes' not in a:
+                    a['nodes'] = []
+                if 'edges' not in a:
+                    a['edges'] = []
+                amr = amrs[k]
+                for i,e in enumerate(a['edges']):
+                    s,r,t = e
+                    if r is None:
+                        new_e = [e2 for e2 in amr.edges if e2[0]==s and e2[2]==t]
+                        if not new_e:
+                            print('Failed to un-anonymize:',amr.id,e,file=sys.stderr)
+                        else:
+                            a['edges'][i] = [s, new_e[1], t]
         alignments[k] = [AMR_Alignment(a['type'], a['tokens'], a['nodes'], [tuple(e) for e in a['edges']]) for a in alignments[k]]
     if amrs:
-        amrs = {amr.id:amr for amr in amrs}
         for k in alignments:
             for align in alignments[k]:
                 if k in amrs:
@@ -57,10 +75,20 @@ def load_from_json(json_file, amrs=None):
     return alignments
 
 
-def write_to_json(json_file, alignments):
+def write_to_json(json_file, alignments, anonymize=False):
     new_alignments = {}
     for k in alignments:
         new_alignments[k] = [a.to_json() for a in alignments[k]]
+        if anonymize:
+            for a in new_alignments[k]:
+                for i,e in enumerate(a['edges']):
+                    a['edges'][i] = [e[0],None,e[2]]
+                if 'string' in a:
+                    del a['string']
+                if 'nodes' in a and not a['nodes']:
+                    del a['nodes']
+                if 'edges' in a and not a['edges']:
+                    del a['edges']
     with open(json_file, 'w+', encoding='utf8') as f:
         json.dump(new_alignments, f)
 
