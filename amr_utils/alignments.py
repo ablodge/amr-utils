@@ -26,10 +26,10 @@ class AMR_Alignment:
 
     def to_json(self, amr=None):
         if amr is not None:
-            return {'type': self.type, 'tokens': self.tokens, 'nodes': self.nodes, 'edges': self.edges, 'string':self.readable(amr)}
+            return {'type': self.type, 'tokens': self.tokens.copy(), 'nodes': self.nodes.copy(), 'edges': self.edges.copy(), 'string':self.readable(amr)}
         if self.amr is not None:
-            return {'type': self.type, 'tokens': self.tokens, 'nodes': self.nodes, 'edges': self.edges, 'string':self.readable(self.amr)}
-        return {'type':self.type, 'tokens':self.tokens, 'nodes':self.nodes, 'edges':self.edges}
+            return {'type': self.type, 'tokens': self.tokens.copy(), 'nodes': self.nodes.copy(), 'edges': self.edges.copy(), 'string':self.readable(self.amr)}
+        return {'type':self.type, 'tokens':self.tokens.copy(), 'nodes':self.nodes.copy(), 'edges':self.edges.copy()}
 
     def readable(self, amr):
         type = '' if self.type=='basic' else self.type
@@ -58,13 +58,17 @@ def load_from_json(json_file, amrs=None, unanonymize=False):
                 if 'edges' not in a:
                     a['edges'] = []
                 amr = amrs[k]
+                taken = set()
                 for i,e in enumerate(a['edges']):
                     s,r,t = e
                     if r is None:
                         new_e = [e2 for e2 in amr.edges if e2[0]==s and e2[2]==t]
+                        new_e = [e2 for e2 in new_e if e2 not in taken]
                         if not new_e:
                             print('Failed to un-anonymize:',amr.id,e,file=sys.stderr)
                         else:
+                            new_e = new_e[0]
+                            taken.add(new_e)
                             a['edges'][i] = [s, new_e[1], t]
         alignments[k] = [AMR_Alignment(a['type'], a['tokens'], a['nodes'], [tuple(e) for e in a['edges']]) for a in alignments[k]]
     if amrs:
