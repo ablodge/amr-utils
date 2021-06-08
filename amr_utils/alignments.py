@@ -1,4 +1,6 @@
 import json
+import sys
+
 
 class AMR_Alignment:
 
@@ -58,17 +60,14 @@ def load_from_json(json_file, amrs=None, unanonymize=False):
                 if 'edges' not in a:
                     a['edges'] = []
                 amr = amrs[k]
-                taken = set()
                 for i,e in enumerate(a['edges']):
                     s,r,t = e
                     if r is None:
                         new_e = [e2 for e2 in amr.edges if e2[0]==s and e2[2]==t]
-                        new_e = [e2 for e2 in new_e if e2 not in taken]
                         if not new_e:
-                            print('Failed to un-anonymize:',amr.id,e,file=sys.stderr)
+                            print('Failed to un-anonymize:', amr.id, e, file=sys.stderr)
                         else:
                             new_e = new_e[0]
-                            taken.add(new_e)
                             a['edges'][i] = [s, new_e[1], t]
         alignments[k] = [AMR_Alignment(a['type'], a['tokens'], a['nodes'], [tuple(e) for e in a['edges']]) for a in alignments[k]]
     if amrs:
@@ -79,14 +78,18 @@ def load_from_json(json_file, amrs=None, unanonymize=False):
     return alignments
 
 
-def write_to_json(json_file, alignments, anonymize=False):
+def write_to_json(json_file, alignments, anonymize=False, amrs=None):
     new_alignments = {}
     for k in alignments:
         new_alignments[k] = [a.to_json() for a in alignments[k]]
         if anonymize:
+            if anonymize and not amrs:
+                raise Exception('To anonymize alignments, the parameter "amrs" is required.')
             for a in new_alignments[k]:
+                amr = next(amr_ for amr_ in  amrs if amr_.id==k)
                 for i,e in enumerate(a['edges']):
-                    a['edges'][i] = [e[0],None,e[2]]
+                    if len([e2 for e2 in amr.edges if e2[0]==e[0] and e2[2]==e[2]])==1:
+                        a['edges'][i] = [e[0],None,e[2]]
                 if 'string' in a:
                     del a['string']
                 if 'nodes' in a and not a['nodes']:

@@ -50,7 +50,7 @@ class Matedata_Parser:
         elif line.startswith("# ::tok"):
             label = 'tok'
             metadata = line[len('# ::tok '):].strip().split()
-        elif line.startswith('# ::snt'):
+        elif line.startswith('# ::snt '):
             label = 'snt'
             metadata = line[len('# ::snt '):].strip()
         elif line.startswith('# ::alignments'):
