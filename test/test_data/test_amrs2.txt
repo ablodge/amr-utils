@@ -1,0 +1,33 @@
+The boy wants to go to New York
+(w / want-01 :ARG0 (b / boy)
+	:ARG1 (g / go-01 :ARG0 b
+		:ARG4 (s / state :name (n / name :op1 "New" 
+			:op2 "York"))))
+
+The quick brown fox jumped over the lazy dog .
+(j / jump-01
+	:ARG0 (f / fox
+		:mod (q / quick)
+		:mod (b / brown))
+	:ARG1 (d / dog
+		:mod (l / lazy)))
+
+Colorless green ideas sleep furiously .
+(s / sleep-01
+	:ARG0 (i2 / idea
+		:mod (g / green)
+		:mod (c / colorless))
+	:time (f / furious))
+
+I love the person who loves that I love them
+(l / love-01
+	:ARG0 (i / i)
+	:ARG1 (p / person)
+	:ARG1-of (l2 / love-01
+		:ARG0 p))
+
+Every person is loved by themself .
+(l / love-01
+	:ARG1 (p / person
+		:mod (e / every))
+	:ARG0 p)

@@ -4,7 +4,7 @@ from amr_readers import AMR_Reader
 from style import HTML_AMR
 
 
-from amr_utils.graph_utils import get_node_alignment
+from amr_utils.amr_graph import get_node_alignment
 
 phase = 1
 
@@ -14,7 +14,7 @@ def style(amr_pairs, other_args, assign_node_color=None, assign_node_desc=None, 
     output = '<!DOCTYPE html>\n'
     output += '<html>\n'
     output += '<style>\n'
-    output += HTML_AMR.style_sheet()
+    output += HTML_AMR._style_sheet()
     output += '</style>\n\n'
     output += '<body>\n'
     i = 0

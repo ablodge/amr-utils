@@ -1,8 +1,8 @@
 import sys
 
 from amr_utils.amr_readers import AMR_Reader
-from amr_utils.graph_utils import is_rooted_dag, get_subgraph
-from amr_utils.style import HTML_AMR
+from amr_utils.amr_graph import is_rooted_dag, get_subgraph
+from amr_utils.amr_writers import HTML_AMR_Writer
 
 
 def is_aligned_node(amr, n, alignments):
@@ -53,14 +53,7 @@ def get_token_aligned_subgraph(amr, tok, alignments):
 
 
 def style(amrs, alignments, outfile):
-    output = HTML_AMR.style(amrs[:5000],
-                            assign_node_color=is_aligned_node,
-                            assign_edge_color=is_aligned_edge,
-                            assign_token_color=is_aligned_token,
-                            assign_node_desc=get_node_aligned_tokens,
-                            assign_edge_desc=get_edge_aligned_tokens,
-                            assign_token_desc=get_token_aligned_subgraph,
-                            other_args=alignments)
+    output = HTML_AMR_Writer.write_to_file(amrs[:5000],,
 
     with open(outfile, 'w+', encoding='utf8') as f:
         f.write(output)

@@ -1,459 +1,534 @@
-import os
-import re
-import sys
 import csv
+import glob
+import re
+import warnings
+from collections import defaultdict, Counter
+from typing import List, Union, Callable, Iterable
 
 import penman
 
-from amr_utils.alignments import AMR_Alignment, write_to_json, load_from_json
-from amr_utils.amr import AMR
+from amr_utils import amr_normalizers
+from amr_utils.amr import AMR, AMR_Notation
+from amr_utils.amr_alignments import AMR_Alignment
+from amr_utils.utils import *
 
 
-class Matedata_Parser:
+class Metadata_Reader:
+    def parse(self, lines: List[str]):
+        raise NotImplemented()
 
-    token_range_re = re.compile('^(\d-\d|\d(,\d)+)$')
-    metadata_re = re.compile('(?<=[^#]) ::')
-
-    def __init__(self):
-        pass
-
-    def get_token_range(self, string):
-        if '-' in string:
-            start = int(string.split('-')[0])
-            end = int(string.split('-')[-1])
-            return [i for i in range(start, end)]
-        else:
-            return [int(i) for i in string.split(',')]
-
-    def readlines(self, lines):
-        lines = self.metadata_re.sub('\n# ::', lines)
-        metadata = {}
-        graph_metadata = {}
-        rows = [self.readline_(line) for line in lines.split('\n')]
-        labels = {label for label,_ in rows}
-        for label in labels:
-            if label in ['root','node','edge']:
-                graph_metadata[label] = [val for l,val in rows if label==l]
-            else:
-                metadata[label] = [val for l,val in rows if label==l][0]
-        if 'snt' not in metadata and 'tok' not in metadata:
-            metadata['snt'] = ['']
-        return metadata, graph_metadata
-
-    def readline_(self, line):
-        if not line.startswith('#'):
-            label = 'snt'
-            metadata = line.strip()
-        elif line.startswith('# ::id'):
-            label = 'id'
-            metadata = line[len('# ::id '):].strip()
-        elif line.startswith("# ::tok"):
-            label = 'tok'
-            metadata = line[len('# ::tok '):].strip().split()
-        elif line.startswith('# ::snt '):
-            label = 'snt'
-            metadata = line[len('# ::snt '):].strip()
-        elif line.startswith('# ::alignments'):
-            label = 'alignments'
-            metadata = line[len('# ::alignments '):].strip()
-        elif line.startswith('# ::node') or line.startswith('# ::root') or line.startswith('# ::edge'):
-            label = line[len('# ::'):].split()[0]
-            line = line[len(f'# ::{label} '):]
-            rows = [row for row in csv.reader([line], delimiter='\t', quotechar='|')]
-            metadata = rows[0]
-            for i, s in enumerate(metadata):
-                if self.token_range_re.match(s):
-                    metadata[i] = self.get_token_range(s)
-        elif line.startswith('# ::'):
-            label = line[len('# ::'):].split()[0]
-            line = line[len(f'# ::{label} '):]
-            metadata = line
-        else:
-            label = 'snt'
-            metadata = line[len('# '):].strip()
-        return label, metadata
+    def write(self, amr: AMR):
+        raise NotImplemented()
 
 
-from penman.model import Model
-
-
-class TreePenmanModel(Model):
-    def deinvert(self, triple):
-        return triple
-
-    def invert(self, triple):
-        return triple
-
-
-class PENMAN_Wrapper:
-
-    def __init__(self, style='isi'):
-        self.style = style
-
-    def parse_amr(self, tokens, amr_string):
-        amr = AMR(tokens=tokens)
-        g = penman.decode(amr_string, model=TreePenmanModel())
-        triples = g.triples() if callable(g.triples) else g.triples
-
-        letter_labels = {}
-        isi_labels = {g.top: '1'}
-        isi_edge_labels = {}
-        jamr_labels = {g.top: '0'}
-
-        new_idx = 0
-
-        isi_edge_idx = {g.top: 1}
-        jamr_edge_idx = {g.top: 0}
-
-        nodes = []
-        attributes = []
-        edges = []
-        reentrancies = []
-
-        for i,tr in enumerate(triples):
-            s, r, t = tr
-            # an amr node
-            if r == ':instance':
-                if reentrancies and edges[-1]==reentrancies[-1]:
-                    s2,r2,t2 = edges[-1]
-                    jamr_labels[t2] = jamr_labels[s2] + '.' + str(jamr_edge_idx[s2])
-                    isi_labels[t2] = isi_labels[s2] + '.' + str(isi_edge_idx[s2])
-                new_s = s
-                while new_s in letter_labels:
-                    new_idx += 1
-                    new_s = f'x{new_idx}'
-                letter_labels[s] = new_s
-                nodes.append(tr)
-            # an amr edge
-            elif t not in letter_labels:
-                if len(t) > 5 or not t[0].isalpha():
-                    if tr in letter_labels:
-                        isi_labels['ignore'] = isi_labels[s] + '.' + str(isi_edge_idx[s])
-                        isi_edge_labels['ignore'] = isi_labels[s] + '.' + str(isi_edge_idx[s])+'.r'
-                        isi_edge_idx[s] += 1
-                        jamr_edge_idx[s] += 1
-                        continue
-                    # attribute
-                    new_s = s
-                    while new_s in letter_labels:
-                        new_idx += 1
-                        new_s = f'x{new_idx}'
-                    letter_labels[tr] = new_s
-                    jamr_labels[tr] = jamr_labels[s] + '.' + str(jamr_edge_idx[s])
-                    isi_labels[tr] = isi_labels[s] + '.' + str(isi_edge_idx[s])
-                    isi_edge_labels[tr] = isi_labels[s] + '.' + str(isi_edge_idx[s])+'.r'
-                    isi_edge_idx[s] += 1
-                    jamr_edge_idx[s] += 1
-                    attributes.append(tr)
-                else:
-                    # edge
-                    jamr_edge_idx[t] = 0
-                    isi_edge_idx[t] = 1
-                    jamr_labels[t] = jamr_labels[s] + '.' + str(jamr_edge_idx[s])
-                    if i+1<len(triples) and triples[i+1][1]==':instance':
-                        jamr_edge_idx[s] += 1
-                    isi_labels[t] = isi_labels[s] + '.' + str(isi_edge_idx[s])
-                    isi_edge_labels[tr] = isi_labels[s] + '.' + str(isi_edge_idx[s])+'.r'
-                    isi_edge_idx[s] += 1
-                    edges.append(tr)
-            else:
-                # reentrancy
-                isi_edge_labels[tr] = isi_labels[s] + '.' + str(isi_edge_idx[s]) + '.r'
-                isi_edge_idx[s] += 1
-                edges.append(tr)
-                reentrancies.append(tr)
-
-        default_labels = letter_labels
-        if self.style=='isi':
-            default_labels = isi_labels
-        elif self.style=='jamr':
-            default_labels = jamr_labels
-
-        amr.root = default_labels[g.top]
-        edge_map = {}
-        for tr in nodes:
-            s,r,t = tr
-            amr.nodes[default_labels[s]] = t
-        for tr in attributes:
-            s,r,t = tr
-            if not r.startswith(':'): r = ':' + r
-            amr.nodes[default_labels[tr]] = t
-            amr.edges.append((default_labels[s], r, default_labels[tr]))
-            edge_map[tr] = (default_labels[s], r, default_labels[tr])
-        for tr in edges:
-            s, r, t = tr
-            if not r.startswith(':'): r = ':' + r
-            amr.edges.append((default_labels[s], r, default_labels[t]))
-            edge_map[tr] = (default_labels[s], r, default_labels[t])
-
-        aligns = []
-        for tr, epidata in g.epidata.items():
-            for align in epidata:
-                if 'Alignment' in type(align).__name__:
-                    indices = align.indices
-                    s,r,t = tr
-                    if tr[1] == ':instance':
-                        align = AMR_Alignment(type='isi', tokens=list(indices), nodes=[default_labels[s]])
-                    elif len(t) > 5 or not t[0].isalpha():
-                        align = AMR_Alignment(type='isi', tokens=list(indices), nodes=[default_labels[tr]])
-                    else:
-                        align = AMR_Alignment(type='isi', tokens=list(indices), edges=[edge_map[tr]])
-                    aligns.append(align)
-
-        letter_labels = {v: default_labels[k] for k,v in letter_labels.items()}
-        jamr_labels = {v: default_labels[k] for k, v in jamr_labels.items()}
-        isi_labels = {v: default_labels[k] if k!='ignore' else k for k, v in isi_labels.items()}
-        isi_edge_labels = {v: edge_map[k] if k in edge_map else k for k, v in isi_edge_labels.items()}
-
-        return amr, (letter_labels, jamr_labels, isi_labels, isi_edge_labels, aligns)
+class ID_Notation:
+    def rename_nodes(self, amr, aligns=None):
+        raise NotImplemented()
 
 
 class AMR_Reader:
 
-    def __init__(self, style='isi'):
-        self.style=style
+    def __init__(self, id_style: Union[str, ID_Notation] = None,
+                 tokenizer: Union[Callable[[str], List[str]], None] = None,
+                 metadata_reader: Union[Metadata_Reader, None] = None,
+                 normalizers: List[Callable[[AMR], None]] = None):
+        self.tokenizer = tokenizer
 
-    def load(self, amr_file_name, remove_wiki=False, output_alignments=False):
-        print('[amr]', 'Loading AMRs from file:', amr_file_name)
+        self.metadata_reader = metadata_reader
+        if metadata_reader is None:
+            self.metadata_reader = Default_Metadata_Reader()
+
+        if id_style is None:
+            self.id_notation = None
+        elif isinstance(id_style, ID_Notation):
+            self.id_notation = id_style
+        elif id_style.lower() == 'isi':
+            self.id_notation = ISI_Notation()
+        elif id_style.lower() == 'jamr':
+            self.id_notation = JAMR_Notation()
+
+        self.normalizers = normalizers if normalizers else []
+
+        self._penman_model = AMR_Reader.TreePenmanModel()
+
+    class TreePenmanModel(penman.model.Model):
+        def deinvert(self, triple):
+            return triple
+
+        def invert(self, triple):
+            return triple
+
+    def load(self, amr_file: str, return_alignments: bool = False, quiet: bool = True, encoding: str = 'utf8'):
+        '''
+        Load AMRs from a file
+        Args:
+            amr_file (str): file to load
+            return_alignments (bool): whether to also load and return alignments
+            quiet (bool): do not print progress to stdout
+            encoding (str): file encoding (default: "utf8")
+
+        Returns:
+            List[AMR]: a list of AMRs (if return_alignments is False)
+             or
+            List[AMR], List[List[AMR_Alignment]]: a list of AMRs and a list of AMR alignments (if return_alignments is True)
+        '''
+        if not quiet:
+            print(f'[{class_name(self)}] Loading AMRs from file:', amr_file)
         amrs = []
-        alignments = {}
-        penman_wrapper = PENMAN_Wrapper(style=self.style)
-        metadata_parser = Matedata_Parser()
-
-        with open(amr_file_name, 'r', encoding='utf8') as f:
-            sents = f.read().replace('\r', '').split('\n\n')
-            amr_idx = 0
-            no_tokens = False
-            if all(sent.strip().startswith('(') for sent in sents):
-                no_tokens = True
-
-            for sent in sents:
-                prefix_lines = [line for i,line in enumerate(sent.split('\n')) if line.strip().startswith('#') or (i==0 and not no_tokens)]
-                prefix = '\n'.join(prefix_lines)
-                amr_string_lines = [line for i, line in enumerate(sent.split('\n'))
-                                    if not line.strip().startswith('#') and (i>0 or no_tokens)]
-                amr_string = ''.join(amr_string_lines).strip()
-                amr_string = re.sub(' +', ' ', amr_string)
-                if not amr_string: continue
-                if not amr_string.startswith('(') or not amr_string.endswith(')'):
-                    raise Exception('Could not parse AMR from: ', amr_string)
-                metadata, graph_metadata = metadata_parser.readlines(prefix)
-                tokens = metadata['tok'] if 'tok' in metadata else metadata['snt'].split()
-                tokens = self._clean_tokens(tokens)
-                if graph_metadata:
-                    amr, aligns = self._parse_amr_from_metadata(tokens, graph_metadata)
-                    amr.id = metadata['id']
-                    if output_alignments:
-                        alignments[amr.id] = aligns
-                else:
-                    amr, other_stuff = penman_wrapper.parse_amr(tokens, amr_string)
-                    if 'id' in metadata:
-                        amr.id = metadata['id']
-                    else:
-                        amr.id = str(amr_idx)
-                    if output_alignments:
-                        alignments[amr.id] = []
-                        if 'alignments' in metadata:
-                            aligns = metadata['alignments'].split()
-                            if any('|' in a for a in aligns):
-                                jamr_labels = other_stuff[1]
-                                alignments[amr.id] = self._parse_jamr_alignments(amr, amr_file_name, aligns, jamr_labels, metadata_parser)
-                            else:
-                                isi_labels, isi_edge_labels = other_stuff[2:4]
-                                alignments[amr.id] = self._parse_isi_alignments(amr, amr_file_name, aligns, isi_labels, isi_edge_labels)
-                        else:
-                            aligns = other_stuff[4]
-                            alignments[amr.id] = aligns
-                amr.metadata = {k:v for k,v in metadata.items() if k not in ['tok','id']}
-                amrs.append(amr)
-                amr_idx += 1
-        if remove_wiki:
-            for amr in amrs:
-                wiki_nodes = []
-                wiki_edges = []
-                for s, r, t in amr.edges.copy():
-                    if r == ':wiki':
-                        amr.edges.remove((s, r, t))
-                        del amr.nodes[t]
-                        wiki_nodes.append(t)
-                        wiki_edges.append((s,r,t))
-                if alignments and amr.id in alignments:
-                    for align in alignments[amr.id]:
-                        for n in wiki_nodes:
-                            if n in align.nodes:
-                                align.nodes.remove(n)
-                        for e in wiki_edges:
-                            if e in align.edges:
-                                align.edges.remove(e)
-        if output_alignments:
+        alignments = []
+        for amr_string in self.iterate_amr_strings(amr_file, encoding=encoding):
+            if return_alignments:
+                amr, aligns = self.parse(amr_string, return_alignments=return_alignments)
+                alignments.append(aligns)
+            else:
+                amr = self.parse(amr_string, return_alignments=return_alignments)
+            amrs.append(amr)
+        if return_alignments:
             return amrs, alignments
         return amrs
 
-    def load_from_dir(self, dir, remove_wiki=False, output_alignments=False):
-        all_amrs = []
-        all_alignments = {}
+    def load_dir(self, dir: str, return_alignments: bool = False, quiet: bool = True):
+        '''
+        Load AMRs from a directory
+        Args:
+            dir (str): directory to load
+            return_alignments (bool): whether to also load and return alignments
+            quiet (bool): do not print progress to stdout
 
-        taken_ids = set()
-        for filename in os.listdir(dir):
-            if filename.endswith('.txt'):
-                print(filename)
-                file = os.path.join(dir, filename)
-                amrs, aligns = self.load(file, output_alignments=True, remove_wiki=remove_wiki)
-                for amr in amrs:
-                    if amr.id.isdigit():
-                        old_id = amr.id
-                        amr.id = filename+':'+old_id
-                        aligns[amr.id] = aligns[old_id]
-                        del aligns[old_id]
-                for amr in amrs:
-                    if amr.id in taken_ids:
-                        old_id = amr.id
-                        amr.id += '#2'
-                        if old_id in aligns:
-                            aligns[amr.id] = aligns[old_id]
-                            del aligns[old_id]
-                    taken_ids.add(amr.id)
-                all_amrs.extend(amrs)
-                all_alignments.update(aligns)
-        if output_alignments:
-            return all_amrs, all_alignments
-        return all_amrs
+        Returns:
+            List[AMR]: a list of AMRs (if return_alignments is False)
+             or
+            List[AMR], List[List[AMR_Alignment]]: a list of AMRs and a list of AMR alignments (if return_alignments is True)
+        '''
+        files = [os.path.join(dir, filename) for filename in os.listdir(dir)]
+        return self._load_files(files, return_alignments=return_alignments, quiet=quiet)
 
-    @staticmethod
-    def write_to_file(output_file, amrs):
-        with open(output_file, 'w+', encoding='utf8') as f:
-            for amr in amrs:
-                f.write(amr.amr_string())
+    def load_glob(self, glob_string: str, return_alignments: bool = False, quiet: bool = True):
+        '''
+        Load AMRs from a glob of files
+        Args:
+            glob_string (str): glob description of files
+            return_alignments (bool): whether to also load and return alignments
+            quiet (bool): do not print progress to stdout
 
-    @staticmethod
-    def load_alignments_from_json(json_file, amrs=None):
-        return load_from_json(json_file, amrs=amrs)
+        Returns:
+            List[AMR]: a list of AMRs (if return_alignments is False)
+             or
+            List[AMR], List[List[AMR_Alignment]]: a list of AMRs and a list of AMR alignments (if return_alignments is True)
+        '''
+        return self._load_files(glob.glob(glob_string), return_alignments=return_alignments, quiet=quiet)
 
-    @staticmethod
-    def save_alignments_to_json(json_file, alignments):
-        write_to_json(json_file, alignments)
+    def parse(self, amr_string: str, return_alignments: bool = False):
+        '''
+        Parse an AMR string, with or without metadata
+        Args:
+            amr_string (str): amr string
+            return_alignments (bool): whether to also load and return alignments
 
-    @staticmethod
-    def _parse_jamr_alignments(amr, amr_file, aligns, jamr_labels, metadata_parser):
-        aligns = [(metadata_parser.get_token_range(a.split('|')[0]), a.split('|')[-1].split('+')) for a in aligns if '|' in a]
+        Returns:
+            AMR: an AMR (if return_alignments is False)
+             or
+            AMR, List[AMR_Alignment]: an AMR and list of AMR alignments (if return_alignments is True)
+        '''
+        try:
+            lines = amr_string.split('\n')
+            amr_start = None
+            for i, line in enumerate(lines):
+                if line.strip().startswith('('):
+                    amr_start = i
+                    break
+            metadata_string = '\n'.join(lines[:amr_start]).strip()
+            id, tokens, metadata = self.metadata_reader.parse(metadata_string)
+            amr = self.metadata_reader.parse_graph_metadata(metadata_string)
+            aligns = None
+            if amr is None:
+                amr_string = '\n'.join(lines[amr_start:]).strip()
+                amr, aligns = self._parse_amr_string(amr_string, return_alignments=return_alignments)
+            amr.id = id
+            amr.tokens = tokens
+            amr.metadata = metadata
+            if self.tokenizer is not None and 'snt' in metadata:
+                amr.tokens = self.tokenizer(amr.metadata['snt'])
+            elif not tokens and 'snt' in metadata:
+                amr.tokens = amr.metadata['snt'].split()
+            if return_alignments:
+                if not aligns and 'alignments' in amr.metadata:
+                    if isinstance(self.id_notation, ISI_Notation) or isinstance(self.id_notation, JAMR_Notation):
+                        aligns = self.id_notation.parse_alignments_from_line(amr, amr.metadata['alignments'])
+                return amr, aligns
+            return amr
+        except:
+            raise Exception('Could not parse:', ''.join(amr_string))
+
+    def iterate_amr_strings(self, amr_file: str, separate_metadata: bool=False, encoding: str = 'utf8'):
+        buffer = []
+        with open(amr_file, 'r', encoding=encoding) as fr:
+            for line in fr:
+                if not line.strip():
+                    if not buffer:
+                        continue
+                    if self._test_is_amr_string(buffer):
+                        if separate_metadata:
+                            amr_start = [i for i,l in enumerate(buffer) if l.strip().startswith('(')][0]
+                            yield ''.join(buffer[:amr_start]).strip(), ''.join(buffer[amr_start:]).strip()
+                        else:
+                            yield ''.join(buffer)
+                    buffer = []
+                else:
+                    buffer.append(line)
+            if buffer and self._test_is_amr_string(buffer):
+                if separate_metadata:
+                    amr_start = [i for i,l in enumerate(buffer) if l.strip().startswith('(')][0]
+                    yield ''.join(buffer[:amr_start]).strip(), ''.join(buffer[amr_start:]).strip()
+                else:
+                    yield ''.join(buffer)
+
+    def _test_is_amr_string(self, lines):
+        if all(line.startswith('#') for line in lines):
+            return False
+        amr_starts = [l for l in lines if l.strip().startswith('(')]
+        if not amr_starts:
+            return False
+        if len(amr_starts)>1:
+            warnings.warn(f'[{class_name(self)}] Could not parse AMR:\n'+''.join(lines))
+            return False
+        return True
+
+    def _parse_amr_string(self, amr_string: str, return_alignments: bool=False):
+
+        with silence_warnings():
+            penman_graph = penman.decode(amr_string, model=self._penman_model)
+
+        root = penman_graph.top
+        nodes = {s: t for s, r, t in penman_graph.triples if r == ':instance'}
+        edges = []
+        new_attribute_nodes = {}
+        reentrancy_artifacts = {}
+        num_parents = Counter()
+        prev_edge = None
+        for i, triple in enumerate(penman_graph.triples):
+            s, r, t = triple
+            if r == ':instance':
+                # an amr node
+                if prev_edge is not None:
+                    reentrancy_artifacts[s] = prev_edge
+            elif AMR_Notation.is_attribute(t):
+                # attribute
+                idx = 0
+                while f'x{idx}' in nodes:
+                    idx += 1
+                new_n = f'x{idx}'
+                new_attribute_nodes[i] = new_n
+                nodes[new_n] = t
+                edges.append((s, r, new_n))
+            else:
+                # edge
+                edges.append((s, r, t))
+                num_parents[t] += 1
+                prev_edge = (s, r, t)
+
+        aligns = []
+        if return_alignments:
+            aligns = self._parse_graph_alignments(penman_graph, new_attribute_nodes)
+
+        amr = AMR(root=root, nodes=nodes, edges=edges)
+        amr.reentrancy_artifacts = {n: reentrancy_artifacts[n] for n in reentrancy_artifacts
+                                    if num_parents[n] > 1}
+        if self.id_notation is not None:
+            self.id_notation.rename_nodes(amr, aligns)
+        for normalize in self.normalizers:
+            normalize(amr)
+        return amr, sorted(aligns)
+
+    def _parse_graph_alignments(self, penman_graph, new_attribute_nodes):
+        aligns = []
+        seen_triples = set()
+        for i, triple in enumerate(penman_graph.triples):
+            if triple in seen_triples:
+                # ignore duplicate triples
+                continue
+            epidata = penman_graph.epidata[triple]
+            for datum in epidata:
+                if 'Alignment' not in type(datum).__name__:
+                    continue
+                s, r, t = triple
+                for tok in datum.indices:
+                    if type(datum).__name__ == 'Alignment':
+                        if r == ':instance':
+                            align = AMR_Alignment(type='isi', tokens=[tok], nodes=[s])
+                        elif AMR_Notation.is_attribute(t):
+                            new_t = new_attribute_nodes[i]
+                            align = AMR_Alignment(type='isi', tokens=[tok], nodes=[new_t])
+                        else:
+                            align = AMR_Alignment(type='isi', tokens=[tok], nodes=[t])
+                        aligns.append(align)
+                    elif type(datum).__name__ == 'RoleAlignment':
+                        if AMR_Notation.is_attribute(t):
+                            new_t = new_attribute_nodes[i]
+                            align = AMR_Alignment(type='isi', tokens=[tok], edges=[(s, r, new_t)])
+                        else:
+                            align = AMR_Alignment(type='isi', tokens=[tok], edges=[(s, r, t)])
+                        aligns.append(align)
+            seen_triples.add(triple)
+        return aligns
+
+    def _load_files(self, files: Iterable[str], return_alignments: bool = False, quiet: bool = True):
+        amrs = []
+        alignments = []
+        for file in files:
+            try:
+                output = self.load(file, return_alignments=return_alignments, quiet=quiet)
+            except:
+                warnings.warn(f'Could not load file: {file}')
+                continue
+            if return_alignments:
+                amrs.extend(output[0])
+                alignments.extend(output[1])
+            else:
+                amrs.extend(output)
+        if return_alignments:
+            return amrs, alignments
+        return amrs
+
+
+class Default_Metadata_Reader(Metadata_Reader):
+    SPLIT_METADATA_RE = re.compile(r'(?<=[^#]) ::(?=\S+)')
+    METADATA_RE = re.compile(r'# ::(?P<tag>\S+)(?P<value>.*)')
+
+    def parse(self, metadata_string: str):
+        lines = self.SPLIT_METADATA_RE.sub('\n# ::', metadata_string).split('\n')
+        id = None
+        tokens = []
+        metadata = {}
+        for line in lines:
+            tag, val = self._parse_line(line)
+            if tag == 'id':
+                id = val
+            elif tag == 'tok':
+                tokens = val
+            elif tag in ['root', 'node', 'edge']:
+                continue
+            else:
+                metadata[tag] = val
+        return id, tokens, metadata
+
+    def parse_graph_metadata(self, metadata_string: str):
+        graph_metadata_lines = []
+        for line in metadata_string.split('\n'):
+            if any(line.startswith(f'# ::{tag}\t') for tag in ['root', 'node', 'edge']):
+                graph_metadata_lines.append(line)
+        if not graph_metadata_lines:
+            return None
+        root = None
+        nodes = {}
+        edges = []
+        for row in csv.reader(graph_metadata_lines, delimiter='\t', quotechar='"'):
+            if row[0] == '# ::root':
+                root = row[1]
+            elif row[0] == '# ::node':
+                nodes[row[1]] = row[2]
+            elif row[0] == '# ::edge':
+                r = ':'+row[2] if not row[2].startswith(':') else row[2]
+                edges.append((row[4], r, row[5]))
+            else:
+                raise Exception('Failed to read metadata:', graph_metadata_lines)
+        amr = AMR(root=root, nodes=nodes, edges=edges)
+        normalize_order = False
+        seen_nodes = {amr.root}
+        for s, r, t in amr.edges:
+            if s not in seen_nodes:
+                normalize_order = True
+                break
+            seen_nodes.add(t)
+        if normalize_order:
+            amr_normalizers.normalize_shape(amr)
+        return amr
+
+    def _parse_line(self, line: str):
+        if not line.startswith('# ::'):
+            tag = 'snt'
+            val = line[1:].strip() if line.startswith('#') else line.strip()
+            return tag, val
+
+        match = self.METADATA_RE.match(line)
+        if not match:
+            raise Exception('Failed to parse metadata:', line)
+        tag = match.group('tag')
+        val = match.group('value').strip()
+        return tag, val
+
+
+class Tree_ID_Notation(ID_Notation):
+
+    def get_ids(self, amr: AMR, start_idx: int = 0, use_annotator_artifacts: bool = False,
+                ignore_reentrancies: bool = True, ignore_dupl_edges: bool = True):
+
+        path_edge_idx = defaultdict(lambda: start_idx)
+        path_labels = {amr.root: str(start_idx)}
+        edge_path_labels = {}
+
+        seen_triples = set()
+        dupl_triples = []
+        for i, e in enumerate(amr.edges):
+            s, r, t = e
+            path_label = path_labels[s] + '.' + str(path_edge_idx[s])
+            edge_path_labels[i] = path_label
+            is_reentrancy = (t in path_labels)
+            if not is_reentrancy:
+                path_labels[t] = path_label
+            # edge
+            if not (ignore_reentrancies and is_reentrancy):
+                # ignore reentrancies
+                path_edge_idx[s] += 1
+            triple = (s, r, amr.nodes[t]) if AMR_Notation.is_attribute(amr.nodes[t]) else e
+            if ignore_dupl_edges and triple in seen_triples:
+                # ignore duplicate
+                dupl_triples.append(path_label)
+            seen_triples.add(triple)
+
+        new_ids = {}
+        for old_id in path_labels:
+            new_ids[old_id] = path_labels[old_id]
+
+        if use_annotator_artifacts and amr.reentrancy_artifacts is not None:
+            for n, parent in amr.reentrancy_artifacts.items():
+                new_ids[n] = edge_path_labels[amr.edges.index(parent)]
+
+        align_ids = {}
+        align_ids[new_ids[amr.root]] = new_ids[amr.root]
+        for i, e in enumerate(amr.edges):
+            s, r, t = e
+            path = edge_path_labels[i]
+            align_ids[path + '.r'] = (new_ids[s], r, new_ids[t])
+            align_ids[path] = new_ids[t]
+            if path in dupl_triples:
+                align_ids[path + '.r'] = 'ignore'
+                align_ids[path] = 'ignore'
+
+        # if len(set(new_ids.values())) < len(new_ids):
+        #     raise Exception('Failed to assign unique IDs:', amr.id)
+        return new_ids, align_ids
+
+
+class ISI_Notation(Tree_ID_Notation):
+
+    def rename_nodes(self, amr, aligns=None):
+        new_ids, _ = super().get_ids(amr, start_idx=1, use_annotator_artifacts=False,
+                                     ignore_reentrancies=False, ignore_dupl_edges=True)
+        amr_normalizers.rename_nodes(amr, new_ids)
+        if aligns:
+            for align in aligns:
+                align.nodes = [new_ids[n] for n in align.nodes]
+                align.edges = [(new_ids[s], r, new_ids[t]) for s, r, t in align.edges]
+
+    def parse_alignments_from_line(self, amr, line):
+        _, align_ids = super().get_ids(amr, start_idx=1, use_annotator_artifacts=False,
+                                     ignore_reentrancies=False, ignore_dupl_edges=True)
+        aligns = []
+        for align in line.split():
+            if '-' in align:
+                token_idx = int(align.split('-')[0])
+                element_id = align.split('-')[-1]
+                aligns.append((token_idx, element_id))
 
         alignments = []
-        for toks, components in aligns:
-            if not all(n in jamr_labels for n in components) or any(t>=len(amr.tokens) for t in toks):
-                raise Exception('Could not parse alignment:', amr_file, amr.id, toks, components)
-            nodes = [jamr_labels[n] for n in components]
-            new_align = AMR_Alignment(type='jamr', tokens=toks, nodes=nodes)
-            alignments.append(new_align)
-        return alignments
-
-    @staticmethod
-    def _parse_isi_alignments(amr, amr_file, aligns, isi_labels, isi_edge_labels):
-        aligns = [(int(a.split('-')[0]), a.split('-')[-1]) for a in aligns if '-' in a]
-
-        alignments = []
-        xml_offset = 1 if amr.tokens[0].startswith('<') and amr.tokens[0].endswith('>') else 0
-        if any(t + xml_offset >= len(amr.tokens) for t, n in aligns):
-            xml_offset = 0
-
-        for tok, component in aligns:
-            tok += xml_offset
+        for tok, element_id in aligns:
             nodes = []
             edges = []
-            if component.replace('.r', '') in isi_labels:
-                # node or attribute
-                n = isi_labels[component.replace('.r', '')]
-                if n=='ignore': continue
-                nodes.append(n)
-                if n not in amr.nodes:
-                    raise Exception('Could not parse alignment:', amr_file, amr.id, tok, component)
-            elif not component.endswith('.r') and component not in isi_labels and component + '.r' in isi_edge_labels:
-                # reentrancy
-                e = isi_edge_labels[component + '.r']
-                edges.append(e)
-                if e not in amr.edges:
-                    raise Exception('Could not parse alignment:', amr_file, amr.id, tok, component)
-            elif component.endswith('.r'):
+            if element_id == '1.r':
+                continue
+            elif element_id in align_ids and align_ids[element_id]=='ignore':
+                # ignore duplicate edges
+                continue
+            elif element_id.endswith('.r'):
                 # edge
-                e = isi_edge_labels[component]
-                if e == 'ignore': continue
+                if element_id not in align_ids or align_ids[element_id] not in amr.edges:
+                    align_ids[element_id] = self.get_element_from_id(amr, element_id)
+                e = align_ids[element_id]
                 edges.append(e)
-                if e not in amr.edges:
-                    raise Exception('Could not parse alignment:', amr_file, amr.id, tok, component)
-            elif component == '0.r':
-                nodes.append(amr.root)
             else:
-                raise Exception('Could not parse alignment:', amr_file, amr.id, tok, component)
+                # node
+                if element_id not in align_ids or align_ids[element_id] not in amr.nodes:
+                    align_ids[element_id] = self.get_element_from_id(amr, element_id)
+                nodes.append(align_ids[element_id])
             if tok >= len(amr.tokens):
-                raise Exception('Could not parse alignment:', amr_file, amr.id, tok, component)
+                raise Exception('Could not parse alignment:', amr.id, tok, element_id)
             new_align = AMR_Alignment(type='isi', tokens=[tok], nodes=nodes, edges=edges)
             alignments.append(new_align)
-        return alignments
+        return sorted(alignments)
 
-    @staticmethod
-    def _parse_amr_from_metadata(tokens, metadata):
-        '''
-           Metadata format is ...
-           # ::id sentence id
-           # ::tok tokens...
-           # ::node node_id node alignments
-           # ::root root_id root
-           # ::edge src label trg src_id trg_id alignments
-           amr graph
-           '''
-        amr = AMR(tokens=tokens)
+    def get_element_from_id(self, amr, element_id):
+        path = element_id.split('.')
+        children = {n:[] for n in amr.nodes}
+        for e in amr.edges:
+            s,r,t = e
+            children[s].append(e)
+        current_node = amr.root
+        current_edge = None
+        for i in path[1:]:
+            if i=='r':
+                return current_edge
+            i = int(i) - 1
+            if len(children[current_node])>i:
+                current_edge = children[current_node][i]
+                current_node = current_edge[-1]
+            else:
+                raise Exception('Could not parse path:', amr.id, element_id)
+        return current_node
+
+
+class JAMR_Notation(Tree_ID_Notation):
+
+    def rename_nodes(self, amr, aligns=None):
+        new_ids, _ = super().get_ids(amr, start_idx=0, use_annotator_artifacts=False,
+                                     ignore_reentrancies=True, ignore_dupl_edges=False)
+        amr_normalizers.rename_nodes(amr, new_ids)
+        if aligns:
+            for align in aligns:
+                align.nodes = [new_ids[n] for n in align.nodes]
+                align.edges = [(new_ids[s], r, new_ids[t]) for s, r, t in align.edges]
+
+    def parse_alignments_from_line(self, amr, line):
+        _, align_ids = super().get_ids(amr, start_idx=0, use_annotator_artifacts=False,
+                                       ignore_reentrancies=True, ignore_dupl_edges=True)
+        align_pairs = []
+        for align in line.split():
+            if '|' in align:
+                token_string = align.split('|')[0].split('-')
+                nodes_string = align.split('|')[1]
+                start, stop = int(token_string[0]), int(token_string[1])
+                tokens = [i for i in range(start, stop)]
+                ns = nodes_string.split('+') if '+' in nodes_string else [nodes_string]
+                align_pairs.append((tokens, ns))
+
         alignments = []
+        for tokens, ns in align_pairs:
+            if not all(t < len(amr.tokens) for t in tokens):
+                raise Exception('Could not parse alignment:', amr.id, tokens, ns)
+            nodes = []
+            for n in ns:
+                if n not in align_ids:
+                    align_ids[n] = self.get_element_from_id(amr, n)
+                nodes.append(align_ids[n])
+            new_align = AMR_Alignment(type='jamr', tokens=tokens, nodes=nodes)
+            alignments.append(new_align)
+        return sorted(alignments)
 
-        nodes = metadata['node']
-        edges = metadata['edge'] if 'edge'in metadata else []
-        root = metadata['root'][0]
-        amr.root = root[0]
-        for data in nodes:
-            n, label = data[:2]
-            if len(data)>2:
-                toks = data[2]
-                alignments.append(AMR_Alignment(type='jamr', nodes=[n], tokens=toks))
-            amr.nodes[n] = label
-        for data in edges:
-            _, r, _, s, t = data[:5]
-            if len(data)>5:
-                toks = data[5]
-                alignments.append(AMR_Alignment(type='jamr', edges=[(s,r,t)], tokens=toks))
-            if not r.startswith(':'): r = ':'+r
-            amr.edges.append((s,r,t))
-        return amr, alignments
-
-    @staticmethod
-    def _clean_tokens(tokens):
-        line = ' '.join(tokens)
-        if '<' in line and '>' in line:
-            tokens_reformat = []
-            is_xml = False
-            for i, tok in enumerate(tokens):
-                if is_xml:
-                    tokens_reformat[-1] += '_' + tok
-                    if '>' in tok:
-                        is_xml = False
-                else:
-                    tokens_reformat.append(tok)
-                    if tok.startswith('<') and not '>' in tok:
-                        if len(tok) > 1 and (tok[1].isalpha() or tok[1] == '/'):
-                            if i + 1 < len(tokens) and '=' in tokens[i + 1]:
-                                is_xml = True
-            tokens = tokens_reformat
-        return tokens
-
-
-
-def main():
-    dir = sys.argv[1]
-    output_file = sys.argv[2]
-
-    reader = AMR_Reader()
-    amrs, alignments = reader.load_from_dir(dir, output_alignments=True)
-
-    reader.write_to_file(output_file, amrs)
-    reader.save_alignments_to_json(output_file.replace('.txt','.alignments.json'), alignments)
-
-
-if __name__ == '__main__':
-    main()
+    def get_element_from_id(self, amr, element_id):
+        path = element_id.split('.')
+        children = {n:[] for n in amr.nodes}
+        seen_nodes = {amr.root}
+        for e in amr.edges:
+            s,r,t = e
+            if t not in seen_nodes:
+                children[s].append(e)
+            seen_nodes.add(t)
+        current_node = amr.root
+        for i in path[1:]:
+            i = int(i)
+            if len(children[current_node])>i:
+                s, r, t = children[current_node][i]
+                current_node = t
+            else:
+                raise Exception('Could not parse path:', amr.id, element_id)
+        return current_node

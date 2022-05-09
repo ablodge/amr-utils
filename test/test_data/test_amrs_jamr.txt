@@ -1,0 +1,15 @@
+# ::snt The president spoke in November.
+# ::tok The president spoke in November .
+# ::alignments 0-1|0.1 4-5|0.1.0+0.1 2-3|0 1-2|0.0 ::annotator JAMR dev v0.2 ::date 2014-10-29T20:53:39.435
+# ::node	0	speak-01	2-3
+# ::node	0.0	president	1-2
+# ::node	0.1	date-entity	4-5
+# ::node	0.1.0	11	4-5
+# ::root	0	speak-01
+# ::edge	speak-01	ARG0	president	0	0.0
+# ::edge	speak-01	time	date-entity	0	0.1
+# ::edge	date-entity	month	11	0.1	0.1.0
+(s / speak-01 
+	:ARG0 (p / president) 
+	:time (d / date-entity 
+		:month 11))
