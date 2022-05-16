@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 import sys
@@ -20,7 +21,7 @@ class PropBank:
     """
 
     print(f'[PropBank] Loading PropBank resources')
-    if os.path.isfile(RESOURCE_FILE):
+    if os.path.isfile(os.path.join(os.path.dirname(__file__), RESOURCE_FILE)):
         _stream = pkg_resources.resource_stream(__name__, RESOURCE_FILE)
         FRAMES = json.load(_stream)
 
@@ -137,7 +138,7 @@ class PropBank:
         """
         if frame in PropBank.FRAMES:
             if 'aliases' in PropBank.FRAMES[frame]:
-                return PropBank.FRAMES[frame]['aliases'].deepcopy()
+                return copy.deepcopy(PropBank.FRAMES[frame]['aliases'])
         return {}
 
     @staticmethod
