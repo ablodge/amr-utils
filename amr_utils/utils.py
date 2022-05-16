@@ -5,6 +5,14 @@ from typing import Any
 
 
 def class_name(object: Any):
+    """
+    Get the class name of object as a string
+    Args:
+        object: an object
+
+    Returns:
+        str: class name
+    """
     if isinstance(object, type):
         return object.__name__
     return object.__class__.__name__
@@ -12,6 +20,15 @@ def class_name(object: Any):
 
 @contextmanager
 def silence_warnings():
+    """
+    Context for silencing warnings and messages to stderr from a function or code block
+    Usage Example:
+        > with silence_warnings():
+        >     noisy_function()
+
+    Returns:
+        None
+    """
     stderr = sys.stderr
     devnull = open(os.devnull, 'w')
     try:

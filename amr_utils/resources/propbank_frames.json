@@ -1088,7 +1088,7 @@
         "ARG1": "Logical subject, patient, thing rising/gaining/being added to",
         "ARG2": "EXT, amount risen",
         "ARG4": "end point",
-        "location": "medium",
+        "Non-Core LOC": "medium",
         "aliases": {
             "FrameNet": [
                 "Cause_change_of_position_on_a_scale"
@@ -4738,7 +4738,7 @@
         "definition": "wait for",
         "ARG1": "wait-er (not waiter, that's a different sense)",
         "ARG2": "thing waited for",
-        "time": "period of time waited through",
+        "Non-Core TMP": "period of time waited through",
         "aliases": {}
     },
     "award-01": {
@@ -5029,7 +5029,7 @@
         "ARG2": "(extent -- rare)",
         "ARG3": "start point",
         "ARG4": "end point",
-        "location": "medium",
+        "Non-Core LOC": "medium",
         "aliases": {}
     },
     "badger-01": {
@@ -5646,7 +5646,7 @@
         "definition": "be located in",
         "ARG0": "agent basing something somewhere",
         "ARG1": "institution",
-        "location": "M-LOC location, where arg1 is based",
+        "Non-Core LOC": "M-LOC location, where arg1 is based",
         "aliases": {}
     },
     "base-02": {
@@ -8161,7 +8161,7 @@
     "blow-04": {
         "definition": "like the wind",
         "ARG1": "wind",
-        "location": "direction or location",
+        "Non-Core LOC": "direction or location",
         "aliases": {
             "FrameNet": [
                 "Breathing"
@@ -8807,7 +8807,7 @@
         "ARG2": "EXT, amount risen",
         "ARG3": "start point",
         "ARG4": "end point",
-        "location": "Medium",
+        "Non-Core LOC": "Medium",
         "aliases": {
             "VerbNet": [
                 "promote-102"
@@ -9919,7 +9919,7 @@
         "ARG2": "EXT, amount risen",
         "ARG3": "Start point",
         "ARG4": "End point",
-        "location": "Medium",
+        "Non-Core LOC": "Medium",
         "aliases": {
             "VerbNet": [
                 "establish-55.5-1"
@@ -9949,7 +9949,7 @@
         "ARG2": "EXT, amount fallen",
         "ARG3": "Start point",
         "ARG4": "End point",
-        "location": "Medium",
+        "Non-Core LOC": "Medium",
         "aliases": {
             "FrameNet": [
                 "Change_of_leadership"
@@ -17049,7 +17049,7 @@
         "ARG0": "Intentional agent",
         "ARG1": "Thing ending",
         "ARG2": "Explicit instrument, thing ended with",
-        "time": "point at which something ends",
+        "Non-Core TMP": "point at which something ends",
         "aliases": {
             "FrameNet": [
                 "Activity_finish",
@@ -18626,7 +18626,7 @@
         "definition": "confine in a small space",
         "ARG0": "cooper",
         "ARG1": "entity cooped",
-        "location": "coop, location",
+        "Non-Core LOC": "coop, location",
         "aliases": {
             "VerbNet": [
                 "pocket-9.10"
@@ -18637,7 +18637,7 @@
         "definition": "confine in a small space",
         "ARG0": "cooper",
         "ARG1": "entity cooped",
-        "location": "coop, location",
+        "Non-Core LOC": "coop, location",
         "aliases": {}
     },
     "cooperate-01": {
@@ -20749,7 +20749,7 @@
         "ARG2": "EXT, amount fallen",
         "ARG3": "Start point",
         "ARG4": "End point, end state of arg1",
-        "ARGM-VSP": "Medium",
+        "Non-Core VSP": "Medium",
         "aliases": {
             "VerbNet": [
                 "subjugate-42.3"
@@ -22326,7 +22326,7 @@
         "definition": "to win over",
         "ARG0": "entity victorious",
         "ARG1": "entity defeated",
-        "location": "domain of competition",
+        "Non-Core LOC": "domain of competition",
         "aliases": {
             "FrameNet": [
                 "Beat_opponent"
@@ -27681,7 +27681,7 @@
         "ARG2": "EXT, amount fallen",
         "ARG3": "start point",
         "ARG4": "end point, end state of arg1",
-        "mod": "attribute of arg1 actually falling, if separate from arg1",
+        "Non-Core ADV": "attribute of arg1 actually falling, if separate from arg1",
         "aliases": {
             "FrameNet": [
                 "Motion_directional",
@@ -28282,7 +28282,7 @@
         "ARG2": "EXT, amount declined by",
         "ARG3": "start point",
         "ARG4": "end point, end state",
-        "location": "medium",
+        "Non-Core LOC": "medium",
         "aliases": {
             "VerbNet": [
                 "other_cos-45.4"
@@ -28464,7 +28464,7 @@
         "ARG2": "EXT, amount moved",
         "ARG3": "start point",
         "ARG4": "end point",
-        "manner": "medium",
+        "Non-Core MNR": "medium",
         "ARG5": "direction--REQUIRED",
         "aliases": {}
     },
@@ -28522,7 +28522,7 @@
         "ARG0": "author",
         "ARG1": "opinion",
         "ARG2": "subject/source of opinion",
-        "location": "medium: location/publication",
+        "Non-Core LOC": "medium: location/publication",
         "aliases": {}
     },
     "educate-01": {
@@ -29531,7 +29531,7 @@
         "ARG0": "Agent/cause of ending",
         "ARG1": "Thing ending",
         "ARG2": "Explicit instrument, thing ended with, end portion",
-        "time": "point at which something ends",
+        "Non-Core TMP": "point at which something ends",
         "aliases": {
             "FrameNet": [
                 "Death",
@@ -31656,7 +31656,7 @@
     "expire-01": {
         "definition": "get to end of valid time period",
         "ARG1": "commodity, thing expiring",
-        "time": "expiration date",
+        "Non-Core TMP": "expiration date",
         "aliases": {
             "FrameNet": [
                 "Death"
@@ -32373,7 +32373,7 @@
         "ARG2": "EXT, amount fallen",
         "ARG3": "start point",
         "ARG4": "end point, end state of arg1",
-        "location": "medium",
+        "Non-Core LOC": "medium",
         "aliases": {
             "FrameNet": [
                 "Motion_directional",
@@ -32595,7 +32595,7 @@
     "fare-01": {
         "definition": "fare, manage, get along",
         "ARG0": "thing faring, managing",
-        "manner": "how?",
+        "Non-Core MNR": "how?",
         "aliases": {
             "FrameNet": [
                 "Thriving"
@@ -33837,7 +33837,7 @@
     "finish-02": {
         "definition": "terminate, conclude or terminate",
         "ARG1": "thing closing",
-        "extent": "EXT end point",
+        "Non-Core EXT": "EXT end point",
         "aliases": {}
     },
     "finish-03": {
@@ -34156,7 +34156,7 @@
         "ARG2": "EXT, amount fallen",
         "ARG3": "start point",
         "ARG4": "end point, end state of arg1",
-        "location": "medium",
+        "Non-Core LOC": "medium",
         "aliases": {}
     },
     "flag-02": {
@@ -34790,7 +34790,7 @@
     "flow-01": {
         "definition": "move like water",
         "ARG1": "substance (ie, water)",
-        "direction": "direction",
+        "Non-Core DIR": "direction",
         "aliases": {
             "FrameNet": [
                 "Fluidic_motion"
@@ -38491,7 +38491,7 @@
     },
     "go-24": {
         "definition": "existential",
-        "mod": "here, there",
+        "Non-Core ADV": "here, there",
         "ARG1": "fixed: you",
         "aliases": {}
     },
@@ -38610,7 +38610,7 @@
         "ARG0": "reviewer",
         "ARG1": "thing reviewed, gone over",
         "ARG2": "attribute",
-        "accompanier": "gone over with whom",
+        "Non-Core COM": "gone over with whom",
         "aliases": {
             "VerbNet": [
                 "assessment-34.1"
@@ -42049,7 +42049,7 @@
         "definition": "wait",
         "ARG1": "wait-er (not waiter, that's the other sense)",
         "ARG2": "thing waited for",
-        "time": "period of time waited through",
+        "Non-Core TMP": "period of time waited through",
         "aliases": {}
     },
     "hold-out-15": {
@@ -42754,7 +42754,7 @@
         "definition": "sit on one's heels",
         "ARG0": "entity hunkering",
         "ARG1": "on what, where",
-        "direction": "arg m; most often 'down'",
+        "Non-Core DIR": "arg m; most often 'down'",
         "aliases": {}
     },
     "hunt-01": {
@@ -43898,7 +43898,7 @@
         "ARG2": "EXT, amount risen",
         "ARG3": "start point",
         "ARG4": "end point",
-        "location": "medium",
+        "Non-Core LOC": "medium",
         "aliases": {
             "FrameNet": [
                 "Improvement_or_decline"
@@ -44124,7 +44124,7 @@
         "definition": "(cause) a corporate entity to have a certain tax status",
         "ARG0": "causer of tax status",
         "ARG1": "corporation",
-        "location": "location",
+        "Non-Core LOC": "location",
         "aliases": {
             "VerbNet": [
                 "amalgamate-22.2-1"
@@ -48746,7 +48746,7 @@
         "ARG2": "EXT, amount fallen",
         "ARG3": "Start point",
         "ARG4": "End point, end state of arg1",
-        "location": "Medium",
+        "Non-Core LOC": "Medium",
         "aliases": {
             "VerbNet": [
                 "other_cos-45.4"
@@ -48995,7 +48995,7 @@
         "ARG2": "EXT, amount risen",
         "ARG3": "Start point",
         "ARG4": "End point",
-        "location": "Medium",
+        "Non-Core LOC": "Medium",
         "aliases": {
             "FrameNet": [
                 "Cause_change_of_position_on_a_scale"
@@ -49718,7 +49718,7 @@
         "definition": "(cause to) be located in",
         "ARG0": "causer of location",
         "ARG1": "institution, thing located",
-        "location": "location",
+        "Non-Core LOC": "location",
         "aliases": {
             "FrameNet": [
                 "Being_located"
@@ -50127,7 +50127,7 @@
         "ARG2": "EXT, amount fallen",
         "ARG3": "start point",
         "ARG4": "end point",
-        "location": "medium",
+        "Non-Core LOC": "medium",
         "aliases": {
             "FrameNet": [
                 "Earnings_and_losses"
@@ -53617,7 +53617,7 @@
         "ARG2": "EXT, amount risen",
         "ARG3": "start point",
         "ARG4": "end point",
-        "location": "medium",
+        "Non-Core LOC": "medium",
         "aliases": {
             "VerbNet": [
                 "meander-47.7"
@@ -54928,7 +54928,7 @@
         "ARG2": "EXT, amount fallen",
         "ARG3": "start point",
         "ARG4": "end point, end state of arg1",
-        "location": "medium",
+        "Non-Core LOC": "medium",
         "aliases": {}
     },
     "nosh-01": {
@@ -54962,7 +54962,7 @@
         "ARG2": "EXT, amount moved",
         "ARG3": "start point",
         "ARG4": "end point",
-        "direction": "direction--REQUIRED",
+        "Non-Core DIR": "direction--REQUIRED",
         "aliases": {}
     },
     "note-01": {
@@ -55083,7 +55083,7 @@
         "ARG2": "EXT, amount moved",
         "ARG3": "start point",
         "ARG4": "end point",
-        "location": "medium",
+        "Non-Core LOC": "medium",
         "ARG5": "direction--REQUIRED",
         "aliases": {
             "FrameNet": [
@@ -55839,7 +55839,7 @@
         "definition": "begin",
         "ARG0": "agent, causer of opening",
         "ARG1": "thing opening",
-        "extent": "start point",
+        "Non-Core EXT": "start point",
         "aliases": {
             "FrameNet": [
                 "Activity_start"
@@ -60651,7 +60651,7 @@
         "ARG2": "EXT, amount fallen",
         "ARG3": "start point",
         "ARG4": "end point, end state of arg1",
-        "location": "medium",
+        "Non-Core LOC": "medium",
         "aliases": {
             "FrameNet": [
                 "Motion_directional",
@@ -62372,7 +62372,7 @@
         "definition": "move",
         "ARG0": "mover",
         "ARG1": "moved",
-        "direction": "ahead, usually",
+        "Non-Core DIR": "ahead, usually",
         "aliases": {
             "VerbNet": [
                 "push-12-1-1"
@@ -62411,7 +62411,7 @@
         "definition": "move, cause motion by pressure",
         "ARG0": "mover",
         "ARG1": "moved",
-        "direction": "ahead, usually",
+        "Non-Core DIR": "ahead, usually",
         "aliases": {}
     },
     "pressurize-01": {
@@ -65204,7 +65204,7 @@
         "ARG3": "Start point",
         "ARG4": "End point",
         "ARG5": "beneficiary",
-        "location": "medium",
+        "Non-Core LOC": "medium",
         "aliases": {
             "FrameNet": [
                 "Cause_change_of_position_on_a_scale"
@@ -67054,7 +67054,7 @@
         "ARG2": "EXT, amount fallen",
         "ARG3": "Start point",
         "ARG4": "End point, end state of arg1",
-        "location": "Medium",
+        "Non-Core LOC": "Medium",
         "aliases": {
             "FrameNet": [
                 "Cause_change_of_position_on_a_scale",
@@ -70118,7 +70118,7 @@
         "ARG2": "(extent -- rare)",
         "ARG3": "start point",
         "ARG4": "end point",
-        "location": "medium",
+        "Non-Core LOC": "medium",
         "aliases": {
             "FrameNet": [
                 "Arriving"
@@ -71014,7 +71014,7 @@
         "ARG2": "EXT, amount risen",
         "ARG3": "start point",
         "ARG4": "end point",
-        "location": "medium",
+        "Non-Core LOC": "medium",
         "aliases": {
             "FrameNet": [
                 "Change_position_on_a_scale"
@@ -72053,7 +72053,7 @@
         "ARG2": "EXT, distance run",
         "ARG3": "start point",
         "ARG4": "end point",
-        "manner": "medium",
+        "Non-Core MNR": "medium",
         "aliases": {
             "VerbNet": [
                 "meander-47.7"
@@ -73501,7 +73501,7 @@
     "scramble-03": {
         "definition": "run in scrambling manner",
         "ARG0": "runner",
-        "location": "path",
+        "Non-Core LOC": "path",
         "aliases": {
             "FrameNet": [
                 "Self_motion"
@@ -75519,7 +75519,7 @@
         "ARG2": "EXT, amount fallen",
         "ARG3": "start point",
         "ARG4": "end point, end state of arg1",
-        "location": "medium",
+        "Non-Core LOC": "medium",
         "aliases": {}
     },
     "shell-01": {
@@ -76545,7 +76545,7 @@
         "ARG0": "Intentional agent",
         "ARG1": "Thing ending",
         "ARG2": "Explicit instrument, thing ended with",
-        "time": "point at which something ends",
+        "Non-Core TMP": "point at which something ends",
         "aliases": {
             "FrameNet": [
                 "Process_stop"
@@ -77278,7 +77278,7 @@
         "definition": "(cause to) be located in",
         "ARG0": "causer",
         "ARG1": "thing that is located",
-        "location": "location",
+        "Non-Core LOC": "location",
         "aliases": {
             "FrameNet": [
                 "Placing"
@@ -77624,7 +77624,7 @@
         "ARG2": "EXT, amount risen",
         "ARG3": "start point",
         "ARG4": "end point",
-        "location": "medium",
+        "Non-Core LOC": "medium",
         "aliases": {
             "FrameNet": [
                 "Change_position_on_a_scale"
@@ -78287,7 +78287,7 @@
         "ARG1": "Logical subject, patient, thing declining",
         "ARG3": "start point",
         "ARG4": "end point",
-        "location": "medium",
+        "Non-Core LOC": "medium",
         "aliases": {}
     },
     "slow-04": {
@@ -80095,8 +80095,8 @@
         "ARG3": "y-axis",
         "ARG4": "z-axis",
         "ARG5": "origin",
-        "ARGM-FOR": "categorical FoR type",
-        "ARGM-ROT": "rotation of the framework-- describes how the respective polarities of the axes are laid out in relation to each other",
+        "Non-Core FOR": "categorical FoR type",
+        "Non-Core ROT": "rotation of the framework-- describes how the respective polarities of the axes are laid out in relation to each other",
         "aliases": {}
     },
     "have-anchor-91": {
@@ -80137,31 +80137,31 @@
     },
     "relative-orientation": {
         "definition": "construction, like relative-position",
-        "ARGM-SE2": "relative to",
-        "ARGM-ANG": "angle-quantity",
-        "ARGM-ORT": "orientation",
-        "ARGM-AXS": "intrinsic axis of rotation of head",
+        "Non-Core SE2": "relative to",
+        "Non-Core ANG": "angle-quantity",
+        "Non-Core ORT": "orientation",
+        "Non-Core AXS": "intrinsic axis of rotation of head",
         "aliases": {}
     },
     "cartesian-coordinate-entity": {
         "definition": "set of general roles for coordinates",
-        "extent": "z-axis value",
-        "ARGM-FOR": "the cartesian framework the coordinate belongs to",
+        "Non-Core EXT": "z-axis value",
+        "Non-Core FOR": "the cartesian framework the coordinate belongs to",
         "aliases": {}
     },
     "dimension-entity": {
         "definition": "general set of roles for dimension values not tied to a particular axis",
-        "ARGM-VSP": "unit",
+        "Non-Core VSP": "unit",
         "aliases": {}
     },
     "ordinal-entity": {
         "definition": "general set of roles for ordinals",
-        "ARGM-VSP": "direction of counting",
+        "Non-Core VSP": "direction of counting",
         "aliases": {}
     },
     "slope-entity": {
         "definition": "general set of roles for slopes, with rise and run",
-        "ARGM-VSP": "quantity of slope",
+        "Non-Core VSP": "quantity of slope",
         "aliases": {}
     },
     "spatter-01": {
@@ -81008,7 +81008,7 @@
     "spread-02": {
         "definition": "extend, ranging",
         "ARG1": "substance",
-        "direction": "diretion or location (for location use loc)",
+        "Non-Core DIR": "diretion or location (for location use loc)",
         "aliases": {
             "FrameNet": [
                 "Expansion"
@@ -87339,7 +87339,7 @@
         "definition": "end, stop",
         "ARG0": "Intentional agent",
         "ARG1": "Thing ending",
-        "time": "point at which something ends",
+        "Non-Core TMP": "point at which something ends",
         "aliases": {
             "FrameNet": [
                 "Activity_stop",
@@ -90527,7 +90527,7 @@
         "ARG0": "agent, binder",
         "ARG1": "patient, thing trussed",
         "ARG2": "second (optional) object, thing trussed *to*",
-        "manner": "trussed with what, instrument",
+        "Non-Core MNR": "trussed with what, instrument",
         "aliases": {
             "FrameNet": [
                 "Attaching"
@@ -90716,7 +90716,7 @@
         "ARG2": "EXT, amount fallen",
         "ARG3": "start point",
         "ARG4": "end point, end state",
-        "location": "medium",
+        "Non-Core LOC": "medium",
         "aliases": {
             "FrameNet": [
                 "Change_position_on_a_scale"
@@ -90780,7 +90780,7 @@
         "ARG0": "turner",
         "ARG1": "thing turning",
         "ARG2": "axis/centerpoint of rotation",
-        "location": "direction, location, destination",
+        "Non-Core LOC": "direction, location, destination",
         "aliases": {
             "FrameNet": [
                 "Moving_in_place",
@@ -93841,7 +93841,7 @@
         "definition": "wait, delay movement or action",
         "ARG1": "wait-er (not waiter, that's the other sense)",
         "ARG2": "thing waited for",
-        "time": "period of time waited through",
+        "Non-Core TMP": "period of time waited through",
         "aliases": {
             "FrameNet": [
                 "Expectation",
@@ -95279,7 +95279,7 @@
         "ARG2": "EXT",
         "ARG3": "start point",
         "ARG4": "end point",
-        "direction": "thing whizzed past, through",
+        "Non-Core DIR": "thing whizzed past, through",
         "aliases": {
             "VerbNet": [
                 "run-51.3.2"
@@ -97088,7 +97088,7 @@
         "ARG2": "EXT",
         "ARG3": "start point",
         "ARG4": "end point",
-        "manner": "medium",
+        "Non-Core MNR": "medium",
         "aliases": {
             "VerbNet": [
                 "run-51.3.2"

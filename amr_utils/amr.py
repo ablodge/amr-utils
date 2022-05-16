@@ -59,12 +59,12 @@ class AMR:
     > print(amr.graph_string())
     """
 
-    def __init__(self, sent_id: str = None, tokens: List[str] = None, root: str = None, nodes: Dict[str, str] = None,
+    def __init__(self, id: str = None, tokens: List[str] = None, root: str = None, nodes: Dict[str, str] = None,
                  edges: List[Edge] = None, metadata: Dict[str, Any] = None, shape: 'AMR_Shape' = None):
         """
         Create an AMR
         Args:
-            sent_id (str): a unique ID for the sentence this AMR represents
+            id (str): a unique ID for the sentence this AMR represents
             tokens (List[str]): a list of tokens for the sentence this AMR represents
             root (str): the node ID of the root node
             nodes (Dict[str, str]): a dictionary from node IDs to node labels
@@ -78,7 +78,7 @@ class AMR:
         self.root = root  # might be None
         self.nodes = nodes if (nodes is not None) else {}
         self.edges = edges if (edges is not None) else []
-        self.id = sent_id if (sent_id is not None) else 'None'
+        self.id = id if (id is not None) else 'None'
         self.metadata = metadata if (metadata is not None) else {}
         self.shape = shape if (shape is not None) else None
 
@@ -91,7 +91,7 @@ class AMR:
         Returns:
             AMR: copy
         """
-        amr = AMR(tokens=self.tokens.copy(), sent_id=self.id, root=self.root, nodes=self.nodes.copy(),
+        amr = AMR(tokens=self.tokens.copy(), id=self.id, root=self.root, nodes=self.nodes.copy(),
                   edges=self.edges.copy(), metadata=self.metadata.copy())
         if self.shape is not None:
             amr.shape = self.shape.copy()
@@ -148,9 +148,19 @@ class AMR:
             tuple[int,tuple[str,str,str]]: an int indicating depth, an AMR triple of the form
                 (source_id, relation, target_id) or (source_id, relation, value)
         """
+        subgraph_root, subgraph_nodes, subgraph_edges = self._clean_subgraph_input(subgraph_root, subgraph_nodes,
+                                                                                   subgraph_edges)
         root = self.root if (subgraph_root is None) else subgraph_root
-        nodes = self.nodes if (subgraph_nodes is None) else {n for n in subgraph_nodes}
+        nodes = self.nodes if (subgraph_nodes is None) else subgraph_nodes
         edges = self.edges if (subgraph_edges is None) else [e for e in subgraph_edges if e in self.edges]
+        # test root
+        if root is None:
+            warnings.warn(f'[{class_name(self)}] Cannot iterate AMR {self.id} because the root is None.')
+            return
+        elif root not in self.nodes:
+            if not any(subgraph_root in [s, t] for s, r, t in self.edges):
+                raise Exception(f'[{class_name(self)}] Cannot iterate AMR {self.id} because the root node {root} '
+                                f'does not exist.')
         # identify each node's child edges
         children = {n: [] for n in self.nodes}
         edges = [(i, e) for i, e in enumerate(edges)]
@@ -163,15 +173,9 @@ class AMR:
         completed_nodes = set()
         node_mentions = Counter()
         stack = []  # pairs (depth, edge_idx, edge)
-        if root is None:
-            self._handle_missing_nodes(nodes)
-            return
         if root in self.nodes:
             yield 1, (root, ':instance', self.nodes[root])
         else:
-            if not any(root in [s,t] for s,r,t in self.edges):
-                warnings.warn(f'[{class_name(self)}] The node {root} in AMR {self.id} does not exist.')
-                return
             warnings.warn(f'[{class_name(self)}] The node {root} in AMR {self.id} has no concept.')
         for edge_idx, edge in children[root]:
             stack.append((1, edge_idx, edge))
@@ -180,7 +184,6 @@ class AMR:
             depth, edge_idx, edge = stack.pop()
             visited_edges.add(edge_idx)
             target = edge[-1]
-
             if target in self.nodes and AMR_Notation.is_attribute(self, edge):
                 # attribute
                 s, r, t = edge
@@ -231,19 +234,31 @@ class AMR:
         Build a string representation for a subgraph of this AMR as a PENMAN string.
         Args:
             subgraph_root (str): the subgraph's root node ID
-            subgraph_nodes (Iterable[str]): nodes to be included in the subgraph
-            subgraph_edges (Iterable[tuple[str,str,str]]): edges to be included in the subgraph, if set, otherwise by
-                default any edge whose source is in subgraph_nodes will be included.
+            subgraph_nodes (Iterable[str]): nodes to be included in the subgraph (if not set, the subgraph will include
+                all descendents of subgraph_root.)
+            subgraph_edges (Iterable[tuple[str,str,str]]): edges to be included in the subgraph (if not set, the
+                subgraph will include all edges whose source is in subgraph_nodes.)
             pretty_print (bool): Use indentation to make the PENMAN string more human-readable
             indent (str): String to use when indenting. Suggested values: '\t' or '    '.
                           This parameter is only used if pretty_print is set.
         Returns:
             str: PENMAN string
         """
-        if subgraph_nodes:
-            subgraph_nodes = [n for n in subgraph_nodes if n in self.nodes]
+        subgraph_root, subgraph_nodes, subgraph_edges = self._clean_subgraph_input(subgraph_root, subgraph_nodes,
+                                                                                   subgraph_edges)
         amr_sequence = self._graph_string_as_list(subgraph_root, subgraph_nodes, subgraph_edges)
         return self._format_graph_string(amr_sequence, indent=indent, pretty_print=pretty_print)
+
+    def _clean_subgraph_input(self, subgraph_root: str = None, subgraph_nodes: Iterable[str] = None,
+                              subgraph_edges: Iterable[Edge] = None):
+        if subgraph_root is not None:
+            if subgraph_root not in self.nodes:
+                if not any(subgraph_root in [s, t] for s, r, t in self.edges):
+                    raise Exception(f'[{class_name(self)}] The subgraph root node {subgraph_root} '
+                                    f'does not exist in AMR {self.id}.')
+        if subgraph_nodes:
+            subgraph_nodes = {n for n in subgraph_nodes if n in self.nodes}
+        return subgraph_root, subgraph_nodes, subgraph_edges
 
     def _default_node_ids(self):
         node_ids = {}
@@ -337,7 +352,7 @@ class AMR:
         for component in components:
             root = component[0]
             sg_string = self.subgraph_string(root, component, pretty_print=False)
-            msg += 'Missing: '+sg_string + '\n'
+            msg += 'Missing: ' + sg_string + '\n'
         warnings.warn(msg)
 
 

@@ -1,29 +1,31 @@
 import unittest
 
-from amr_utils.amr_readers import AMR_Reader
-
-TEST_FILE1 = 'test_data/test_amrs.txt'
-TEST_FILE2 = 'test_data/test_amrs2.txt'
-
-LDC_DIR = '../../LDC_2020/data/amrs/unsplit'
+from amr_utils.propbank_utils import PropBank
 
 
 class Test_PropBank_Utils(unittest.TestCase):
 
-    def test_create_resources(self):
-        pass
-
-    def test_load_resources(self):
-        pass
-
     def test_get_frame_description(self):
-        pass
+        desc = PropBank.frame_description('go-02')
 
     def test_is_propbank_frame(self):
-        pass
+        if PropBank.is_propbank_frame('go-02'):
+            pass
 
     def test_is_valid_role(self):
+        if PropBank.is_valid_role('go-02',':ARG1'):
+            pass
+
+    def test_get_roles(self):
+        roles = PropBank.frame_roles('go-02')
         pass
+
+    def test_frame_definition(self):
+        definition = PropBank.frame_def('go-02')
+        pass
+
+    def test_frame_aliases(self):
+        aliases = PropBank.frame_aliases('go-02')
 
 
 if __name__ == '__main__':

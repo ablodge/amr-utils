@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+from typing import List, Dict
 
 import pkg_resources
 
@@ -10,40 +11,151 @@ RESOURCE_FILE = 'resources/propbank_frames.json'
 
 
 class PropBank:
+    """
+    This class contains static methods related to PropBank frames and roles such as methods for looking up the
+    definition of a frame or getting a frame's semantic roles.
+
+    PropBank (https://propbank.github.io/) is a lexical resource of 9,000 predicate senses with semantic roles.
+    PropBank frames and roles can be found here: https://github.com/propbank/propbank-frames/
+    """
 
     print(f'[PropBank] Loading PropBank resources')
-    stream = pkg_resources.resource_stream(__name__, RESOURCE_FILE)
-    frames = json.load(stream)
+    if os.path.isfile(RESOURCE_FILE):
+        _stream = pkg_resources.resource_stream(__name__, RESOURCE_FILE)
+        FRAMES = json.load(_stream)
 
-    ROLE_TO_AMR_ROLE = {
-        'LOC': 'location',
-        'TMP': 'time',
-        'DIR': 'direction',
-        'MNR': 'manner',
-        'EXT': 'extent',
-        'ADV': 'mod',
-        'COM': 'accompanier',
-        'GOL': 'destination',
-        'PRP': 'purpose',
-    }
+    @staticmethod
+    def is_propbank_frame(frame: str) -> bool:
+        """
+        Test whether a string is a PropBank frame. The string must be in the AMR format for frames,
+        containing only letters, numbers, and hyphens (e.g., "aaa-aaa-01" instead of "aaa_aaa.01").
+        Args:
+            frame (str): string to test
+
+        Returns:
+            bool: True if and only if string is in the list of PropBank frames.
+        """
+        return frame in PropBank.FRAMES
+
+    @staticmethod
+    def is_valid_role(frame: str, role: str) -> bool:
+        """
+        Test whether a semantic role is a possible core role for this frame.
+        Args:
+            frame (str): frame to test
+            role (str): role to test (e.g., ":ARG0")
+
+        Returns:
+            bool: True if and only if role is one of the frame's core roles
+        """
+        if role.startswith(':'):
+            role = role[1:]
+        if frame in PropBank.FRAMES:
+            if role not in ['definition', 'aliases'] and role in PropBank.FRAMES[frame]:
+                return True
+        return False
+
+    @staticmethod
+    def frame_roles(frame: str) -> List[str]:
+        """
+        Get a list of valid core semantic roles for this frame.
+        Args:
+            frame (str): a frame
+
+        Returns:
+            List[str]: a list of relations
+        """
+        if frame in PropBank.FRAMES:
+            roles = []
+            for role in PropBank.FRAMES[frame]:
+                if role.startswith('ARG'):
+                    roles.append(':'+role)
+            return roles
+        return []
+
+    @staticmethod
+    def frame_description(frame: str) -> str:
+        """
+        Get a complete description of this frame's definition and roles.
+        Args:
+            frame (str): a frame
+
+        Returns:
+            str: a formatted description including the frame's definition and possible roles.
+        """
+        if frame in PropBank.FRAMES:
+            desc = [PropBank.FRAMES[frame]['definition']]
+            for role in PropBank.FRAMES[frame]:
+                if role in ['definition', 'aliases']:
+                    continue
+                desc.append(role +': ' + PropBank.FRAMES[frame][role])
+            return '\n'.join(desc)
+        return ''
+
+    @staticmethod
+    def frame_def(frame: str) -> str:
+        """
+        Get this frame's definition
+        Args:
+            frame (str): a frame
+
+        Returns:
+            str: a definition
+        """
+        if frame in PropBank.FRAMES:
+            return PropBank.FRAMES[frame]['definition']
+        return ''
+
+    @staticmethod
+    def role_description(frame: str, role: str) -> str:
+        """
+        Get the description of a semantic role for this frame
+        Args:
+            frame (str): a frame
+            role (str): a role (e.g., ":ARG0")
+
+        Returns:
+            str: a description of this role for this frame
+        """
+        if role.startswith(':'):
+            role = role[1:]
+        if frame in PropBank.FRAMES:
+            if role in PropBank.FRAMES[frame] and role not in ['definition', 'aliases']:
+                return PropBank.FRAMES[frame][role]
+        return ''
+
+    @staticmethod
+    def frame_aliases(frame: str) -> Dict[str, List[str]]:
+        """
+
+        Args:
+            frame (str): a frame
+            role (str): a role (e.g., ":ARG0")
+
+        Returns:
+            str: a description of this role for this frame
+        """
+        if frame in PropBank.FRAMES:
+            if 'aliases' in PropBank.FRAMES[frame]:
+                return PropBank.FRAMES[frame]['aliases'].deepcopy()
+        return {}
 
     @staticmethod
     def _pb_frame_to_amr_frame(frame: str):
-        return frame.replace('_','-').replace('.','-')
+        return frame.replace('_', '-').replace('.', '-')
 
     @staticmethod
     def _pb_role_to_amr_role(role: str, non_core: str):
         if role.isdigit():
             return f'ARG{role}'
         else:
-            if non_core in PropBank.ROLE_TO_AMR_ROLE:
-                return PropBank.ROLE_TO_AMR_ROLE[non_core]
-            return f'ARGM-{non_core}'
+            return f'Non-Core {non_core}'
 
     @staticmethod
     def _create_propbank_resources(frame_directory: str):
         if os.path.isfile(RESOURCE_FILE):
             raise Exception('PropBank resource already exists!')
+        frame_directory = os.path.join(frame_directory, 'frames')
 
         import xml.etree.ElementTree as ET
 
@@ -94,28 +206,6 @@ class PropBank:
 
         with open(RESOURCE_FILE, 'w+') as fw:
             json.dump(propbank_frames, fw, indent=4)
-
-    @staticmethod
-    def get_frame_description(frame: str):
-        if frame in PropBank.frames:
-            desc = [PropBank.frames[frame]['definition']]
-            for role in PropBank.frames[frame]:
-                if role in ['definition', 'aliases']:
-                    continue
-                desc.append(role+': '+PropBank.frames[frame][role])
-            return '\n'.join(desc)
-        return ''
-
-    @staticmethod
-    def is_propbank_frame(frame: str):
-        return frame in PropBank.frames
-
-    @staticmethod
-    def is_valid_role(frame: str, role: str):
-        if frame in PropBank.frames:
-            if role not in ['definition', 'aliases'] and role in PropBank.frames[frame]:
-                return True
-        return False
 
 
 if __name__ == '__main__':
