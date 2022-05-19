@@ -1,7 +1,7 @@
 import re
 import warnings
-from collections import Counter
-from typing import Tuple, Any, List, Dict, Optional, Iterable, Iterator
+from collections import Counter, defaultdict
+from typing import Tuple, Any, List, Dict, Optional, Iterable
 
 from amr_utils.utils import class_name
 
@@ -74,13 +74,13 @@ class AMR:
             shape (AMR_Shape): an extra parameter which saves the exact AMR shape, to preserve formatting
         """
 
-        self.tokens = tokens if (tokens is not None) else []
+        self.id = id  # might be None
+        self.tokens = tokens  # might be None
         self.root = root  # might be None
         self.nodes = nodes if (nodes is not None) else {}
         self.edges = edges if (edges is not None) else []
-        self.id = id if (id is not None) else 'None'
         self.metadata = metadata if (metadata is not None) else {}
-        self.shape = shape if (shape is not None) else None
+        self.shape = shape  # might be None
 
     def __str__(self):
         return f'[{class_name(self)} {self.id}]: ' + self.graph_string()
@@ -97,72 +97,79 @@ class AMR:
             amr.shape = self.shape.copy()
         return amr
 
-    def triples(self, normalize_inverse_relations=False) -> Iterator[Triple]:
+    def triples(self, normalize_inverse_relations=False) -> List[Triple]:
         """
-        Iterate the triples in this AMR. Each triple takes the form (source_id, relation, target_id)
-        or (source_id, relation, value). By default, :instance triples are yielded first, then edges,
+        Get the triples in this AMR. Each triple takes the form (source_id, relation, target_id)
+        or (source_id, relation, value). By default, :instance triples are appended first, then edges,
         then attributes. To get the triples in a graph ordering, use `depth_first_triples()`
         Args:
             normalize_inverse_relations (bool): convert inverse relations to normal relations
-        Yields:
-            tuple: AMR triples of the form (source_id, relation, target_id) or (source_id, relation, value)
+        Returns:
+            List[tuple]: AMR triples of the form (source_id, relation, target_id) or (source_id, relation, value)
         """
+        triples_ = []
         # instance triples
         for n in self.nodes:
             if AMR_Notation.is_constant(self.nodes[n]):
                 if not self.nodes[n][0].isalpha() or \
                         any(e[-1] == n and AMR_Notation.is_attribute(self, e) for e in self.edges):
                     continue
-            yield n, ':instance', self.nodes[n]
+            triples_.append((n, ':instance', self.nodes[n]))
         # edge triples
         for s, r, t in self.edges:
             if s not in self.nodes:
-                warnings.warn(f'[{class_name(self)}] The node {s} in AMR {self.id} has no concept.')
+                warnings.warn(f'[{class_name(self)}] The node "{s}" in AMR "{self.id}" has no concept.')
             if t not in self.nodes:
-                warnings.warn(f'[{class_name(self)}] The node {t} in AMR {self.id} has no concept.')
+                warnings.warn(f'[{class_name(self)}] The node "{t}" in AMR "{self.id}" has no concept.')
             elif AMR_Notation.is_attribute(self, (s, r, t)):
                 continue
             if normalize_inverse_relations and AMR_Notation.is_inverse_relation(r):
-                yield t, r[:-len('-of')], s
+                triples_.append((t, r[:-len('-of')], s))
             else:
-                yield s, r, t
+                triples_.append((s, r, t))
         # attribute triples
         for s, r, t in self.edges:
             if t in self.nodes and AMR_Notation.is_attribute(self, (s, r, t)):
-                yield s, r, self.nodes[t]
+                triples_.append((s, r, self.nodes[t]))
+        return triples_
 
     def depth_first_triples(self, subgraph_root: str = None, subgraph_nodes: Iterable[str] = None,
                             subgraph_edges: Iterable[Edge] = None, normalize_inverse_relations: bool = False) -> \
-            Iterator[Tuple[int, Triple]]:
+            List[Tuple[int, Triple]]:
         """
-        Iterate the triples in this AMR in depth first order. Each triple takes the form
+        Get the triples in this AMR in depth first order as a list of (depth, triple) pairs. Each triple takes the form
         (source_id, relation, target_id) or (source_id, relation, value).
+
+        This function is called when building an AMR graph string. If you want to make a custom AMR Writer, you should
+        call this function. You can use `AMR._graph_string()` as a template for building a graph string from triples.
         Args:
-            subgraph_root (str): if set, iterate triples of the subgraph starting at this root
-            subgraph_nodes (Iterable[str]): if set, iterate triples of the subgraph containing these nodes (and any
+            subgraph_root (str): if set, list triples of the subgraph starting at this root
+            subgraph_nodes (Iterable[str]): if set, list triples of the subgraph containing these nodes (and any
                 connecting or outgoing edges)
-            subgraph_edges (Iterable[Triple[str,str,str]]): if set, iterate triples of the subgraph while only
+            subgraph_edges (Iterable[Triple[str,str,str]]): if set, list triples of the subgraph while only
                 considering these edges
             normalize_inverse_relations (bool): convert inverse relations to normal relations
-        Yields:
-            tuple[int,tuple[str,str,str]]: an int indicating depth, an AMR triple of the form
+        Returns:
+            List[Tuple[int,Tuple[str,str,str]]]: a list of pairs (depth, triple) with AMR triples of the form
                 (source_id, relation, target_id) or (source_id, relation, value)
         """
         subgraph_root, subgraph_nodes, subgraph_edges = self._clean_subgraph_input(subgraph_root, subgraph_nodes,
                                                                                    subgraph_edges)
         root = self.root if (subgraph_root is None) else subgraph_root
         nodes = self.nodes if (subgraph_nodes is None) else subgraph_nodes
-        edges = self.edges if (subgraph_edges is None) else [e for e in subgraph_edges if e in self.edges]
+        edges = self.edges if (subgraph_edges is None) else subgraph_edges
         # test root
-        if root is None:
-            warnings.warn(f'[{class_name(self)}] Cannot iterate AMR {self.id} because the root is None.')
-            return
-        elif root not in self.nodes:
-            if not any(subgraph_root in [s, t] for s, r, t in self.edges):
-                raise Exception(f'[{class_name(self)}] Cannot iterate AMR {self.id} because the root node {root} '
+        if root not in self.nodes:
+            if root is None:
+                if nodes:
+                    raise Exception(f'[{class_name(self)}] Cannot iterate AMR "{self.id}" because the root is None.')
+                else:
+                    return []
+            elif not any(root in [s, t] for s, r, t in self.edges):
+                raise Exception(f'[{class_name(self)}] Cannot iterate AMR "{self.id}" because the root node "{root}" '
                                 f'does not exist.')
         # identify each node's child edges
-        children = {n: [] for n in self.nodes}
+        children = defaultdict(list)
         edges = [(i, e) for i, e in enumerate(edges)]
         for i, e in reversed(edges):
             s, r, t = e
@@ -173,10 +180,11 @@ class AMR:
         completed_nodes = set()
         node_mentions = Counter()
         stack = []  # pairs (depth, edge_idx, edge)
+        triples = []
         if root in self.nodes:
-            yield 1, (root, ':instance', self.nodes[root])
+            triples.append((1, (root, ':instance', self.nodes[root])))
         else:
-            warnings.warn(f'[{class_name(self)}] The node {root} in AMR {self.id} has no concept.')
+            warnings.warn(f'[{class_name(self)}] The node "{root}" in AMR "{self.id}" has no concept.')
         for edge_idx, edge in children[root]:
             stack.append((1, edge_idx, edge))
         completed_nodes.add(root)
@@ -187,22 +195,22 @@ class AMR:
             if target in self.nodes and AMR_Notation.is_attribute(self, edge):
                 # attribute
                 s, r, t = edge
-                yield depth, (s, r, self.nodes[t])
+                triples.append((depth, (s, r, self.nodes[t])))
                 completed_nodes.add(t)
             else:
                 # relation
                 if normalize_inverse_relations and AMR_Notation.is_inverse_relation(edge[1]):
                     s, r, t = edge
-                    yield depth, (t, r[:-len('-of')], s)
+                    triples.append((depth, (t, r[:-len('-of')], s)))
                 else:
-                    yield depth, edge
-                if target not in completed_nodes and target in nodes:
+                    triples.append((depth, edge))
+                if target not in completed_nodes and (subgraph_nodes is None or target in nodes):
                     if self.shape is None or self.shape.locate_instance(target) == node_mentions[target]:
                         # instance
                         if target in self.nodes:
-                            yield depth + 1, (target, ':instance', self.nodes[target])
+                            triples.append((depth + 1, (target, ':instance', self.nodes[target])))
                         else:
-                            warnings.warn(f'[{class_name(self)}] The node {target} in AMR {self.id} has no concept.')
+                            warnings.warn(f'[{class_name(self)}] The node "{target}" in AMR "{self.id}" has no concept.')
                         completed_nodes.add(target)
                         # update stack
                         for new_edge_idx, new_edge in children[target]:
@@ -211,9 +219,10 @@ class AMR:
                             stack.append((depth + 1, new_edge_idx, new_edge))
                 node_mentions[target] += 1
         if subgraph_root and not subgraph_nodes:
-            return
+            return triples
         if len(completed_nodes) < len(nodes):
             self._handle_missing_nodes([n for n in nodes if n not in completed_nodes])
+        return triples
 
     def graph_string(self, pretty_print: bool = False, indent: str = '\t'):
         """
@@ -225,8 +234,7 @@ class AMR:
         Returns:
             str: PENMAN string for this AMR
         """
-        amr_sequence = self._graph_string_as_list()
-        return self._format_graph_string(amr_sequence, indent=indent, pretty_print=pretty_print)
+        return self._graph_string(indent=indent, pretty_print=pretty_print)
 
     def subgraph_string(self, subgraph_root: str, subgraph_nodes: Iterable[str] = None,
                         subgraph_edges: Iterable[Edge] = None, pretty_print: bool = False, indent: str = '\t'):
@@ -244,20 +252,26 @@ class AMR:
         Returns:
             str: PENMAN string
         """
-        subgraph_root, subgraph_nodes, subgraph_edges = self._clean_subgraph_input(subgraph_root, subgraph_nodes,
-                                                                                   subgraph_edges)
-        amr_sequence = self._graph_string_as_list(subgraph_root, subgraph_nodes, subgraph_edges)
-        return self._format_graph_string(amr_sequence, indent=indent, pretty_print=pretty_print)
+        return self._graph_string(subgraph_root=subgraph_root, subgraph_nodes=subgraph_nodes,
+                                  subgraph_edges=subgraph_edges, indent=indent, pretty_print=pretty_print)
 
     def _clean_subgraph_input(self, subgraph_root: str = None, subgraph_nodes: Iterable[str] = None,
                               subgraph_edges: Iterable[Edge] = None):
         if subgraph_root is not None:
             if subgraph_root not in self.nodes:
                 if not any(subgraph_root in [s, t] for s, r, t in self.edges):
-                    raise Exception(f'[{class_name(self)}] The subgraph root node {subgraph_root} '
-                                    f'does not exist in AMR {self.id}.')
+                    raise Exception(f'[{class_name(self)}] The subgraph root node "{subgraph_root}" '
+                                    f'does not exist in AMR "{self.id}".')
         if subgraph_nodes:
-            subgraph_nodes = {n for n in subgraph_nodes if n in self.nodes}
+            missing_concept_nodes = set()
+            for s, r, t in self.edges:
+                if s not in self.nodes and s in subgraph_nodes:
+                    missing_concept_nodes.add(s)
+                if t not in self.nodes and t in subgraph_nodes:
+                    missing_concept_nodes.add(t)
+            subgraph_nodes = {n for n in subgraph_nodes if (n in self.nodes or n in missing_concept_nodes)}
+        if subgraph_edges:
+            subgraph_edges = [e for e in subgraph_edges if e in self.edges]
         return subgraph_root, subgraph_nodes, subgraph_edges
 
     def _default_node_ids(self):
@@ -278,76 +292,58 @@ class AMR:
                 node_ids[n] = letter
         return node_ids
 
-    def _format_graph_string(self, amr_sequence: List[str], pretty_print: bool = False, indent: str = '\t') -> str:
-        depth = 0
-        for i, element in enumerate(amr_sequence):
-            if element == '(':
-                depth += 1
-            elif element == ')':
-                depth -= 1
-            elif element.startswith(':'):
-                r = element
-                whitespace = '\n' + (indent * depth) if pretty_print else ' '
-                amr_sequence[i] = f'{whitespace}{r} '
-            elif element == '/':
-                amr_sequence[i] = ' / '
-        amr_string = ''.join(amr_sequence)
-        return amr_string
-
-    def _graph_string_as_list(self, subgraph_root: str = None, subgraph_nodes: Iterable[str] = None,
-                              subgraph_edges: Iterable[Edge] = None) -> List[str]:
-        root = self.root if (subgraph_root is None) else subgraph_root
-        nodes = self.nodes if (subgraph_nodes is None) else subgraph_nodes
-        if root is None or root not in nodes:
-            if nodes:
-                self._handle_missing_nodes(set(nodes))
-            return ['(', 'a', '/', 'amr-empty', ')']
+    def _graph_string(self, pretty_print: bool = False, indent: str = '\t', subgraph_root: str = None,
+                      subgraph_nodes: Iterable[str] = None, subgraph_edges: Iterable[Edge] = None) -> str:
         amr_sequence = []
-        completed_nodes = set()
-        node_map = None
-        if not all(n[0].isalpha() for n in nodes):
-            node_map = self._default_node_ids()
-        nodes_todo = [root]
+        node_id_map = None
+        if not all(n[0].isalpha() for n in self.nodes):
+            node_id_map = self._default_node_ids()
         prev_depth = 0
-        for depth, triple in self.depth_first_triples(subgraph_root=subgraph_root, subgraph_nodes=subgraph_nodes,
-                                                      subgraph_edges=subgraph_edges):
+        triples = self.depth_first_triples(subgraph_root=subgraph_root, subgraph_nodes=subgraph_nodes,
+                                           subgraph_edges=subgraph_edges)
+        if triples:
+            # root node
+            _, triple = triples[0]
+            root = triple[0]
+            node_id = root if (node_id_map is None) else node_id_map[root]
+            amr_sequence.extend([f'(', node_id])
+        for i, _ in enumerate(triples):
+            depth, triple = _
             s, r, t = triple
-            if nodes_todo:
-                node_id = nodes_todo.pop()
-                if r == ':instance':
-                    amr_sequence.append('(')
-                amr_sequence.append(node_id)
             if depth < prev_depth:
                 for _ in range(prev_depth - depth):
                     amr_sequence.append(')')
-            node_id = t if (node_map is None) else node_map[t]
             if r == ':instance':
                 # new concept
-                amr_sequence.extend(['/', t])
-                completed_nodes.add(s)
-            elif AMR_Notation.is_constant(t):
-                # attribute
-                amr_sequence.extend([r, t])
-                completed_nodes.add(f'attr{len(completed_nodes)}')
+                amr_sequence.append(f' / {t}')
             else:
-                # relation
-                amr_sequence.append(r)
-                nodes_todo.append(node_id)
+                whitespace = '\n' + (indent * depth) if pretty_print else ' '
+                if AMR_Notation.is_constant(t):
+                    # attribute
+                    amr_sequence.append(f'{whitespace}{r} {t}')
+                elif i+1 < len(triples) and triples[i+1][-1][1] == ':instance':
+                    # relation
+                    node_id = t if (node_id_map is None) else node_id_map[t]
+                    amr_sequence.extend([f'{whitespace}{r} ', '(', node_id])
+                else:
+                    # reentrancy
+                    node_id = t if (node_id_map is None) else node_id_map[t]
+                    amr_sequence.append(f'{whitespace}{r} {node_id}')
             prev_depth = depth
-        if nodes_todo:
-            node_id = nodes_todo.pop()
-            amr_sequence.append(node_id)
         for _ in range(prev_depth):
             amr_sequence.append(')')
+        if not amr_sequence:
+            return '(a / amr-empty)'
+        amr_string = ''.join(amr_sequence)
         if amr_sequence.count('(') != amr_sequence.count(')'):
             raise Exception(f'[{class_name(self)}] Failed to print AMR, Mismatched Parentheses:',
-                            self.id, ' '.join(amr_sequence))
-        return amr_sequence
+                            self.id, amr_string)
+        return amr_string
 
     def _handle_missing_nodes(self, missing_nodes):
         from amr_utils.amr_graph import find_connected_components
-        components = find_connected_components(self, nodes=missing_nodes)
-        msg = f'[{class_name(self)}] Failed to iterate AMR {self.id} ' \
+        components = find_connected_components(self, subgraph_nodes=missing_nodes)
+        msg = f'[{class_name(self)}] Failed to iterate AMR "{self.id}" ' \
               f'({len(missing_nodes)} of {len(self.nodes)} nodes were unreachable).\n'
         for component in components:
             root = component[0]
@@ -497,7 +493,7 @@ class AMR_Notation:
         return relation + '-of'
 
     @staticmethod
-    def lexicographic_edge_key(amr: AMR, edge: Edge):
+    def sorted_edge_key(amr: AMR, edge: Edge):
         """
         Create a key for this edge that can be used in `sorted()` to sort edges alphabetically.
         Rather than alphabetizing edges by their string representation, this key also properly orders numbers so that

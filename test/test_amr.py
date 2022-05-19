@@ -24,31 +24,11 @@ class Test_AMR(unittest.TestCase):
         for amr in amrs2:
             output = str(amr)
 
-        # test non-DAG AMRs
-        amr = amrs[0].copy()
-        amr.root = 'g'
-        output = amr.graph_string(pretty_print=False)
-        if output != '(g / go-02 :ARG0 (b / boy) :ARG4 (c / city :name (n / name :op1 "New" :op2 "York" :op3 "City")))':
-            raise Exception('Failed to print AMR')
-        amr.nodes['a'] = 'aardvark'
-        amr.nodes['z'] = 'zebra'
-        amr.edges.append(('a', ':mod', 'z'))
-        output = amr.graph_string(pretty_print=False)
-        if output != '(g / go-02 :ARG0 (b / boy) :ARG4 (c / city :name (n / name :op1 "New" :op2 "York" :op3 "City")))':
-            raise Exception('Failed to print AMR')
-        # test missing nodes
-        amr = amrs[0].copy()
-        del amr.nodes['b']
-        output = amr.graph_string(pretty_print=False)
-        if output != '(w / want-01 :ARG0 b :ARG1 (g / go-02 :ARG0 b :ARG4 ' \
-                     '(c / city :name (n / name :op1 "New" :op2 "York" :op3 "City"))))':
-            raise Exception('Failed to print AMR')
-        # test empty root
-        amr = amrs[0].copy()
-        amr.root = None
-        output = amr.graph_string(pretty_print=False)
+        # empty AMR
+        amr = AMR()
+        output = amr.graph_string()
         if output != '(a / amr-empty)':
-            raise Exception('Failed to print AMR')
+            raise Exception('Failed to print graph')
 
         # thorough test
         for filename in os.listdir(LDC_DIR):
@@ -60,6 +40,7 @@ class Test_AMR(unittest.TestCase):
                 amr_string2 = amr.graph_string(pretty_print=False)
                 if amr_string1 != amr_string2:
                     raise Exception('Mismatching AMR string')
+
 
     def test_subgraph_string(self):
         reader = AMR_Reader()
@@ -78,11 +59,6 @@ class Test_AMR(unittest.TestCase):
         if output != '(w / want-01 :ARG0 (b / boy) :ARG1 (g / go-02 :ARG0 b))':
             raise Exception('Failed to print subgraph')
 
-        amr = AMR()
-        output = amr.subgraph_string(subgraph_root='a', subgraph_nodes=['a','b'])
-        if output != '(a / amr-empty)':
-            raise Exception('Failed to print subgraph')
-
     def test_triples(self):
         reader = AMR_Reader()
         amrs = reader.load(TEST_FILE1, quiet=True)
@@ -99,11 +75,6 @@ class Test_AMR(unittest.TestCase):
         test = [e for e in amrs[0].triples()]
         if test != correct:
             raise Exception('Incorrect output')
-        # test missing node
-        amr = amrs[0]
-        del amr.nodes['b']
-        for t in amr.triples():
-            pass
 
         # thorough test
         for filename in os.listdir(LDC_DIR):
@@ -186,15 +157,6 @@ class Test_AMR(unittest.TestCase):
         if test != correct:
             raise Exception('Incorrect output')
 
-        correct = [('w', ':instance', 'want-01'), ('w', ':ARG0', 'b'), ('b', ':instance', 'boy'),
-                   ('w', ':ARG1', 'g'), ('g', ':instance', 'go-02'), ('g', ':ARG0', 'b')]
-        # (w/want-01 :ARG0 (b/boy)
-        # 	:ARG1 (g/go-02 :ARG0 b
-        # 		:ARG4 (c/city :name (n/name :op1 "New"
-        # 			:op2 "York"
-        # 			:op3 "City"))))
-        test = [t for _, t in amrs[0].depth_first_triples(subgraph_edges=[('w', ':ARG0', 'b'), ('w', ':ARG1', 'g'),
-                                                                          ('g', ':ARG0', 'b')])]
         if test != correct:
             raise Exception('Incorrect output')
         # test cycle
@@ -281,11 +243,11 @@ class Test_AMR(unittest.TestCase):
             if not AMR_Notation.is_relation(pos_ex):
                 raise Exception(f'{pos_ex} is a relation!')
 
-    def test_lexicographic_edge_key(self):
+    def test_sorted_edge_key(self):
         amr = AMR(nodes={'a': 'a', 'b': 'b', 'c': 'c'})
         test = [('a', ':ARG0', 'b'), ('a', ':ARG11', 'b'), ('a', ':ARG10', 'b'), ('a', ':ARG2', 'b'),
                 ('a', ':ARG0-of', 'b'), ('a', ':value', 'b'), ('a', ':mod', 'c'), ('a', ':mod', 'b')]
-        test = [e for e in sorted(test, key=lambda e: AMR_Notation.lexicographic_edge_key(amr, e))]
+        test = [e for e in sorted(test, key=lambda e: AMR_Notation.sorted_edge_key(amr, e))]
         correct = [('a', ':ARG0', 'b'), ('a', ':ARG0-of', 'b'), ('a', ':ARG2', 'b'), ('a', ':ARG10', 'b'),
                    ('a', ':ARG11', 'b'), ('a', ':mod', 'b'), ('a', ':mod', 'c'), ('a', ':value', 'b'), ]
         if test != correct:
@@ -318,6 +280,61 @@ class Test_AMR(unittest.TestCase):
         test = amr.shape.locate_instance('b')
         if test != correct:
             raise Exception('Failed to build AMR Shape')
+
+    def test_warnings_and_exceptions(self):
+        reader = AMR_Reader()
+        amrs = reader.load(TEST_FILE1, quiet=True)
+
+        # test empty root
+        amr = amrs[0].copy()
+        amr.root = None
+        self.assertRaises(Exception,
+                          lambda: amr.graph_string())
+        # test subgraph with non-existent node
+        amr = AMR()
+        self.assertRaises(Exception,
+                          lambda: amr.subgraph_string(subgraph_root='a', subgraph_nodes=['a', 'b']))
+
+        # test non-DAG AMRs
+        with self.assertWarns(Warning):
+            amr = amrs[0].copy()
+            amr.root = 'g'
+            output = amr.graph_string(pretty_print=False)
+            if output != '(g / go-02 :ARG0 (b / boy) :ARG4 (c / city :name (n / name :op1 "New" :op2 "York" :op3 "City")))':
+                raise Exception('Failed to print AMR')
+        # disconnected graph
+        with self.assertWarns(Warning):
+            amr.nodes['a'] = 'aardvark'
+            amr.nodes['z'] = 'zebra'
+            amr.edges.append(('a', ':mod', 'z'))
+            output = amr.graph_string(pretty_print=False)
+            if output != '(g / go-02 :ARG0 (b / boy) :ARG4 (c / city :name (n / name :op1 "New" :op2 "York" :op3 "City")))':
+                raise Exception('Failed to print AMR')
+
+        # test missing nodes
+        with self.assertWarns(Warning):
+            amr = amrs[0].copy()
+            del amr.nodes['b']
+            output = amr.graph_string(pretty_print=False)
+            if output != '(w / want-01 :ARG0 b :ARG1 (g / go-02 :ARG0 b :ARG4 ' \
+                         '(c / city :name (n / name :op1 "New" :op2 "York" :op3 "City"))))':
+                raise Exception('Failed to print AMR')
+        with self.assertWarns(Warning):
+            amr = amrs[0].copy()
+            del amr.nodes['b']
+            for t in amr.triples():
+                pass
+
+        with self.assertWarns(Warning):
+            correct = [('w', ':instance', 'want-01'), ('w', ':ARG0', 'b'), ('b', ':instance', 'boy'),
+                       ('w', ':ARG1', 'g'), ('g', ':instance', 'go-02'), ('g', ':ARG0', 'b')]
+            # (w/want-01 :ARG0 (b/boy)
+            # 	:ARG1 (g/go-02 :ARG0 b
+            # 		:ARG4 (c/city :name (n/name :op1 "New"
+            # 			:op2 "York"
+            # 			:op3 "City"))))
+            test = [t for _, t in amrs[0].depth_first_triples(subgraph_edges=[('w', ':ARG0', 'b'), ('w', ':ARG1', 'g'),
+                                                                              ('g', ':ARG0', 'b')])]
 
 
 if __name__ == '__main__':
