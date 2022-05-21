@@ -1,8 +1,6 @@
 import os
 import unittest
 
-import penman
-
 from amr_utils.amr import *
 from amr_utils.amr_readers import AMR_Reader
 from amr_utils.utils import silence_warnings
@@ -14,6 +12,37 @@ LDC_DIR = '../../LDC_2020/data/amrs/unsplit'
 
 
 class Test_AMR(unittest.TestCase):
+
+    def test_from_string(self):
+        amr = AMR.from_string('''
+        (w / want-01 :ARG0 (b / boy)
+         	:ARG1 (g / go-02 :ARG0 b
+         		:ARG4 (c / city :name (n / name :op1 "New"
+         			:op2 "York"
+         			:op3 "City"))))
+        ''')
+        correct = '(w / want-01 :ARG0 (b / boy) :ARG1 (g / go-02 :ARG0 b :ARG4 ' \
+                  '(c / city :name (n / name :op1 "New" :op2 "York" :op3 "City"))))'
+        test = amr.graph_string(pretty_print=False)
+        if test != correct:
+            raise Exception('Failed to read AMR')
+
+        amr = AMR.from_string('''
+                # ::id 1 ::date 20220521
+                # ::tok The boy wants to go to New York .
+                (w / want-01 :ARG0 (b / boy)
+                 	:ARG1 (g / go-02 :ARG0 b
+                 		:ARG4 (c / city :name (n / name :op1 "New"
+                 			:op2 "York"
+                 			:op3 "City"))))
+                ''')
+        correct = '(w / want-01 :ARG0 (b / boy) :ARG1 (g / go-02 :ARG0 b :ARG4 ' \
+                  '(c / city :name (n / name :op1 "New" :op2 "York" :op3 "City"))))'
+        test = amr.graph_string(pretty_print=False)
+        if test != correct:
+            raise Exception('Failed to read AMR')
+        if not (amr.tokens and amr.id and amr.metadata):
+            raise Exception('Failed to read AMR')
 
     def test_graph_string(self):
         reader = AMR_Reader()
@@ -40,7 +69,6 @@ class Test_AMR(unittest.TestCase):
                 amr_string2 = amr.graph_string(pretty_print=False)
                 if amr_string1 != amr_string2:
                     raise Exception('Mismatching AMR string')
-
 
     def test_subgraph_string(self):
         reader = AMR_Reader()
@@ -171,6 +199,19 @@ class Test_AMR(unittest.TestCase):
         if test != correct:
             raise Exception('Mishandled cycle')
 
+        # subgraph edges
+        correct = [('w', ':instance', 'want-01'), ('w', ':ARG0', 'b'), ('b', ':instance', 'boy'),
+                   ('w', ':ARG1', 'g'), ('g', ':instance', 'go-02'), ('g', ':ARG0', 'b')]
+        # (w/want-01 :ARG0 (b/boy)
+        # 	:ARG1 (g/go-02 :ARG0 b
+        # 		:ARG4 (c/city :name (n/name :op1 "New"
+        # 			:op2 "York"
+        # 			:op3 "City"))))
+        test = [t for _, t in amrs[0].depth_first_triples(subgraph_edges=[('w', ':ARG0', 'b'), ('w', ':ARG1', 'g'),
+                                                                          ('g', ':ARG0', 'b')])]
+        if test != correct:
+            raise Exception('Failed to get triples')
+
         # thorough test
         for filename in os.listdir(LDC_DIR):
             file = os.path.join(LDC_DIR, filename)
@@ -178,7 +219,7 @@ class Test_AMR(unittest.TestCase):
                 amr = reader.parse(amr_string)
                 triples1 = [t for _, t in amr.depth_first_triples(normalize_inverse_relations=False)]
                 with silence_warnings():
-                    g = penman.decode(amr_string, model=reader._TreePenmanModel())
+                    g = penman.decode(amr_string, model=AMR._TreePenmanModel())
                 triples2 = [(s, r, t) for s, r, t in g.triples]
                 if triples1 != triples2:
                     raise Exception('Mismatching triples')
@@ -259,6 +300,17 @@ class Test_AMR(unittest.TestCase):
         if test != correct:
             raise Exception(f'Failed to reify edge!')
 
+    def test_metadata(self):
+        sent_id, tokens, metadata = Metadata.read_metadata('# ::tag1 This is my first tag  ::tag2 5-21-2022 '
+                                                           '::tok My sentence .\n\n        # ::id 1')
+        if sent_id != '1' or tokens != ['My', 'sentence', '.']:
+            raise Exception('Failed to read metadata')
+        if 'tag1' not in metadata or 'tag2' not in metadata or len(metadata) != 2:
+            raise Exception('Failed to read metadata')
+        sent_id, tokens, metadata = Metadata.read_metadata('# ::tok ::id')
+        if sent_id != '' or tokens != []:
+            raise Exception('Failed to read metadata')
+
     def test_amr_shape(self):
         reader = AMR_Reader()
         amr = reader.parse('''
@@ -273,17 +325,30 @@ class Test_AMR(unittest.TestCase):
             :ARG4 a)
         ''')
         correct = 3
-        test = amr.shape.locate_instance('a')
+        test = amr.shape.locate_instance(amr, 'a')
         if test != correct:
             raise Exception('Failed to build AMR Shape')
-        correct = 2
-        test = amr.shape.locate_instance('b')
+        correct = 6
+        test = amr.shape.locate_instance(amr, 'b')
         if test != correct:
             raise Exception('Failed to build AMR Shape')
 
     def test_warnings_and_exceptions(self):
         reader = AMR_Reader()
         amrs = reader.load(TEST_FILE1, quiet=True)
+
+        # test ill formatted AMR
+        self.assertRaises(Exception,
+                          lambda: AMR.from_string(
+                              '((w / want-01 :ARG0 (b / boy) :ARG1 (g / go-02 :ARG0 b :ARG4 '
+                              '(c / city :name (n / name :op1 "New" :op2 "York" :op3 "City"))))'
+                          ))
+
+        self.assertRaises(Exception,
+                          lambda: AMR.from_string(
+                              '(w / want-01 :ARG0 (b / boy) :ARG1 (g / go-02 :ARG0 b :ARG4 '
+                              '(c / city :name (n / name :op1 "New" :op2 "York" :op3 "City"'
+                          ))
 
         # test empty root
         amr = amrs[0].copy()
@@ -300,7 +365,7 @@ class Test_AMR(unittest.TestCase):
             amr = amrs[0].copy()
             amr.root = 'g'
             output = amr.graph_string(pretty_print=False)
-            if output != '(g / go-02 :ARG0 (b / boy) :ARG4 (c / city :name (n / name :op1 "New" :op2 "York" :op3 "City")))':
+            if output != '(g / go-02 :ARG0 b :ARG4 (c / city :name (n / name :op1 "New" :op2 "York" :op3 "City")))':
                 raise Exception('Failed to print AMR')
         # disconnected graph
         with self.assertWarns(Warning):
@@ -308,7 +373,7 @@ class Test_AMR(unittest.TestCase):
             amr.nodes['z'] = 'zebra'
             amr.edges.append(('a', ':mod', 'z'))
             output = amr.graph_string(pretty_print=False)
-            if output != '(g / go-02 :ARG0 (b / boy) :ARG4 (c / city :name (n / name :op1 "New" :op2 "York" :op3 "City")))':
+            if output != '(g / go-02 :ARG0 b :ARG4 (c / city :name (n / name :op1 "New" :op2 "York" :op3 "City")))':
                 raise Exception('Failed to print AMR')
 
         # test missing nodes
@@ -325,16 +390,6 @@ class Test_AMR(unittest.TestCase):
             for t in amr.triples():
                 pass
 
-        with self.assertWarns(Warning):
-            correct = [('w', ':instance', 'want-01'), ('w', ':ARG0', 'b'), ('b', ':instance', 'boy'),
-                       ('w', ':ARG1', 'g'), ('g', ':instance', 'go-02'), ('g', ':ARG0', 'b')]
-            # (w/want-01 :ARG0 (b/boy)
-            # 	:ARG1 (g/go-02 :ARG0 b
-            # 		:ARG4 (c/city :name (n/name :op1 "New"
-            # 			:op2 "York"
-            # 			:op3 "City"))))
-            test = [t for _, t in amrs[0].depth_first_triples(subgraph_edges=[('w', ':ARG0', 'b'), ('w', ':ARG1', 'g'),
-                                                                              ('g', ':ARG0', 'b')])]
 
 
 if __name__ == '__main__':

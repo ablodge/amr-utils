@@ -3,7 +3,9 @@ import warnings
 from collections import Counter, defaultdict
 from typing import Tuple, Any, List, Dict, Optional, Iterable
 
-from amr_utils.utils import class_name
+import penman
+
+from amr_utils.utils import class_name, silence_warnings
 
 Edge = Tuple[str, str, str]
 Triple = Tuple[str, str, str]
@@ -57,7 +59,31 @@ class AMR:
     > for source_id, relation, target_id in amr.edges.items():
     >     print(node_id, relation, target_id)
     > print(amr.graph_string())
+    > # equivalently:
+    > amr = AMR.from_string(
+    > '''
+    > (c / chase-01
+    >   :ARG0 (d / dog)
+    >   :ARG1 (c / cat))
+    > ''',
+    > tokens=['Dogs', 'chase', 'cats', '.']
+    > )
+    > for node_id, label in amr.nodes.items():
+    >     print(node_id, label)
+    > for source_id, relation, target_id in amr.edges.items():
+    >     print(node_id, relation, target_id)
+    > print(amr.graph_string())
+    >
     """
+
+    class _TreePenmanModel(penman.model.Model):
+        def deinvert(self, triple):
+            return triple
+
+        def invert(self, triple):
+            return triple
+
+    _penman_model = _TreePenmanModel()
 
     def __init__(self, id: str = None, tokens: List[str] = None, root: str = None, nodes: Dict[str, str] = None,
                  edges: List[Edge] = None, metadata: Dict[str, Any] = None, shape: 'AMR_Shape' = None):
@@ -81,6 +107,84 @@ class AMR:
         self.edges = edges if (edges is not None) else []
         self.metadata = metadata if (metadata is not None) else {}
         self.shape = shape  # might be None
+
+    @staticmethod
+    def from_string(amr_string: str, id: str = None, tokens: List[str] = None, metadata: Dict[str, Any] = None):
+        """
+        Construct an AMR from `amr_string`. To read AMRs from a file, see `amr_readers.AMR_Reader`.
+        Args:
+            amr_string (str): a string representing an AMR graph (with or without metadata)
+            id (str): a unique ID for the sentence this AMR represents
+            tokens (List[str]): a list of tokens for the sentence this AMR represents
+            metadata (Dict[str, Any]): a dictionary of metadata for this AMR, with keys such as 'snt', 'alignments',
+                'notes', etc.
+
+        Returns:
+            AMR: an AMR
+
+        Example Usage:
+        > amr = AMR.from_string(
+        >     '''
+        >     (c / chase-01
+        >       :ARG0 (d / dog)
+        >       :ARG1 (c / cat))
+        >     ''',
+        >     id='1',
+        >     tokens=['Dogs', 'chase', 'cats', '.']
+        >     )
+        > # equivalently
+        > amr = AMR.from_string(
+        >     '''
+        >     # ::id 1
+        >     # ::tok Dogs chase cats .
+        >     (c / chase-01
+        >       :ARG0 (d / dog)
+        >       :ARG1 (c / cat))
+        >     '''
+        >     )
+        """
+        metadata_string = None
+        if not Metadata.AMR_START_RE.match(amr_string):
+            metadata_string, amr_string = Metadata.separate_metadata(amr_string)
+        with silence_warnings():
+            try:
+                penman_graph = penman.decode(amr_string, model=AMR._penman_model)
+            except Exception:
+                AMR._test_parens(amr_string)
+                raise Exception(f'[{AMR}] Failed to read AMR from string:\n', amr_string)
+
+        root = penman_graph.top
+        nodes = {s: t for s, r, t in penman_graph.triples if r == ':instance'}
+        edges = []
+        new_attribute_nodes = {}
+        num_parents = Counter()
+        for i, triple in enumerate(penman_graph.triples):
+            s, r, t = triple
+            if r == ':instance':
+                # an amr node
+                pass
+            elif AMR_Notation.is_constant(t):
+                # attribute
+                idx = 0
+                while f'x{idx}' in nodes:
+                    idx += 1
+                new_n = f'x{idx}'
+                new_attribute_nodes[i] = new_n
+                nodes[new_n] = t
+                edges.append((s, r, new_n))
+            else:
+                # edge
+                edges.append((s, r, t))
+                num_parents[t] += 1
+
+        amr = AMR(root=root, nodes=nodes, edges=edges)
+        amr.shape = AMR_Shape(penman_graph.triples, new_attribute_nodes)
+        if metadata_string is not None:
+            amr.id, amr.tokens, amr.metadata = Metadata.read_metadata(metadata_string)
+        amr.id = id if (id is not None) else amr.id
+        amr.tokens = tokens if (tokens is not None) else amr.tokens
+        amr.metadata = metadata if (metadata is not None) else amr.metadata
+        return amr
 
     def __str__(self):
         return f'[{class_name(self)} {self.id}]: ' + self.graph_string()
@@ -153,8 +257,12 @@ class AMR:
             List[Tuple[int,Tuple[str,str,str]]]: a list of pairs (depth, triple) with AMR triples of the form
                 (source_id, relation, target_id) or (source_id, relation, value)
         """
-        subgraph_root, subgraph_nodes, subgraph_edges = self._clean_subgraph_input(subgraph_root, subgraph_nodes,
-                                                                                   subgraph_edges)
+        preserve_shape = True
+        if (subgraph_root is not None) or (subgraph_nodes is not None) or (subgraph_edges is not None):
+            from amr_utils.amr_graph import process_subgraph
+            preserve_shape = False
+            subgraph_root, subgraph_nodes, subgraph_edges = \
+                process_subgraph(self, subgraph_root, subgraph_nodes, subgraph_edges)
         root = self.root if (subgraph_root is None) else subgraph_root
         nodes = self.nodes if (subgraph_nodes is None) else subgraph_nodes
         edges = self.edges if (subgraph_edges is None) else subgraph_edges
@@ -178,7 +286,6 @@ class AMR:
         # depth first algorithm
         visited_edges = set()
         completed_nodes = set()
-        node_mentions = Counter()
         stack = []  # pairs (depth, edge_idx, edge)
         triples = []
         if root in self.nodes:
@@ -205,21 +312,19 @@ class AMR:
                 else:
                     triples.append((depth, edge))
                 if target not in completed_nodes and (subgraph_nodes is None or target in nodes):
-                    if self.shape is None or self.shape.locate_instance(target) == node_mentions[target]:
+                    if not preserve_shape or self.shape is None or self.shape.locate_instance(self, target) == edge_idx:
                         # instance
                         if target in self.nodes:
                             triples.append((depth + 1, (target, ':instance', self.nodes[target])))
                         else:
-                            warnings.warn(f'[{class_name(self)}] The node "{target}" in AMR "{self.id}" has no concept.')
+                            warnings.warn(
+                                f'[{class_name(self)}] The node "{target}" in AMR "{self.id}" has no concept.')
                         completed_nodes.add(target)
                         # update stack
                         for new_edge_idx, new_edge in children[target]:
                             if new_edge_idx in visited_edges:
                                 continue
                             stack.append((depth + 1, new_edge_idx, new_edge))
-                node_mentions[target] += 1
-        if subgraph_root and not subgraph_nodes:
-            return triples
         if len(completed_nodes) < len(nodes):
             self._handle_missing_nodes([n for n in nodes if n not in completed_nodes])
         return triples
@@ -254,25 +359,6 @@ class AMR:
         """
         return self._graph_string(subgraph_root=subgraph_root, subgraph_nodes=subgraph_nodes,
                                   subgraph_edges=subgraph_edges, indent=indent, pretty_print=pretty_print)
-
-    def _clean_subgraph_input(self, subgraph_root: str = None, subgraph_nodes: Iterable[str] = None,
-                              subgraph_edges: Iterable[Edge] = None):
-        if subgraph_root is not None:
-            if subgraph_root not in self.nodes:
-                if not any(subgraph_root in [s, t] for s, r, t in self.edges):
-                    raise Exception(f'[{class_name(self)}] The subgraph root node "{subgraph_root}" '
-                                    f'does not exist in AMR "{self.id}".')
-        if subgraph_nodes:
-            missing_concept_nodes = set()
-            for s, r, t in self.edges:
-                if s not in self.nodes and s in subgraph_nodes:
-                    missing_concept_nodes.add(s)
-                if t not in self.nodes and t in subgraph_nodes:
-                    missing_concept_nodes.add(t)
-            subgraph_nodes = {n for n in subgraph_nodes if (n in self.nodes or n in missing_concept_nodes)}
-        if subgraph_edges:
-            subgraph_edges = [e for e in subgraph_edges if e in self.edges]
-        return subgraph_root, subgraph_nodes, subgraph_edges
 
     def _default_node_ids(self):
         node_ids = {}
@@ -321,7 +407,7 @@ class AMR:
                 if AMR_Notation.is_constant(t):
                     # attribute
                     amr_sequence.append(f'{whitespace}{r} {t}')
-                elif i+1 < len(triples) and triples[i+1][-1][1] == ':instance':
+                elif i + 1 < len(triples) and triples[i + 1][-1][1] == ':instance':
                     # relation
                     node_id = t if (node_id_map is None) else node_id_map[t]
                     amr_sequence.extend([f'{whitespace}{r} ', '(', node_id])
@@ -351,6 +437,38 @@ class AMR:
             msg += 'Missing: ' + sg_string + '\n'
         warnings.warn(msg)
 
+    @staticmethod
+    def _test_parens(amr_string):
+        count = 0
+        in_quote = False
+        finished = False
+        prev_char = None
+        last_paren_idx = 0
+        for i, char in enumerate(amr_string):
+            if char == '"' and not prev_char == '\\':
+                in_quote = not in_quote
+            elif in_quote:
+                continue
+            elif char == "(":
+                count += 1
+                if finished:
+                    raise Exception(f'[{class_name(AMR)}] Cannot parse AMR string. Reached end of parentheses early.'
+                                    f'\nParentheses end: {amr_string[:last_paren_idx + 1]}'
+                                    f'\nRemaining string: {amr_string[last_paren_idx + 1]:}')
+                last_paren_idx = i
+            elif char == ")":
+                count -= 1
+                if finished:
+                    raise Exception(f'[{class_name(AMR)}] Cannot parse AMR string. Reached end of parentheses early.'
+                                    f'\nParentheses end: {amr_string[:last_paren_idx + 1]}'
+                                    f'\nRemaining string: {amr_string[last_paren_idx + 1]:}')
+                last_paren_idx = i
+            if count == 0:
+                finished = True
+            prev_char = char
+        if count > 0:
+            raise Exception(f'[{class_name(AMR)}] Cannot parse AMR string. ')
+
 
 class AMR_Shape:
     """
@@ -363,7 +481,7 @@ class AMR_Shape:
     nodes with more than one parent.
     """
 
-    def __init__(self, triples: List[Triple]):
+    def __init__(self, triples: List[Triple], attribute_nodes: Dict[int, str]):
         """
         Create an AMR_Shape from a list of triples
         Args:
@@ -371,32 +489,46 @@ class AMR_Shape:
                                                 or (source_id, relation, value).
         """
         self.triples = triples
-        self.instance_placements = {}
-        node_mentions = Counter()
-        root = triples[0][0]
-        node_mentions[root] = 1
+        self.attribute_nodes = attribute_nodes
+        parents = Counter()
+        for s, r, t in self.triples:
+            parents[t] += 1
+        self.instance_locations = {}
+        prev_triple = None
+        edge_idx = 0
         for triple in triples:
             s, r, t = triple
             if r == ':instance':
-                if node_mentions[s] > 1:
-                    self.instance_placements[s] = node_mentions[s] - 1
-            elif AMR_Notation.is_constant(t):
-                pass
+                if parents[s] > 1:
+                    self.instance_locations[s] = (edge_idx - 1, prev_triple)
             else:
-                node_mentions[t] += 1
+                edge_idx += 1
+            prev_triple = triple
 
-    def locate_instance(self, node) -> int:
+    def locate_instance(self, amr, node) -> int:
         """
-        Get the location of this node's instance relation as an index
+        Get the location of this node's instance as an edge index for the edge pointing to the instance location
         Args:
+            amr: the AMR
             node: a node ID
 
         Returns:
-            int: the index of the node mention (in depth first order) where the instance relation is placed
+            int: the edge index of the edge pointing to where the instance relation is placed
         """
-        if node in self.instance_placements:
-            return self.instance_placements[node]
-        return 0
+        if node == amr.root:
+            return -1
+        if node in self.instance_locations:
+            edge_idx, edge = self.instance_locations[node]
+            if amr.edges[edge_idx] == edge:
+                return edge_idx
+            elif edge in amr.edges:
+                return amr.edges.index(edge)
+        for i, e in enumerate(amr.edges):
+            s, r, t = e
+            if t == node:
+                return i
+        raise Exception(f'[{class_name(self)}] Failed to locate instance. '
+                        f'This typically happens when one or more edges have been deleted.')
 
     def copy(self):
         """
@@ -404,7 +536,85 @@ class AMR_Shape:
         Returns:
             AMR_Shape: copy
         """
-        return AMR_Shape(self.triples.copy())
+        return AMR_Shape(self.triples.copy(), self.attribute_nodes.copy())
+
+
+class Metadata:
+    """
+    This class contains static functions for handling AMR metadata.
+
+    An example of AMR metadata:
+
+    # ::id 1 ::date 2020-05-21
+    # ::tok The boy wants to go to New York .
+    # ::snt The boy wants to go to New York.
+    """
+
+    SPLIT_METADATA_RE = re.compile(r'(?<=[^#])[\t ]::(?=\S+)')
+    METADATA_RE = re.compile(r'# ::(?P<tag>\S+)(?P<value>.*)')
+    AMR_START_RE = re.compile(r'^\s*\(', flags=re.MULTILINE)
+
+    @staticmethod
+    def read_metadata(metadata_string: str):
+        """
+        Read a string containing AMR metadata
+        Args:
+            metadata_string: a string
+
+        Returns:
+            tuple: a sentence ID string, a list of tokens, a dict of remaining metadata
+        """
+        lines = Metadata.SPLIT_METADATA_RE.sub('\n# ::', metadata_string).split('\n')
+        lines = [line.strip() for line in lines]
+        sent_id = None
+        tokens = []
+        metadata = {}
+        for line in lines:
+            tag, val = Metadata._parse_line(line)
+            if tag is None:
+                continue
+            if tag == 'id':
+                sent_id = val
+            elif tag == 'tok':
+                tokens = val.split()
+            elif tag in ['root', 'node', 'edge']:
+                continue
+            else:
+                metadata[tag] = val
+        return sent_id, tokens, metadata
+
+    @staticmethod
+    def separate_metadata(amr_string):
+        """
+        Separate a string into a pair of strings (metadata string, AMR string)
+        Args:
+            amr_string: a string representing an AMR graph
+
+        Returns:
+            tuple: a pair of strings (metadata string, AMR string)
+        """
+        amr_starts = []
+        for m in Metadata.AMR_START_RE.finditer(amr_string):
+            amr_starts.append(m.start())
+            break
+        if len(amr_starts) == 0:
+            raise Exception(f'[{Metadata}] Did not find AMR in string:\n', amr_string)
+        return amr_string[:amr_starts[0]].strip(), amr_string[amr_starts[0]:].strip()
+
+    @staticmethod
+    def _parse_line(line: str):
+        if not line.startswith('# ::'):
+            if not line.strip():
+                return None, None
+            tag = 'snt'
+            val = line[1:].strip() if line.startswith('#') else line.strip()
+            return tag, val
+        match = Metadata.METADATA_RE.match(line)
+        if not match:
+            raise Exception('Failed to parse metadata:', line)
+        tag = match.group('tag')
+        val = match.group('value').strip()
+        return tag, val
 
 
 class AMR_Notation:
