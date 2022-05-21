@@ -261,11 +261,11 @@ class AMR:
         if (subgraph_root is not None) or (subgraph_nodes is not None) or (subgraph_edges is not None):
             from amr_utils.amr_graph import process_subgraph
             preserve_shape = False
-            subgraph_root, subgraph_nodes, subgraph_edges = \
-                process_subgraph(self, subgraph_root, subgraph_nodes, subgraph_edges)
-        root = self.root if (subgraph_root is None) else subgraph_root
-        nodes = self.nodes if (subgraph_nodes is None) else subgraph_nodes
-        edges = self.edges if (subgraph_edges is None) else subgraph_edges
+            root, nodes, edges = process_subgraph(self, subgraph_root, subgraph_nodes, subgraph_edges)
+        else:
+            root = self.root
+            nodes = self.nodes
+            edges = self.edges
         # test root
         if root not in self.nodes:
             if root is None:

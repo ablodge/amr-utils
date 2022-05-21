@@ -212,6 +212,8 @@ class Test_AMR(unittest.TestCase):
         if test != correct:
             raise Exception('Failed to get triples')
 
+    def test_depth_first_triples2(self):
+        reader = AMR_Reader()
         # thorough test
         for filename in os.listdir(LDC_DIR):
             file = os.path.join(LDC_DIR, filename)
