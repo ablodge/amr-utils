@@ -61,7 +61,8 @@ def has_cycles(amr: AMR, subgraph_nodes: Iterable[str] = None, subgraph_edges: I
     Returns:
         bool: True if the AMR contains cycles, False otherwise
     """
-    _, nodes, edges = process_subgraph(amr, subgraph_nodes=subgraph_nodes, subgraph_edges=subgraph_edges)
+    _, nodes, edges = process_subgraph(amr, subgraph_nodes=subgraph_nodes, subgraph_edges=subgraph_edges,
+                                       ignore_root=True)
     reachable_nodes = _get_reachable_nodes(amr, nodes=nodes, edges=edges)
     edges = amr.edges if (subgraph_edges is None) else subgraph_edges
     for s, r, t in edges:
@@ -83,7 +84,8 @@ def find_cycles(amr: AMR, subgraph_nodes: Iterable[str] = None, subgraph_edges: 
         List[Set[str]]: a list of sets on node IDs. Each set contains a cycle (defined by its equivalence class of nodes
             reachable from each node in the cycle).
     """
-    _, nodes, edges = process_subgraph(amr, subgraph_nodes=subgraph_nodes, subgraph_edges=subgraph_edges)
+    _, nodes, edges = process_subgraph(amr, subgraph_nodes=subgraph_nodes, subgraph_edges=subgraph_edges,
+                                       ignore_root=True)
     reachable_nodes = _get_reachable_nodes(amr, nodes=nodes, edges=edges)
     cycles = []
     equivalence_classes = []
@@ -123,7 +125,7 @@ def get_subgraph(amr: AMR, subgraph_root: str, subgraph_nodes: Iterable[str], su
 
 
 def find_best_root(amr: AMR, subgraph_nodes: Iterable[str] = None,
-                   subgraph_edges: Iterable[Edge] = None, undirected_graph: bool = False) -> Optional[str]:
+                   subgraph_edges: Iterable[Edge] = None) -> Optional[str]:
     """
     Retrieve the node which has the highest number of descendant nodes
     Args:
@@ -132,13 +134,13 @@ def find_best_root(amr: AMR, subgraph_nodes: Iterable[str] = None,
             (default: amr.nodes)
         subgraph_edges (Iterable[Edge]): if set, find the root in the subgraph containing these edges
             (default: amr.edges)
-        undirected_graph:
 
     Returns:
         Optional[str]: a node ID which is the best root, or None if the graph is empty
     """
-    _, nodes, edges = process_subgraph(amr, subgraph_nodes=subgraph_nodes, subgraph_edges=subgraph_edges)
-    reachable_nodes = _get_reachable_nodes(amr, nodes=nodes, edges=edges, undirected_graph=undirected_graph)
+    _, nodes, edges = process_subgraph(amr, subgraph_nodes=subgraph_nodes, subgraph_edges=subgraph_edges,
+                                       ignore_root=True)
+    reachable_nodes = _get_reachable_nodes(amr, nodes=nodes, edges=edges)
     max_size = 0
     best_root = None
     for n in reachable_nodes:
@@ -163,7 +165,8 @@ def is_connected(amr: AMR, undirected_graph: bool = False,
     Returns:
         bool: True if the AMR (or subgraph) is connected, otherwise False
     """
-    _, nodes, edges = process_subgraph(amr, subgraph_nodes=subgraph_nodes, subgraph_edges=subgraph_edges)
+    _, nodes, edges = process_subgraph(amr, subgraph_nodes=subgraph_nodes, subgraph_edges=subgraph_edges,
+                                       ignore_root=True)
     reachable_nodes = _get_reachable_nodes(amr, nodes=nodes, edges=edges, undirected_graph=undirected_graph)
 
     for n in reachable_nodes:
@@ -191,7 +194,8 @@ def find_connected_components(amr: AMR, undirected_graph: bool = False,
         List[List[str]]: A list of lists of node IDs. Each smaller list contains node IDs for a single connected
             component.
     """
-    _, nodes, edges = process_subgraph(amr, subgraph_nodes=subgraph_nodes, subgraph_edges=subgraph_edges)
+    _, nodes, edges = process_subgraph(amr, subgraph_nodes=subgraph_nodes, subgraph_edges=subgraph_edges,
+                                       ignore_root=True)
     reachable_nodes = _get_reachable_nodes(amr, nodes=nodes, edges=edges, undirected_graph=undirected_graph)
 
     components = []
@@ -295,7 +299,8 @@ def find_shortest_path(amr: AMR, n1: str, n2: str, undirected_graph: bool = Fals
 
 
 def process_subgraph(amr, subgraph_root: str = None, subgraph_nodes: Iterable[str] = None,
-                     subgraph_edges: Iterable[Edge] = None) -> Tuple[Optional[str], Set[str], List[Edge]]:
+                     subgraph_edges: Iterable[Edge] = None, ignore_root: bool = False) \
+        -> Tuple[Optional[str], Set[str], List[Edge]]:
     """
     This function is called by amr_utils functions that take subgraphs as optional parameters in order to provide
     flexibility and consistency in interpreting subgraph parameters and to assure subgraph parameters are well-defined.
@@ -304,12 +309,13 @@ def process_subgraph(amr, subgraph_root: str = None, subgraph_nodes: Iterable[st
         subgraph_root (str): the subgraph root (default: amr.root)
         subgraph_nodes (Iterable[str]): nodes in the subgraph (default: amr.nodes)
         subgraph_edges (Iterable[Edge]): edges in the subgraph (default: amr.edges)
+        ignore_root (bool): if set, skip processing of subgraph root to save time
 
     Returns:
         tuple: a subgraph root ID, a set of subgraph node IDs, a list of subgraph edges
     """
     if (subgraph_root is None) and (subgraph_nodes is None) and (subgraph_edges is None):
-        return amr.root, amr.nodes, amr.edges
+        return amr.root, set(amr.nodes), amr.edges.copy()
     if subgraph_root is not None:
         # clean subgraph root
         if subgraph_root not in amr.nodes:
@@ -349,7 +355,7 @@ def process_subgraph(amr, subgraph_root: str = None, subgraph_nodes: Iterable[st
         # assign subgraph root
         if amr.root in subgraph_nodes:
             subgraph_root = amr.root
-        else:
+        elif not ignore_root:
             # find best root
             reachable_nodes = _get_reachable_nodes(amr, subgraph_nodes, subgraph_edges)
             max_size = 0

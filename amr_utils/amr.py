@@ -146,6 +146,8 @@ class AMR:
         metadata_string = None
         if not Metadata.AMR_START_RE.match(amr_string):
             metadata_string, amr_string = Metadata.separate_metadata(amr_string)
+        else:
+            amr_string = amr_string.strip()
         with silence_warnings():
             try:
                 penman_graph = penman.decode(amr_string, model=AMR._penman_model)
