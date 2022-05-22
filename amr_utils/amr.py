@@ -251,7 +251,7 @@ class AMR:
         Args:
             subgraph_root (str): if set, list triples of the subgraph starting at this root
             subgraph_nodes (Iterable[str]): if set, list triples of the subgraph containing these nodes (and any
-                connecting or outgoing edges)
+                connecting edges)
             subgraph_edges (Iterable[Triple[str,str,str]]): if set, list triples of the subgraph while only
                 considering these edges
             normalize_inverse_relations (bool): convert inverse relations to normal relations
@@ -352,7 +352,7 @@ class AMR:
             subgraph_nodes (Iterable[str]): nodes to be included in the subgraph (if not set, the subgraph will include
                 all descendents of subgraph_root.)
             subgraph_edges (Iterable[tuple[str,str,str]]): edges to be included in the subgraph (if not set, the
-                subgraph will include all edges whose source is in subgraph_nodes.)
+                subgraph will include all edges whose source and target is in subgraph_nodes.)
             pretty_print (bool): Use indentation to make the PENMAN string more human-readable
             indent (str): String to use when indenting. Suggested values: '\t' or '    '.
                           This parameter is only used if pretty_print is set.
@@ -435,7 +435,9 @@ class AMR:
               f'({len(missing_nodes)} of {len(self.nodes)} nodes were unreachable).\n'
         for component in components:
             root = component[0]
-            sg_string = self.subgraph_string(root, component, pretty_print=False)
+            edges = [(s, r, t) for s,r,t in self.edges if s in component]
+            sg_string = self.subgraph_string(subgraph_root=root, subgraph_nodes=component, subgraph_edges=edges,
+                                             pretty_print=False)
             msg += 'Missing: ' + sg_string + '\n'
         warnings.warn(msg)
 
@@ -470,153 +472,6 @@ class AMR:
             prev_char = char
         if count > 0:
             raise Exception(f'[{class_name(AMR)}] Cannot parse AMR string. ')
-
-
-class AMR_Shape:
-    """
-    Two AMRs are considered equivalent if their graphs are equivalent, but for formatting, it is sometimes important
-    to keep track of smaller details of an AMR's shape. When an AMR is read from a string or file, this class is used
-    to save information like the ordering of edges and the placement of instance relations. That assures that the AMR's
-    formatting doesn't change in unexpected ways when it is read and re-written to a file.
-
-    This class can also be used to keep track of annotator artifacts, such as the placement of instance relations for
-    nodes with more than one parent.
-    """
-
-    def __init__(self, triples: List[Triple], attribute_nodes: Dict[int, str]):
-        """
-        Create an AMR_Shape from a list of triples
-        Args:
-            triples (List[Tuple[str,str,str]]): a list of triples of the form (source_id, relation, target_id)
-                                                or (source_id, relation, value).
-        """
-        self.triples = triples
-        self.attribute_nodes = attribute_nodes
-        parents = Counter()
-        for s, r, t in self.triples:
-            parents[t] += 1
-        self.instance_locations = {}
-        prev_triple = None
-        edge_idx = 0
-        for triple in triples:
-            s, r, t = triple
-            if r == ':instance':
-                if parents[s] > 1:
-                    self.instance_locations[s] = (edge_idx - 1, prev_triple)
-            else:
-                edge_idx += 1
-            prev_triple = triple
-
-    def locate_instance(self, amr, node) -> int:
-        """
-        Get the location of this node's instance as an edge index for the edge pointing to the instance location
-        Args:
-            amr: the AMR
-            node: a node ID
-
-        Returns:
-            int: the edge index of the edge pointing to where the instance relation is placed
-        """
-        if node == amr.root:
-            return -1
-        if node in self.instance_locations:
-            edge_idx, edge = self.instance_locations[node]
-            if amr.edges[edge_idx] == edge:
-                return edge_idx
-            elif edge in amr.edges:
-                return amr.edges.index(edge)
-        for i, e in enumerate(amr.edges):
-            s, r, t = e
-            if t == node:
-                return i
-        raise Exception(f'[{class_name(self)}] Failed to locate instance. '
-                        f'This typically happens when one or more edges have been deleted.')
-
-    def copy(self):
-        """
-        Create a copy
-        Returns:
-            AMR_Shape: copy
-        """
-        return AMR_Shape(self.triples.copy(), self.attribute_nodes.copy())
-
-
-class Metadata:
-    """
-    This class contains static functions for handling AMR metadata.
-
-    An example of AMR metadata:
-
-    # ::id 1 ::date 2020-05-21
-    # ::tok The boy wants to go to New York .
-    # ::snt The boy wants to go to New York.
-    """
-
-    SPLIT_METADATA_RE = re.compile(r'(?<=[^#])[\t ]::(?=\S+)')
-    METADATA_RE = re.compile(r'# ::(?P<tag>\S+)(?P<value>.*)')
-    AMR_START_RE = re.compile(r'^\s*\(', flags=re.MULTILINE)
-
-    @staticmethod
-    def read_metadata(metadata_string: str):
-        """
-        Read a string containing AMR metadata
-        Args:
-            metadata_string: a string
-
-        Returns:
-            tuple: a sentence ID string, a list of tokens, a dict of remaining metadata
-        """
-        lines = Metadata.SPLIT_METADATA_RE.sub('\n# ::', metadata_string).split('\n')
-        lines = [line.strip() for line in lines]
-        sent_id = None
-        tokens = []
-        metadata = {}
-        for line in lines:
-            tag, val = Metadata._parse_line(line)
-            if tag is None:
-                continue
-            if tag == 'id':
-                sent_id = val
-            elif tag == 'tok':
-                tokens = val.split()
-            elif tag in ['root', 'node', 'edge']:
-                continue
-            else:
-                metadata[tag] = val
-        return sent_id, tokens, metadata
-
-    @staticmethod
-    def separate_metadata(amr_string):
-        """
-        Separate a string into a pair of strings (metadata string, AMR string)
-        Args:
-            amr_string: a string representing an AMR graph
-
-        Returns:
-            tuple: a pair of strings (metadata string, AMR string)
-        """
-        amr_starts = []
-        for m in Metadata.AMR_START_RE.finditer(amr_string):
-            amr_starts.append(m.start())
-            break
-        if len(amr_starts) == 0:
-            raise Exception(f'[{Metadata}] Did not find AMR in string:\n', amr_string)
-        return amr_string[:amr_starts[0]].strip(), amr_string[amr_starts[0]:].strip()
-
-    @staticmethod
-    def _parse_line(line: str):
-        if not line.startswith('# ::'):
-            if not line.strip():
-                return None, None
-            tag = 'snt'
-            val = line[1:].strip() if line.startswith('#') else line.strip()
-            return tag, val
-        match = Metadata.METADATA_RE.match(line)
-        if not match:
-            raise Exception('Failed to parse metadata:', line)
-        tag = match.group('tag')
-        val = match.group('value').strip()
-        return tag, val
 
 
 class AMR_Notation:
@@ -905,3 +760,150 @@ class AMR_Notation:
         ':value': (':ARG1-of', 'have-value-91', ':ARG2'),
 
     }
+
+
+class AMR_Shape:
+    """
+    Two AMRs are considered equivalent if their graphs are equivalent, but for formatting, it is sometimes important
+    to keep track of smaller details of an AMR's shape. When an AMR is read from a string or file, this class is used
+    to save information like the ordering of edges and the placement of instance relations. That assures that the AMR's
+    formatting doesn't change in unexpected ways when it is read and re-written to a file.
+
+    This class can also be used to keep track of annotator artifacts, such as the placement of instance relations for
+    nodes with more than one parent.
+    """
+
+    def __init__(self, triples: List[Triple], attribute_nodes: Dict[int, str]):
+        """
+        Create an AMR_Shape from a list of triples
+        Args:
+            triples (List[Tuple[str,str,str]]): a list of triples of the form (source_id, relation, target_id)
+                                                or (source_id, relation, value).
+        """
+        self.triples = triples
+        self.attribute_nodes = attribute_nodes
+        parents = Counter()
+        for s, r, t in self.triples:
+            parents[t] += 1
+        self.instance_locations = {}
+        prev_triple = None
+        edge_idx = 0
+        for triple in triples:
+            s, r, t = triple
+            if r == ':instance':
+                if parents[s] > 1:
+                    self.instance_locations[s] = (edge_idx - 1, prev_triple)
+            else:
+                edge_idx += 1
+            prev_triple = triple
+
+    def locate_instance(self, amr, node) -> int:
+        """
+        Get the location of this node's instance as an edge index for the edge pointing to the instance location
+        Args:
+            amr: the AMR
+            node: a node ID
+
+        Returns:
+            int: the edge index of the edge pointing to where the instance relation is placed
+        """
+        if node == amr.root:
+            return -1
+        if node in self.instance_locations:
+            edge_idx, edge = self.instance_locations[node]
+            if amr.edges[edge_idx] == edge:
+                return edge_idx
+            elif edge in amr.edges:
+                return amr.edges.index(edge)
+        for i, e in enumerate(amr.edges):
+            s, r, t = e
+            if t == node:
+                return i
+        raise Exception(f'[{class_name(self)}] Failed to locate instance. '
+                        f'This typically happens when one or more edges have been deleted.')
+
+    def copy(self):
+        """
+        Create a copy
+        Returns:
+            AMR_Shape: copy
+        """
+        return AMR_Shape(self.triples.copy(), self.attribute_nodes.copy())
+
+
+class Metadata:
+    """
+    This class contains static functions for handling AMR metadata.
+
+    An example of AMR metadata:
+
+    # ::id 1 ::date 2020-05-21
+    # ::tok The boy wants to go to New York .
+    # ::snt The boy wants to go to New York.
+    """
+
+    SPLIT_METADATA_RE = re.compile(r'(?<=[^#])[\t ]::(?=\S+)')
+    METADATA_RE = re.compile(r'# ::(?P<tag>\S+)(?P<value>.*)')
+    AMR_START_RE = re.compile(r'^\s*\(', flags=re.MULTILINE)
+
+    @staticmethod
+    def read_metadata(metadata_string: str):
+        """
+        Read a string containing AMR metadata
+        Args:
+            metadata_string: a string
+
+        Returns:
+            tuple: a sentence ID string, a list of tokens, a dict of remaining metadata
+        """
+        lines = Metadata.SPLIT_METADATA_RE.sub('\n# ::', metadata_string).split('\n')
+        lines = [line.strip() for line in lines]
+        sent_id = None
+        tokens = []
+        metadata = {}
+        for line in lines:
+            tag, val = Metadata._parse_line(line)
+            if tag is None:
+                continue
+            if tag == 'id':
+                sent_id = val
+            elif tag == 'tok':
+                tokens = val.split()
+            elif tag in ['root', 'node', 'edge']:
+                continue
+            else:
+                metadata[tag] = val
+        return sent_id, tokens, metadata
+
+    @staticmethod
+    def separate_metadata(amr_string):
+        """
+        Separate a string into a pair of strings (metadata string, AMR string)
+        Args:
+            amr_string: a string representing an AMR graph
+
+        Returns:
+            tuple: a pair of strings (metadata string, AMR string)
+        """
+        amr_starts = []
+        for m in Metadata.AMR_START_RE.finditer(amr_string):
+            amr_starts.append(m.start())
+            break
+        if len(amr_starts) == 0:
+            raise Exception(f'[{Metadata}] Did not find AMR in string:\n', amr_string)
+        return amr_string[:amr_starts[0]].strip(), amr_string[amr_starts[0]:].strip()
+
+    @staticmethod
+    def _parse_line(line: str):
+        if not line.startswith('# ::'):
+            if not line.strip():
+                return None, None
+            tag = 'snt'
+            val = line[1:].strip() if line.startswith('#') else line.strip()
+            return tag, val
+        match = Metadata.METADATA_RE.match(line)
+        if not match:
+            raise Exception('Failed to parse metadata:', line)
+        tag = match.group('tag')
+        val = match.group('value').strip()
+        return tag, val

@@ -79,7 +79,7 @@ class Test_AMR(unittest.TestCase):
             raise Exception('Failed to print subgraph')
 
         output = amr.subgraph_string(subgraph_root='g', subgraph_nodes=['g', 'c'])
-        if output != '(g / go-02 :ARG0 b :ARG4 (c / city :name n))':
+        if output != '(g / go-02 :ARG4 (c / city))':
             raise Exception('Failed to print subgraph')
 
         output = amr.subgraph_string(subgraph_root='w', subgraph_nodes=['w', 'g', 'b'],
@@ -174,8 +174,7 @@ class Test_AMR(unittest.TestCase):
         if test != correct:
             raise Exception('Incorrect output')
 
-        correct = [('g', ':instance', 'go-02'), ('g', ':ARG0', 'b'), ('g', ':ARG4', 'c'),
-                   ('c', ':instance', 'city'), ('c', ':name', 'n')]
+        correct = [('g', ':instance', 'go-02'), ('g', ':ARG4', 'c'), ('c', ':instance', 'city')]
         # (w/want-01 :ARG0 (b/boy)
         # 	:ARG1 (g/go-02 :ARG0 b
         # 		:ARG4 (c/city :name (n/name :op1 "New"

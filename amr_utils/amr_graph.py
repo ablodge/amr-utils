@@ -24,6 +24,16 @@ def _get_reachable_nodes(amr: AMR, nodes: Iterable[str] = None, edges: Iterable[
     return descendants
 
 
+def _best_root(reachable_nodes: Dict[str, Set[str]], nodes: Iterable[str]):
+    max_size = 0
+    best_root = None
+    for n in nodes:
+        if len(reachable_nodes[n]) > max_size:
+            max_size = len(reachable_nodes[n])
+            best_root = n
+    return best_root
+
+
 def is_directed_acyclic_graph(amr: AMR, subgraph_root: str = None, subgraph_nodes: Iterable[str] = None,
                               subgraph_edges: Iterable[Edge] = None) -> bool:
     """
@@ -106,7 +116,7 @@ def find_cycles(amr: AMR, subgraph_nodes: Iterable[str] = None, subgraph_edges: 
     return cycles
 
 
-def get_subgraph(amr: AMR, subgraph_root: str, subgraph_nodes: Iterable[str], subgraph_edges: Iterable[Edge]) -> AMR:
+def get_subgraph(amr: AMR, subgraph_root: str = None, subgraph_nodes: Iterable[str] = None, subgraph_edges: Iterable[Edge] = None) -> AMR:
     """
     Get an AMR which is a subgraph of this AMR specified by subgraph_root, subgraph_nodes, and subgraph_edges
     Args:
@@ -118,9 +128,11 @@ def get_subgraph(amr: AMR, subgraph_root: str, subgraph_nodes: Iterable[str], su
     Returns:
         AMR: a new AMR which is a subgraph of the given AMR
     """
-    sub = AMR(root=subgraph_root,
-              edges=[e for e in subgraph_edges],
-              nodes={n: amr.nodes[n] for n in subgraph_nodes})
+    root, nodes, edges = process_subgraph(amr, subgraph_root=subgraph_root, subgraph_nodes=subgraph_nodes,
+                                          subgraph_edges=subgraph_edges)
+    sub = AMR(root=root,
+              edges=[e for e in edges],
+              nodes={n: amr.nodes[n] for n in nodes})
     return sub
 
 
@@ -141,13 +153,7 @@ def find_best_root(amr: AMR, subgraph_nodes: Iterable[str] = None,
     _, nodes, edges = process_subgraph(amr, subgraph_nodes=subgraph_nodes, subgraph_edges=subgraph_edges,
                                        ignore_root=True)
     reachable_nodes = _get_reachable_nodes(amr, nodes=nodes, edges=edges)
-    max_size = 0
-    best_root = None
-    for n in reachable_nodes:
-        if len(reachable_nodes[n]) > max_size:
-            max_size = len(reachable_nodes[n])
-            best_root = n
-    return best_root
+    return _best_root(reachable_nodes, nodes)
 
 
 def is_connected(amr: AMR, undirected_graph: bool = False,
@@ -199,43 +205,25 @@ def find_connected_components(amr: AMR, undirected_graph: bool = False,
     reachable_nodes = _get_reachable_nodes(amr, nodes=nodes, edges=edges, undirected_graph=undirected_graph)
 
     components = []
-    taken = set()
+    main_component = None
+    unconnected_nodes = {n for n in nodes}
     # component attached to root
     if amr.root is not None and amr.root in nodes:
-        component_nodes = [amr.root]
-        taken.add(amr.root)
-        component_nodes.extend(n for n in reachable_nodes[amr.root] if n not in taken)
-        components.append(component_nodes)
-        taken.update(component_nodes)
+        main_component = [amr.root]
+        main_component.extend(n for n in reachable_nodes[amr.root] if n in unconnected_nodes and n != amr.root)
+        for n in main_component:
+            unconnected_nodes.remove(n)
     # disconnected components
-    if len(taken) < len(nodes):
-        roots = {n for n in nodes}
-        for n in reachable_nodes:
-            for m in reachable_nodes[n]:
-                if n != m and m in roots:
-                    roots.remove(m)
-        for root in roots:
-            if root in taken:
-                continue
-            component_nodes = [root]
-            taken.add(root)
-            component_nodes.extend(n for n in reachable_nodes[root] if n not in taken)
-            components.append(component_nodes)
-            taken.update(component_nodes)
-    # handle cycles
-    if len(taken) < len(nodes):
-        cycles = find_cycles(amr)
-        for cycle in cycles:
-            for c in cycle:
-                if c in taken:
-                    continue
-                component_nodes = [c]
-                taken.add(c)
-                component_nodes.extend(n for n in reachable_nodes[c] if n not in taken)
-                components.append(component_nodes)
-                taken.update(component_nodes)
-                break
+    while unconnected_nodes:
+        new_root = _best_root(reachable_nodes, unconnected_nodes)
+        component_nodes = [new_root]
+        component_nodes.extend(n for n in reachable_nodes[new_root] if n in unconnected_nodes and n != new_root)
+        components.append(component_nodes)
+        for n in component_nodes:
+            unconnected_nodes.remove(n)
     components = sorted(components, key=lambda ns: len(ns), reverse=True)
+    if main_component:
+        components.insert(0, main_component)
     return components
 
 
@@ -262,7 +250,7 @@ def break_into_connected_components(amr: AMR, undirected_graph: bool = False,
     amrs = []
     for nodes in components:
         nodes = {n: amr.nodes[n] for n in nodes}
-        edges = [(s, r, t) for s, r, t in amr.edges if (s in nodes and t in nodes)]
+        edges = [(s, r, t) for s, r, t in amr.edges if (s in nodes)]
         root = find_best_root(amr, subgraph_nodes=nodes, subgraph_edges=edges)
         amr_ = get_subgraph(amr, subgraph_root=root, subgraph_nodes=nodes, subgraph_edges=edges)
         amrs.append(amr_)
@@ -290,7 +278,8 @@ def find_shortest_path(amr: AMR, n1: str, n2: str, undirected_graph: bool = Fals
     edge_iter = breadth_first_edges(amr, subgraph_root=n1,
                                     subgraph_edges=subgraph_edges,
                                     traverse_undirected_graph=undirected_graph)
-    for s, r, t in edge_iter:
+    for _, e in edge_iter:
+        s, r, t = e
         if s in paths and t not in paths:
             paths[t] = paths[s] + [t]
             if t == n2:
@@ -343,14 +332,16 @@ def process_subgraph(amr, subgraph_root: str = None, subgraph_nodes: Iterable[st
         subgraph_edges = [e for e in amr.edges if e in set(subgraph_edges)]
     if subgraph_nodes is None:
         # find subgraph nodes (based on root or edges)
-        if subgraph_root is not None:
-            descendants = _get_reachable_nodes(amr, edges=subgraph_edges)
-            subgraph_nodes = descendants[subgraph_root]
+        if subgraph_edges is not None:
+            subgraph_nodes = {s for s, r, t in subgraph_edges}
+            subgraph_nodes.update(t for s, r, t in subgraph_edges)
         else:
-            subgraph_nodes = amr.nodes
+            descendants = _get_reachable_nodes(amr)
+            subgraph_nodes = descendants[subgraph_root]
+
     if subgraph_edges is None:
         # find subgraph edges (based on nodes)
-        subgraph_edges = [(s, r, t) for s, r, t in amr.edges if (s in subgraph_nodes)]
+        subgraph_edges = [(s, r, t) for s, r, t in amr.edges if (s in subgraph_nodes and t in subgraph_nodes)]
     if subgraph_root is None:
         # assign subgraph root
         if amr.root in subgraph_nodes:
@@ -358,11 +349,5 @@ def process_subgraph(amr, subgraph_root: str = None, subgraph_nodes: Iterable[st
         elif not ignore_root:
             # find best root
             reachable_nodes = _get_reachable_nodes(amr, subgraph_nodes, subgraph_edges)
-            max_size = 0
-            best_root = None
-            for n in reachable_nodes:
-                if len(reachable_nodes[n]) > max_size:
-                    max_size = len(reachable_nodes[n])
-                    best_root = n
-            subgraph_root = best_root
+            subgraph_root = _best_root(reachable_nodes, subgraph_nodes)
     return subgraph_root, subgraph_nodes, subgraph_edges
