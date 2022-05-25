@@ -435,7 +435,7 @@ class AMR:
               f'({len(missing_nodes)} of {len(self.nodes)} nodes were unreachable).\n'
         for component in components:
             root = component[0]
-            edges = [(s, r, t) for s,r,t in self.edges if s in component]
+            edges = [(s, r, t) for s, r, t in self.edges if s in component]
             sg_string = self.subgraph_string(subgraph_root=root, subgraph_nodes=component, subgraph_edges=edges,
                                              pretty_print=False)
             msg += 'Missing: ' + sg_string + '\n'
@@ -759,6 +759,59 @@ class AMR_Notation:
         ':topic': (':ARG0-of', 'concern-02', ':ARG1'),
         ':value': (':ARG1-of', 'have-value-91', ':ARG2'),
 
+    }
+
+    # OntoNotes NER categories and the named entity types and quantities
+    # for each category
+    NER_TYPES = {
+        'PERSON':  # PERSON People, including fictional
+            ['person', 'family'],
+        'NORP':  # NORP Nationalities or religious or political groups
+            ['nationality', 'ethnic-group', 'regional-group', 'religious-group', 'political-movement'],
+        'FAC':  # FACILITY Buildings, airports, highways, bridges, etc.
+            ['facility', 'airport', 'station', 'port', 'tunnel', 'bridge', 'road', 'railway-line', 'canal', 'building',
+             'theater', 'museum', 'palace', 'hotel', 'worship-place', 'sports-facility', 'market', 'park', 'zoo',
+             'amusement-park'],
+        'ORG':  # ORGANIZATION Companies, agencies, institutions, etc.
+            ['organization', 'company', 'government-organization', 'military', 'criminal-organization',
+             'political-party', 'market-sector', 'school', 'university', 'research-institute', 'team', 'league'],
+        'GPE':  # GPE Countries, cities, states
+            ['city', 'city-district', 'county', 'state', 'province', 'territory', 'country'],
+        'LOC':  # LOCATION Non-GPE locations, mountain ranges, bodies of water
+            ['location', 'local-region', 'country-region', 'world-region', 'continent' 'ocean', 'sea', 'lake', 'river',
+             'gulf', 'bay', 'strait', 'canal', 'peninsula', 'mountain', 'volcano', 'valley', 'canyon', 'island',
+             'desert', 'forest', 'moon', 'planet', 'star', 'constellation'],
+        'PRODUCT':  # PRODUCT Vehicles, weapons, foods, etc. (Not services)
+            ['product', 'vehicle', 'ship', 'aircraft', 'aircraft-type', 'spaceship', 'car-make'],
+        'EVENT':  # EVENT Named hurricanes, battles, wars, sports events, etc.
+            ['event', 'incident', 'natural-disaster', 'earthquake', 'war', 'conference', 'game', 'festival'],
+        'WORK_OF_ART':  # WORK OF ART Titles of books, songs, etc.
+            ['work-of-art', 'picture', 'music', 'show', 'broadcast-program', 'publication', 'book', 'newspaper',
+             'magazine', 'journal'],
+        'LAW':  # LAW Named documents made into laws
+            ['law', 'court-decision', 'treaty'],
+        'LANGUAGE': ['language'],  # LANGUAGE Any named language
+        'DATE': ['date-entity'],  # DATE Absolute or relative dates or periods
+        'TIME': ['date-entity'],  # TIME Times smaller than a day
+        'PERCENT': ['percent-entity'],  # PERCENT Percentage (including “%”)
+        'MONEY': ['monetary-quantity'],  # MONEY Monetary values, including unit
+        'QUANTITY':  # QUANTITY Measurements, as of weight or distance
+            ['distance-quantity', 'area-quantity', 'volume-quantity', 'temporal-quantity', 'frequency-quantity',
+             'speed-quantity', 'acceleration-quantity', 'mass-quantity', 'force-quantity', 'pressure-quantity',
+             'energy-quantity', 'power-quantity', 'charge-quantity', 'potential-quantity', 'resistance-quantity',
+             'inductance-quantity', 'magnetic-field-quantity', 'magnetic-flux-quantity', 'radiation-quantity',
+             'fuel-consumption-quantity', 'numerical-quantity', 'information-quantity', 'concentration-quantity',
+             'catalytic-activity-quantity', 'acidity-quantity', 'seismic-quantity', 'temperature-quantity'],
+        'ORDINAL': ['ordinal-entity'],  # ORDINAL “first”, “second”
+        'CARDINAL': [],  # CARDINAL Numerals that do not fall under another type
+        'BIOMEDICAL':  # Added category
+            ['molecular-physical-entity', 'small-molecule', 'protein', 'protein-family', 'protein-segment',
+             'amino-acid', 'macro-molecular-complex', 'enzyme', 'nucleic-acid', 'pathway', 'gene', 'dna-sequence',
+             'cell', 'cell-line', 'species', 'taxon', 'disease', 'medical-condition'],
+        'OTHER':  # Added category
+            ['thing', 'animal', 'natural-object', 'award', 'music-key', 'musical-note', 'food-dish', 'writing-script',
+             'variable', 'program', 'string-entity', 'url-entity', 'phone-number-entity', 'email-address-entity',
+             'score-entity']
     }
 
 

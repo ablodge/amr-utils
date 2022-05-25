@@ -38,7 +38,7 @@ class Test_AMR_Iterators(unittest.TestCase):
         # 		:ARG1-of (q/quick-02)
         # 		:mod (b/brown))
         # 	:ARG2 (d/dog :mod (l/lazy)))
-        test = [e for e in depth_first_edges(amrs[1], root='f')]
+        test = [e for e in depth_first_edges(amrs[1], subgraph_root='f')]
         if test != correct:
             raise Exception('Incorrect order')
 
@@ -48,7 +48,7 @@ class Test_AMR_Iterators(unittest.TestCase):
         # 	:ARG1 (p/person
         #         :mod (e/every))
         #     :ARG0 p)
-        test = [e for e in depth_first_edges(amrs2[4], alphabetical_edges=True)]
+        test = [e for e in depth_first_edges(amrs2[4])]
         if test != correct:
             raise Exception('Incorrect order')
 
@@ -80,7 +80,7 @@ class Test_AMR_Iterators(unittest.TestCase):
         # 	:ARG1 (p/person
         # 	    :ARG0-of (l2/love-01
         # 	        :ARG1 l)))
-        test = [e for e in depth_first_edges(amrs[3], root='l2')]
+        test = [e for e in depth_first_edges(amrs[3], subgraph_root='l2')]
         if test != correct:
             raise Exception('Mishandled cycle')
 
@@ -117,7 +117,7 @@ class Test_AMR_Iterators(unittest.TestCase):
         # 		:ARG1-of (q/quick-02)
         # 		:mod (b/brown))
         # 	:ARG2 (d/dog :mod (l/lazy)))
-        test = [e for e in breadth_first_edges(amrs[1], root='f')]
+        test = [e for e in breadth_first_edges(amrs[1], subgraph_root='f')]
         if test != correct:
             raise Exception('Incorrect order')
 
@@ -127,7 +127,11 @@ class Test_AMR_Iterators(unittest.TestCase):
         #   :ARG1 (p/person
         #       :mod (e/every))
         #   :ARG0 p)
-        test = [e for e in breadth_first_edges(amrs2[4], alphabetical_edges=True)]
+        test = [e for e in breadth_first_edges(amrs2[4])]
+        if test != correct:
+            raise Exception('Incorrect order')
+        correct = [(1, ('l', ':ARG1', 'p')), (1, ('l', ':ARG0', 'p')), (2, ('p', ':mod', 'e'))]
+        test = [e for e in breadth_first_edges(amrs2[4], preserve_shape=True)]
         if test != correct:
             raise Exception('Incorrect order')
 
@@ -159,7 +163,7 @@ class Test_AMR_Iterators(unittest.TestCase):
         # 	:ARG1 (p/person
         # 	    :ARG0-of (l2/love-01
         # 	        :ARG1 l)))
-        test = [e for e in breadth_first_edges(amrs[3], root='l2')]
+        test = [e for e in breadth_first_edges(amrs[3], subgraph_root='l2')]
         if test != correct:
             raise Exception('Mishandled cycle')
 
@@ -171,14 +175,9 @@ class Test_AMR_Iterators(unittest.TestCase):
             if len(amr.edges) != len(edges_):
                 raise Exception('Number of edges mismatched:', amr.id)
 
-    def test_traverse(self):
-        reader = AMR_Reader()
-        amrs = reader.load(TEST_FILE1, quiet=True)
-        amrs2 = reader.load(TEST_FILE2, quiet=True)
-
         # test run
         for amr in amrs:
-            for e in traverse_graph(amr):
+            for e in breadth_first_edges(amr, traverse_undirected_graph=True):
                 pass
 
         # test ordering
@@ -188,7 +187,7 @@ class Test_AMR_Iterators(unittest.TestCase):
         # 		:ARG1-of (q/quick-02)
         # 		:mod (b/brown))
         # 	:ARG2 (d/dog :mod (l/lazy)))
-        test = [e for e in traverse_graph(amrs[1])]
+        test = [e for e in breadth_first_edges(amrs[1], traverse_undirected_graph=True)]
         if test != correct:
             raise Exception('Incorrect order')
         correct = [(1, ('f', ':ARG0-of', 'j')), (1, ('f', ':ARG1-of', 'q')), (1, ('f', ':mod', 'b')),
@@ -197,7 +196,7 @@ class Test_AMR_Iterators(unittest.TestCase):
         # 		:ARG1-of (q/quick-02)
         # 		:mod (b/brown))
         # 	:ARG2 (d/dog :mod (l/lazy)))
-        test = [e for e in traverse_graph(amrs[1], root='f')]
+        test = [e for e in breadth_first_edges(amrs[1], traverse_undirected_graph=True, subgraph_root='f')]
         if test != correct:
             raise Exception('Incorrect order')
 
@@ -207,7 +206,7 @@ class Test_AMR_Iterators(unittest.TestCase):
         # 	:ARG1 (p/person
         #         :mod (e/every))
         #     :ARG0 p)
-        test = [e for e in traverse_graph(amrs2[4], alphabetical_edges=True)]
+        test = [e for e in breadth_first_edges(amrs2[4], traverse_undirected_graph=True)]
         if test != correct:
             raise Exception('Incorrect order')
 
@@ -218,7 +217,7 @@ class Test_AMR_Iterators(unittest.TestCase):
         # 	:ARG1 (p/person
         # 	    :ARG0-of (l2/love-01
         # 	        :ARG1 l)))
-        test = [e for e in traverse_graph(amrs[3])]
+        test = [e for e in breadth_first_edges(amrs[3], traverse_undirected_graph=True)]
         if test != correct:
             raise Exception('Mishandled cycle')
         correct = [(1, ('l2', ':ARG0', 'p')), (1, ('l2', ':ARG1', 'l')), (2, ('p', ':ARG1-of', 'l')),
@@ -227,14 +226,14 @@ class Test_AMR_Iterators(unittest.TestCase):
         # 	:ARG1 (p/person
         # 	    :ARG0-of (l2/love-01
         # 	        :ARG1 l)))
-        test = [e for e in traverse_graph(amrs[3], root='l2')]
+        test = [e for e in breadth_first_edges(amrs[3], traverse_undirected_graph=True, subgraph_root='l2')]
         if test != correct:
             raise Exception('Mishandled cycle')
 
         # thorough number test
         for amr in self.ldc_amrs:
             edges_ = []
-            for _, e in traverse_graph(amr):
+            for _, e in breadth_first_edges(amr, traverse_undirected_graph=True):
                 edges_.append(e)
             if len(amr.edges) != len(edges_):
                 raise Exception('Number of edges mismatched:', amr.id)
@@ -267,17 +266,6 @@ class Test_AMR_Iterators(unittest.TestCase):
         test = [n for n in nodes(amrs[1], depth_first=True)]
         if test != correct:
             raise Exception('Incorrect order')
-
-        # test ignore_attributes
-        correct = ['w', 'b', 'g', 'c', 'n']
-        # (w/want-01 :ARG0 (b/boy)
-        # 	:ARG1 (g/go-02 :ARG0 b
-        # 		:ARG4 (c/city :name (n/name :op1 "New"
-        # 			:op2 "York"
-        # 			:op3 "City"))))
-        test = [n for n in nodes(amrs[0], ignore_attributes=True, depth_first=True)]
-        if test != correct:
-            raise Exception('Incorrect output')
 
         # thorough number test
         for amr in self.ldc_amrs:
@@ -318,18 +306,6 @@ class Test_AMR_Iterators(unittest.TestCase):
         if test != correct:
             raise Exception('Incorrect order')
 
-        # test ignore_attributes
-        correct = [('w', ':ARG0', 'b'), ('w', ':ARG1', 'g'), ('g', ':ARG0', 'b'), ('g', ':ARG4', 'c'),
-                   ('c', ':name', 'n'),]
-        # (w/want-01 :ARG0 (b/boy)
-        # 	:ARG1 (g/go-02 :ARG0 b
-        # 		:ARG4 (c/city :name (n/name :op1 "New"
-        # 			:op2 "York"
-        # 			:op3 "City"))))
-        test = [e for e in edges(amrs[0], ignore_attributes=True, depth_first=True)]
-        if test != correct:
-            raise Exception('Incorrect output')
-
         # thorough number test
         for amr in self.ldc_amrs:
             edges_ = []
@@ -368,96 +344,52 @@ class Test_AMR_Iterators(unittest.TestCase):
                 pass
 
         # test order
-        correct = [('b', ('w', ':ARG0', 'b')), ('b', ('g', ':ARG0', 'b'))]
+        correct = [('b', [('w', ':ARG0', 'b'), ('g', ':ARG0', 'b')])]
         # (w/want-01 :ARG0 (b/boy)
         # 	:ARG1 (g/go-02 :ARG0 b
         # 		:ARG4 (c/city :name (n/name :op1 "New"
         # 			:op2 "York"
         # 			:op3 "City"))))
-        test = [(n, e) for n, e in reentrancies(amrs[0], depth_first=True)]
+        test = [(n, rs) for n, rs in reentrancies(amrs[0], depth_first=True)]
         if test != correct:
             raise Exception('Incorrect order')
 
         # test artifacts
-        correct = [('p', ('l', ':ARG1', 'p')), ('p', ('l', ':ARG0', 'p'))]
+        correct = [('p', [('l', ':ARG1', 'p'), ('l', ':ARG0', 'p')])]
         # (l/love-01
         #     :ARG0 p
         # 	:ARG1 (p/person
         #         :mod (e/every)))
-        test = [(n, e) for n, e in reentrancies(amrs[4])]
+        test = [(n, rs) for n, rs in reentrancies(amrs[4], preserve_shape=True)]
         if test != correct:
             raise Exception('Incorrect output')
 
         # test cycle
-        correct = [('l', ('l2', ':ARG1', 'l'))]
+        correct = [('l', [('l2', ':ARG1', 'l')])]
         # (l/love-01 :ARG0 (i/i)
         # 	:ARG1 (p/person
         # 	    :ARG0-of (l2/love-01
         # 	        :ARG1 l)))
-        test = [(n, e) for n, e in reentrancies(amrs[3])]
+        test = [(n, rs) for n, rs in reentrancies(amrs[3])]
         if test != correct:
             raise Exception('Mishandled cycle')
 
-    def test_triples(self):
-        reader = AMR_Reader()
-        amrs = reader.load(TEST_FILE1, quiet=True)
+    def test_iterate_subgraphs(self):
 
-        # test run
-        for amr in amrs:
-            for triple in triples(amr):
+        ne_desc = Subgraph_Pattern('* :name (name :op* *)')
+        for amr in self.ldc_amrs:
+            for sub_amr in subgraphs_by_pattern(amr, ne_desc):
+                pass
+        org_desc = Subgraph_Pattern('have-org-role-91 :ARG* *')
+        for amr in self.ldc_amrs:
+            for sub_amr in subgraphs_by_pattern(amr, org_desc):
                 pass
 
-        # test ordering, breadth_first
-        correct = [('j', ':instance', 'jump-03'), ('j', ':ARG0', 'f'), ('f', ':instance', 'fox'),
-                   ('j', ':ARG2', 'd'), ('d', ':instance', 'dog'), ('f', ':ARG1-of', 'q'),
-                   ('q', ':instance', 'quick-02'), ('f', ':mod', 'b'), ('b', ':instance', 'brown'),
-                   ('d', ':mod', 'l'), ('l', ':instance', 'lazy'), ]
-        # (j/jump-03 :ARG0 (f/fox
-        # 		:ARG1-of (q/quick-02)
-        # 		:mod (b/brown))
-        # 	:ARG2 (d/dog :mod (l/lazy)))
-        test = [triple for triple in triples(amrs[1], breadth_first=True)]
-        if test != correct:
-            raise Exception('Incorrect order')
+    def test_iterate_entities(self):
 
-        # test ordering, depth_first
-        correct = [('j', ':instance', 'jump-03'), ('j', ':ARG0', 'f'), ('f', ':instance', 'fox'),
-                   ('f', ':ARG1-of', 'q'), ('q', ':instance', 'quick-02'), ('f', ':mod', 'b'),
-                   ('b', ':instance', 'brown'), ('j', ':ARG2', 'd'), ('d', ':instance', 'dog'),
-                   ('d', ':mod', 'l'), ('l', ':instance', 'lazy')]
-        # (j/jump-03 :ARG0 (f/fox
-        # 		:ARG1-of (q/quick-02)
-        # 		:mod (b/brown))
-        # 	:ARG2 (d/dog :mod (l/lazy)))
-        test = [triple for triple in triples(amrs[1], depth_first=True)]
-        if test != correct:
-            raise Exception('Incorrect order')
-
-        # handle attributes
-        correct = [('w', ':instance', 'want-01'), ('w', ':ARG0', 'b'), ('b', ':instance', 'boy'),
-                   ('w', ':ARG1', 'g'), ('g', ':instance', 'go-02'), ('g', ':ARG0', 'b'), ('g', ':ARG4', 'c'),
-                   ('c', ':instance', 'city'), ('c', ':name', 'n'), ('n', ':instance', 'name'),
-                   ('n', ':op1', '"New"'), ('n', ':op2', '"York"'), ('n', ':op3', '"City"')]
-        # (w/want-01 :ARG0 (b/boy)
-        # 	:ARG1 (g/go-02 :ARG0 b
-        # 		:ARG4 (c/city :name (n/name :op1 "New"
-        # 			:op2 "York"
-        # 			:op3 "City"))))
-        test = [e for e in triples(amrs[0], depth_first=True)]
-        if test != correct:
-            raise Exception('Incorrect output')
-
-        # handle artifacts
-        correct = [('l', ':instance', 'love-01'), ('l', ':ARG0', 'p'), ('l', ':ARG1', 'p'),
-                   ('p', ':instance', 'person'), ('p', ':mod', 'e'), ('e', ':instance', 'every')]
-        # (l/love-01
-        #     :ARG0 p
-        # 	:ARG1 (p/person
-        #         :mod (e/every)))
-        test = [e for e in triples(amrs[4])]
-        if test != correct:
-            raise Exception('Incorrect output')
-
+        for amr in self.ldc_amrs:
+            for ne_tag, attr, ne_amr in named_entities(amr):
+                 print()
 
 
 if __name__ == '__main__':
