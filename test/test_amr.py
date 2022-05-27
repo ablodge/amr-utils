@@ -1,4 +1,5 @@
 import os
+import random
 import unittest
 
 from amr_utils.amr import *
@@ -288,10 +289,13 @@ class Test_AMR(unittest.TestCase):
     def test_sorted_edge_key(self):
         amr = AMR(nodes={'a': 'a', 'b': 'b', 'c': 'c'})
         test = [('a', ':ARG0', 'b'), ('a', ':ARG11', 'b'), ('a', ':ARG10', 'b'), ('a', ':ARG2', 'b'),
-                ('a', ':ARG0-of', 'b'), ('a', ':value', 'b'), ('a', ':mod', 'c'), ('a', ':mod', 'b')]
+                ('a', ':ARG0-of', 'b'), ('a', ':ARG2-of', 'b'), ('a', ':value', 'b'), ('a', ':mod', 'c'),
+                ('a', ':mod', 'b')]
+        random.shuffle(test)
         test = [e for e in sorted(test, key=lambda e: AMR_Notation.sorted_edge_key(amr, e))]
-        correct = [('a', ':ARG0', 'b'), ('a', ':ARG0-of', 'b'), ('a', ':ARG2', 'b'), ('a', ':ARG10', 'b'),
-                   ('a', ':ARG11', 'b'), ('a', ':mod', 'b'), ('a', ':mod', 'c'), ('a', ':value', 'b'), ]
+        correct = [('a', ':ARG0', 'b'), ('a', ':ARG2', 'b'), ('a', ':ARG10', 'b'),
+                   ('a', ':ARG11', 'b'), ('a', ':ARG0-of', 'b'), ('a', ':ARG2-of', 'b'), ('a', ':mod', 'b'),
+                   ('a', ':mod', 'c'), ('a', ':value', 'b'), ]
         if test != correct:
             raise Exception(f'Failed to sort edges!')
 

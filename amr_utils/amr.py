@@ -521,6 +521,8 @@ class AMR_Notation:
         Returns:
             bool: True if and only if this is an attribute
         """
+        if edge[-1] not in amr.nodes:
+            return False
         concept = amr.nodes[edge[-1]]
         if not concept[0].isalpha():
             return True
@@ -583,7 +585,8 @@ class AMR_Notation:
                 digits = int(r[len(prefix):])
                 r = prefix
                 break
-        return r, digits, inv, amr.nodes[t]
+        target_concept = amr.nodes[t] if t in amr.nodes else ''
+        return r, inv, digits, target_concept
 
     @staticmethod
     def is_relation(relation: str) -> bool:
