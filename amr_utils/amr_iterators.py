@@ -27,16 +27,12 @@ def depth_first_edges(amr: AMR, preserve_shape: bool = False, ignore_reentrancie
     Yields:
         tuple: pairs of the form (depth, (source_id, relation, target_id))
     """
-    if traverse_undirected_graph:
-        root = amr.root if (subgraph_root is None) else subgraph_root
-        nodes_ = amr.nodes
-        edges_ = amr.edges if (subgraph_edges is None) else [e for e in amr.edges if e in set(subgraph_edges)]
-    else:
-        root, nodes_, edges_ = process_subgraph(amr, subgraph_root=subgraph_root, subgraph_edges=subgraph_edges)
+    root, _, edges_ = process_subgraph(amr, subgraph_root=subgraph_root, subgraph_edges=subgraph_edges,
+                                       undirected_graph=traverse_undirected_graph, ignore_nodes=True)
     if not edges_:
         return
     # identify each node's child edges
-    children = {n: [] for n in nodes_}
+    children = defaultdict(list)
     edges_ = [(i, e) for i, e in enumerate(edges_)]
     for i, e in reversed(edges_):
         s, r, t = e
@@ -46,7 +42,7 @@ def depth_first_edges(amr: AMR, preserve_shape: bool = False, ignore_reentrancie
             children[t].append((i, (t, r_inv, s)))
     # alphabetize edges
     if not preserve_shape:
-        for n in nodes_:
+        for n in children:
             if len(children[n]) > 1:
                 children[n] = sorted(children[n], key=lambda x: AMR_Notation.sorted_edge_key(amr, x[-1]),
                                      reverse=True)
@@ -73,6 +69,11 @@ def depth_first_edges(amr: AMR, preserve_shape: bool = False, ignore_reentrancie
                         continue
                     stack.append((depth + 1, new_edge_idx, new_edge))
         yield depth, edge
+    if len(visited_edges) < len(edges_):
+        missing_edges = [e for e in edges_ if e not in visited_edges]
+        warnings.warn(f'[{__name__}] Failed to iterate edges in AMR "{amr.id}" because {len(missing_edges)} of '
+                      f'{len(edges_)} edges were unreachable.'
+                      f'\nMissing edges: {missing_edges}')
 
 
 def breadth_first_edges(amr: AMR, preserve_shape: bool = False, ignore_reentrancies: bool = False,
@@ -93,16 +94,12 @@ def breadth_first_edges(amr: AMR, preserve_shape: bool = False, ignore_reentranc
     Yields:
         tuple: pairs of the form (depth, (source_id, relation, target_id))
     """
-    if traverse_undirected_graph:
-        root = amr.root if (subgraph_root is None) else subgraph_root
-        nodes_ = amr.nodes
-        edges_ = amr.edges if (subgraph_edges is None) else [e for e in amr.edges if e in set(subgraph_edges)]
-    else:
-        root, nodes_, edges_ = process_subgraph(amr, subgraph_root=subgraph_root, subgraph_edges=subgraph_edges)
+    root, _, edges_ = process_subgraph(amr, subgraph_root=subgraph_root, subgraph_edges=subgraph_edges,
+                                       undirected_graph=traverse_undirected_graph, ignore_nodes=True)
     if not edges_:
         return
     nodes_to_visit = [(1, root)]
-    children = {n: [] for n in nodes_}
+    children = defaultdict(list)
     for i, edge in enumerate(edges_):
         s, r, t = edge
         children[s].append((i, edge))
@@ -110,7 +107,7 @@ def breadth_first_edges(amr: AMR, preserve_shape: bool = False, ignore_reentranc
             r_inv = AMR_Notation.invert_relation(r)
             children[t].append((i, (t, r_inv, s)))
     if not preserve_shape:
-        for n in nodes_:
+        for n in children:
             if len(children[n]) > 1:
                 children[n] = sorted(children[n], key=lambda x: AMR_Notation.sorted_edge_key(amr, x[1]))
     visited_nodes = {root} if ignore_reentrancies else None
@@ -135,6 +132,11 @@ def breadth_first_edges(amr: AMR, preserve_shape: bool = False, ignore_reentranc
                 yield depth, edge
                 visited_edges.add(edge_idx)
         nodes_to_visit = next_nodes_to_visit
+    if len(visited_edges) < len(edges_):
+        missing_edges = [e for e in edges_ if e not in visited_edges]
+        warnings.warn(f'[{__name__}] Failed to iterate edges in AMR "{amr.id}" because {len(missing_edges)} of '
+                      f'{len(edges_)} edges were unreachable.'
+                      f'\nMissing edges: {missing_edges}')
 
 
 def edges(amr: AMR, depth_first: bool = False, breadth_first: bool = False, preserve_shape: bool = False,
@@ -189,19 +191,17 @@ def nodes(amr: AMR, depth_first: bool = False, breadth_first: bool = False, pres
     Yields:
         str: node IDs
     """
-    root = amr.root if (subgraph_root is None) else subgraph_root
-    nodes_ = amr.nodes if (subgraph_nodes is None) else subgraph_nodes
-    subgraph_edges = amr.edges if (subgraph_nodes is None) else \
-        [(s, r, t) for s, r, t in amr.edges if s in subgraph_nodes and t in subgraph_nodes]
+    root, nodes_, edges_ = process_subgraph(amr, subgraph_root=subgraph_root, subgraph_nodes=subgraph_nodes,
+                                            undirected_graph=traverse_undirected_graph)
     if depth_first or breadth_first:
         if depth_first:
             edge_iter = depth_first_edges(amr, ignore_reentrancies=True, preserve_shape=preserve_shape,
                                           traverse_undirected_graph=traverse_undirected_graph,
-                                          subgraph_root=subgraph_root, subgraph_edges=subgraph_edges)
+                                          subgraph_root=root, subgraph_edges=edges_)
         else:
             edge_iter = breadth_first_edges(amr, ignore_reentrancies=True, preserve_shape=preserve_shape,
                                             traverse_undirected_graph=traverse_undirected_graph,
-                                            subgraph_root=subgraph_root, subgraph_edges=subgraph_edges)
+                                            subgraph_root=root, subgraph_edges=edges_)
         if root in nodes_:
             if root not in amr.nodes:
                 warnings.warn(f'[{__name__}] The node "{root}" in AMR "{amr.id}" has no concept.')
@@ -213,16 +213,10 @@ def nodes(amr: AMR, depth_first: bool = False, breadth_first: bool = False, pres
                     warnings.warn(f'[{__name__}] The node "{t}" in AMR "{amr.id}" has no concept.')
                 yield t
     else:
-        for n in amr.nodes:
-            if n in nodes_:
-                yield n
-        visited_nodes = set()
-        for s, r, t in amr.edges:
-            for n in [s, t]:
-                if n not in amr.nodes and n not in visited_nodes and n in nodes_:
-                    warnings.warn(f'[{__name__}] The node "{n}" in AMR "{amr.id}" has no concept.')
-                    yield n
-                    visited_nodes.add(n)
+        for n in nodes_:
+            if n not in amr.nodes:
+                warnings.warn(f'[{__name__}] The node "{n}" in AMR "{amr.id}" has no concept.')
+            yield n
 
 
 def reentrancies(amr: AMR, depth_first: bool = False, breadth_first: bool = False, preserve_shape: bool = False,
@@ -241,7 +235,7 @@ def reentrancies(amr: AMR, depth_first: bool = False, breadth_first: bool = Fals
     Yields:
         tuple: (node, edge) pairs for each node with a reentrancy and each parent edge
     """
-    parents = {n: [] for n in amr.nodes}
+    parents = defaultdict(list)
     for s, r, t in edges(amr, depth_first=depth_first, breadth_first=breadth_first,
                          preserve_shape=preserve_shape, traverse_undirected_graph=traverse_undirected_graph):
         parents[t].append((s, r, t))
@@ -282,13 +276,10 @@ def triples(amr: AMR, depth_first: bool = False, breadth_first: bool = False, pr
     Yields:
         tuple: triples of the form (source_id, relation, target_id) or (source_id, relation, value)
     """
-    root = amr.root if (subgraph_root is None) else subgraph_root
-    nodes_ = amr.nodes if (subgraph_nodes is None) else subgraph_nodes
-    edges_ = amr.edges if (subgraph_edges is None) else subgraph_edges
-    if subgraph_nodes is not None:
-        edges_ = [(s, r, t) for s, r, t in edges_ if s in subgraph_nodes]
+    root, nodes_, edges_ = process_subgraph(amr, subgraph_root=subgraph_root, subgraph_nodes=subgraph_nodes,
+                                            subgraph_edges=subgraph_edges, undirected_graph=traverse_undirected_graph)
     edge_iter = edges(amr, depth_first=depth_first, breadth_first=breadth_first, preserve_shape=preserve_shape,
-                      traverse_undirected_graph=traverse_undirected_graph, subgraph_root=subgraph_root,
+                      traverse_undirected_graph=traverse_undirected_graph, subgraph_root=root,
                       subgraph_edges=edges_)
     visited_edges = set()
     # root
@@ -428,8 +419,12 @@ def subgraphs_by_pattern(amr: AMR, subgraph_pattern: Union[str, 'Subgraph_Patter
         neighbors[s].append((s, r, t, False))
         neighbors[t].append((t, AMR_Notation.invert_relation(r), s, True))
 
-    for n in amr.nodes:
-        if subgraph_pattern.wildcard_match(amr.nodes[n], subgraph_pattern.nodes['0']):
+    nodes_ = [n for n in nodes(amr)]
+    for n in nodes_:
+        concept = ''
+        if n in amr.nodes:
+            concept = amr.nodes[n]
+        if subgraph_pattern.wildcard_match(concept, subgraph_pattern.nodes['0']):
             found_match = True
             node_map = defaultdict(list)
             identified_edges = []
@@ -442,9 +437,12 @@ def subgraphs_by_pattern(amr: AMR, subgraph_pattern: Union[str, 'Subgraph_Patter
                 possible_edges = [e for n2 in node_map[sg_s] for e in neighbors[n2]]
                 found_edges = []
                 for s, r, t, inv in possible_edges:
+                    target_concept = ''
+                    if t in amr.nodes:
+                        target_concept = amr.nodes[t]
                     if s in node_map[sg_s] \
                             and subgraph_pattern.wildcard_match(r, sg_r) \
-                            and subgraph_pattern.wildcard_match(amr.nodes[t], subgraph_pattern.nodes[sg_t]) \
+                            and subgraph_pattern.wildcard_match(target_concept, subgraph_pattern.nodes[sg_t]) \
                             and (s, r, t) not in taken:
                         node_map[sg_t].append(t)
                         found_edges.append((s, r, t) if not inv else (t, AMR_Notation.invert_relation(r), s))
@@ -457,7 +455,11 @@ def subgraphs_by_pattern(amr: AMR, subgraph_pattern: Union[str, 'Subgraph_Patter
                     found_match = False
                     break
             if found_match:
-                sg_nodes = {n2: amr.nodes[n2] for sub_n in node_map for n2 in node_map[sub_n]}
+                sg_nodes = {}
+                for sub_n in node_map:
+                    for n2 in node_map[sub_n]:
+                        if n2 in amr.nodes:
+                            sg_nodes[n2] = amr.nodes[n2]
                 root = node_map['0'][0]
                 yield Subgraph_AMR(id=amr.id, root=root, nodes=sg_nodes, edges=identified_edges)
 

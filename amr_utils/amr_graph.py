@@ -1,6 +1,7 @@
 from typing import Iterable, Tuple, Optional, List, Set, Dict
 
 from amr_utils.amr import AMR
+from amr_utils.utils import class_name
 
 Edge = Tuple[str, str, str]
 
@@ -114,26 +115,6 @@ def find_cycles(amr: AMR, subgraph_nodes: Iterable[str] = None, subgraph_edges: 
                 equiv_class = reachable_nodes[t]
                 equivalence_classes.append(equiv_class)
     return cycles
-
-
-def get_subgraph(amr: AMR, subgraph_root: str = None, subgraph_nodes: Iterable[str] = None, subgraph_edges: Iterable[Edge] = None) -> AMR:
-    """
-    Get an AMR which is a subgraph of this AMR specified by subgraph_root, subgraph_nodes, and subgraph_edges
-    Args:
-        amr (AMR): an AMR
-        subgraph_root (str): the root of the subgraph
-        subgraph_nodes (Iterable[str]): the nodes contained in the subgraph
-        subgraph_edges (Iterable[Edge]): the edges contained in the subgraph
-
-    Returns:
-        AMR: a new AMR which is a subgraph of the given AMR
-    """
-    root, nodes, edges = process_subgraph(amr, subgraph_root=subgraph_root, subgraph_nodes=subgraph_nodes,
-                                          subgraph_edges=subgraph_edges)
-    sub = AMR(root=root,
-              edges=[e for e in edges],
-              nodes={n: amr.nodes[n] for n in nodes})
-    return sub
 
 
 def find_best_root(amr: AMR, subgraph_nodes: Iterable[str] = None,
@@ -288,7 +269,8 @@ def find_shortest_path(amr: AMR, n1: str, n2: str, undirected_graph: bool = Fals
 
 
 def process_subgraph(amr, subgraph_root: str = None, subgraph_nodes: Iterable[str] = None,
-                     subgraph_edges: Iterable[Edge] = None, ignore_root: bool = False) \
+                     subgraph_edges: Iterable[Edge] = None, ignore_root: bool = False, ignore_nodes: bool = False,
+                     undirected_graph: bool = False) \
         -> Tuple[Optional[str], Set[str], List[Edge]]:
     """
     This function is called by amr_utils functions that take subgraphs as optional parameters in order to provide
@@ -299,12 +281,20 @@ def process_subgraph(amr, subgraph_root: str = None, subgraph_nodes: Iterable[st
         subgraph_nodes (Iterable[str]): nodes in the subgraph (default: amr.nodes)
         subgraph_edges (Iterable[Edge]): edges in the subgraph (default: amr.edges)
         ignore_root (bool): if set, skip processing of subgraph root to save time
+        ignore_nodes (bool): if set, skip processing of subgraph nodes to save time
+        undirected_graph (bool): if set, infer subgraph nodes and edges based on an undirected graph of the AMR
 
     Returns:
         tuple: a subgraph root ID, a set of subgraph node IDs, a list of subgraph edges
     """
     if (subgraph_root is None) and (subgraph_nodes is None) and (subgraph_edges is None):
-        return amr.root, set(amr.nodes), amr.edges.copy()
+        if ignore_nodes:
+            nodes_ = set()
+        else:
+            nodes_ = {n for n in amr.nodes}
+            nodes_.update(s for s, _, _ in amr.edges)
+            nodes_.update(t for _, _, t in amr.edges)
+        return amr.root, nodes_, amr.edges.copy()
     if subgraph_root is not None:
         # clean subgraph root
         if subgraph_root not in amr.nodes:
@@ -332,13 +322,17 @@ def process_subgraph(amr, subgraph_root: str = None, subgraph_nodes: Iterable[st
         subgraph_edges = [e for e in amr.edges if e in set(subgraph_edges)]
     if subgraph_nodes is None:
         # find subgraph nodes (based on root or edges)
+        # Note: We can't ignore this computation if ignore_nodes is set because subgraph_edges may depend on it.
         if subgraph_edges is not None:
             subgraph_nodes = {s for s, r, t in subgraph_edges}
             subgraph_nodes.update(t for s, r, t in subgraph_edges)
+        elif undirected_graph:
+            subgraph_nodes = {n for n in amr.nodes}
+            subgraph_nodes.update(s for s, _, _ in amr.edges)
+            subgraph_nodes.update(t for _, _, t in amr.edges)
         else:
             descendants = _get_reachable_nodes(amr)
             subgraph_nodes = descendants[subgraph_root]
-
     if subgraph_edges is None:
         # find subgraph edges (based on nodes)
         subgraph_edges = [(s, r, t) for s, r, t in amr.edges if (s in subgraph_nodes and t in subgraph_nodes)]
@@ -351,3 +345,40 @@ def process_subgraph(amr, subgraph_root: str = None, subgraph_nodes: Iterable[st
             reachable_nodes = _get_reachable_nodes(amr, subgraph_nodes, subgraph_edges)
             subgraph_root = _best_root(reachable_nodes, subgraph_nodes)
     return subgraph_root, subgraph_nodes, subgraph_edges
+
+
+def get_subgraph(amr: AMR, subgraph_root: str = None, subgraph_nodes: Iterable[str] = None, subgraph_edges: Iterable[Edge] = None) -> AMR:
+    """
+    Get an AMR which is a subgraph of this AMR specified by subgraph_root, subgraph_nodes, and subgraph_edges
+    Args:
+        amr (AMR): an AMR
+        subgraph_root (str): the root of the subgraph
+        subgraph_nodes (Iterable[str]): the nodes contained in the subgraph
+        subgraph_edges (Iterable[Edge]): the edges contained in the subgraph
+
+    Returns:
+        AMR: a new AMR which is a subgraph of the given AMR
+    """
+    root, nodes, edges = process_subgraph(amr, subgraph_root=subgraph_root, subgraph_nodes=subgraph_nodes,
+                                          subgraph_edges=subgraph_edges)
+    sub = Subgraph_AMR(root=root,
+              edges=[e for e in edges],
+              nodes={n: amr.nodes[n] for n in nodes})
+    return sub
+
+
+class Subgraph_AMR(AMR):
+
+    def __init__(self, id: str = None, tokens: List[str] = None, root: str = None, nodes: Dict[str, str] = None,
+                 edges: List[Edge] = None):
+        super().__init__(id=id, root=root, nodes=nodes, edges=edges, tokens=tokens)
+
+    def __str__(self):
+        graph_strings = []
+        for component in find_connected_components(self):
+            root = component[0]
+            edges = [(s, r, t) for s, r, t in self.edges if s in component]
+            sg_string = self.subgraph_string(subgraph_root=root, subgraph_nodes=component, subgraph_edges=edges,
+                                             pretty_print=False)
+            graph_strings.append(sg_string)
+        return f'[{class_name(self)} {self.id}]: ' + ', '.join(graph_strings)
