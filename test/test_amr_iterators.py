@@ -175,69 +175,6 @@ class Test_AMR_Iterators(unittest.TestCase):
             if len(amr.edges) != len(edges_):
                 raise Exception('Number of edges mismatched:', amr.id)
 
-        # test run
-        for amr in amrs:
-            for e in breadth_first_edges(amr, traverse_undirected_graph=True):
-                pass
-
-        # test ordering
-        correct = [(1, ('j', ':ARG0', 'f')), (1, ('j', ':ARG2', 'd')), (2, ('f', ':ARG1-of', 'q')),
-                   (2, ('f', ':mod', 'b')), (2, ('d', ':mod', 'l')),]
-        # (j/jump-03 :ARG0 (f/fox
-        # 		:ARG1-of (q/quick-02)
-        # 		:mod (b/brown))
-        # 	:ARG2 (d/dog :mod (l/lazy)))
-        test = [e for e in breadth_first_edges(amrs[1], traverse_undirected_graph=True)]
-        if test != correct:
-            raise Exception('Incorrect order')
-        correct = [(1, ('f', ':ARG0-of', 'j')), (1, ('f', ':ARG1-of', 'q')), (1, ('f', ':mod', 'b')),
-                   (2, ('j', ':ARG2', 'd')), (3, ('d', ':mod', 'l'))]
-        # (j/jump-03 :ARG0 (f/fox
-        # 		:ARG1-of (q/quick-02)
-        # 		:mod (b/brown))
-        # 	:ARG2 (d/dog :mod (l/lazy)))
-        test = [e for e in breadth_first_edges(amrs[1], traverse_undirected_graph=True, subgraph_root='f')]
-        if test != correct:
-            raise Exception('Incorrect order')
-
-        # alphabetical edges
-        correct = [(1, ('l', ':ARG0', 'p')), (1, ('l', ':ARG1', 'p')), (2, ('p', ':mod', 'e'))]
-        # (l/love-01
-        # 	:ARG1 (p/person
-        #         :mod (e/every))
-        #     :ARG0 p)
-        test = [e for e in breadth_first_edges(amrs2[4], traverse_undirected_graph=True)]
-        if test != correct:
-            raise Exception('Incorrect order')
-
-        # cycles
-        correct = [(1, ('l', ':ARG0', 'i')), (1, ('l', ':ARG1', 'p')), (1, ('l', ':ARG1-of', 'l2')),
-                   (2, ('p', ':ARG0-of', 'l2'))]
-        # (l/love-01 :ARG0 (i/i)
-        # 	:ARG1 (p/person
-        # 	    :ARG0-of (l2/love-01
-        # 	        :ARG1 l)))
-        test = [e for e in breadth_first_edges(amrs[3], traverse_undirected_graph=True)]
-        if test != correct:
-            raise Exception('Mishandled cycle')
-        correct = [(1, ('l2', ':ARG0', 'p')), (1, ('l2', ':ARG1', 'l')), (2, ('p', ':ARG1-of', 'l')),
-                   (2, ('l', ':ARG0', 'i'))]
-        # (l/love-01 :ARG0 (i/i)
-        # 	:ARG1 (p/person
-        # 	    :ARG0-of (l2/love-01
-        # 	        :ARG1 l)))
-        test = [e for e in breadth_first_edges(amrs[3], traverse_undirected_graph=True, subgraph_root='l2')]
-        if test != correct:
-            raise Exception('Mishandled cycle')
-
-        # thorough number test
-        for amr in self.ldc_amrs:
-            edges_ = []
-            for _, e in breadth_first_edges(amr, traverse_undirected_graph=True):
-                edges_.append(e)
-            if len(amr.edges) != len(edges_):
-                raise Exception('Number of edges mismatched:', amr.id)
-
     def test_nodes(self):
         reader = AMR_Reader()
         amrs = reader.load(TEST_FILE1, quiet=True)
@@ -375,21 +312,143 @@ class Test_AMR_Iterators(unittest.TestCase):
             raise Exception('Mishandled cycle')
 
     def test_iterate_subgraphs(self):
+        # TODO single node
 
         ne_desc = Subgraph_Pattern('* :name (name :op* *)')
         for amr in self.ldc_amrs:
             for sub_amr in subgraphs_by_pattern(amr, ne_desc):
-                pass
+                for s,r,t in edges(sub_amr, traverse_undirected_graph=True, breadth_first=True):
+                    if not (r.startswith(':op') or r == ':name'):
+                        raise Exception('Failed to iterate subgraphs.')
+                if len(sub_amr.edges) < 2:
+                    raise Exception('Failed to iterate subgraphs.')
+                if 'name' not in [sub_amr.nodes[n] for n in sub_amr.nodes]:
+                    raise Exception('Failed to iterate subgraphs.')
+
         org_desc = Subgraph_Pattern('have-org-role-91 :ARG* *')
         for amr in self.ldc_amrs:
             for sub_amr in subgraphs_by_pattern(amr, org_desc):
-                pass
+                if sub_amr.nodes[sub_amr.root] != 'have-org-role-91':
+                    raise Exception('Failed to iterate subgraphs.')
+                for s, r, t in sub_amr.edges:
+                    if not r.startswith(':ARG'):
+                        raise Exception('Failed to iterate subgraphs.')
+                if len(sub_amr.edges) < 1:
+                    raise Exception('Failed to iterate subgraphs.')
 
-    def test_iterate_entities(self):
-
+        # matches nodes labelled "and" or "or" along with their ":op" arguments
+        conjunction_pattern = Subgraph_Pattern('(and|or :op* *)')
         for amr in self.ldc_amrs:
+            for sub_amr in subgraphs_by_pattern(amr, conjunction_pattern):
+                if sub_amr.nodes[sub_amr.root] not in ['and', 'or']:
+                    raise Exception('Failed to iterate subgraphs.')
+                for s,r,t in sub_amr.edges:
+                    if not r.startswith(':op'):
+                        raise Exception('Failed to iterate subgraphs.')
+                if len(sub_amr.edges) < 1:
+                    raise Exception('Failed to iterate subgraphs.')
+
+        # matches subgraphs for countries beginning with "A"
+        county_pattern = Subgraph_Pattern('(country :name (name :op1 "A* :op*? *))')
+        for amr in self.ldc_amrs:
+            for sub_amr in subgraphs_by_pattern(amr, county_pattern):
+                if sub_amr.nodes[sub_amr.root] != 'country':
+                    raise Exception('Failed to iterate subgraphs.')
+                for s,r,t in edges(sub_amr, traverse_undirected_graph=True, breadth_first=True):
+                    if not (r.startswith(':op') or r == ':name'):
+                        raise Exception('Failed to iterate subgraphs.')
+                if len(sub_amr.edges) < 2:
+                    raise Exception('Failed to iterate subgraphs.')
+
+    def test_named_entities(self):
+        ner_tags = Counter()
+        ner_types = defaultdict(Counter)
+        for amr in self.ldc_amrs:
+            taken = set()
             for ne_tag, attr, ne_amr in named_entities(amr):
-                 print()
+                ner_tags[ne_tag] += 1
+                ner_types[ne_tag][attr['type']] += 1
+                if ne_amr.root in taken:
+                    raise Exception('Failed to tag named entities')
+                taken.add(ne_amr.root)
+        if len(ner_tags) < 20:
+            raise Exception('Failed to tag named entities')
+
+    def test_traverse_undirected_graph(self):
+        reader = AMR_Reader()
+        amrs = reader.load(TEST_FILE1, quiet=True)
+        amrs2 = reader.load(TEST_FILE2, quiet=True)
+
+        # depth first
+        # TODO
+
+        # breadth first
+        # test ordering
+        correct = [(1, ('j', ':ARG0', 'f')), (1, ('j', ':ARG2', 'd')), (2, ('f', ':ARG1-of', 'q')),
+                   (2, ('f', ':mod', 'b')), (2, ('d', ':mod', 'l')), ]
+        # (j/jump-03 :ARG0 (f/fox
+        # 		:ARG1-of (q/quick-02)
+        # 		:mod (b/brown))
+        # 	:ARG2 (d/dog :mod (l/lazy)))
+        test = [e for e in breadth_first_edges(amrs[1], traverse_undirected_graph=True)]
+        if test != correct:
+            raise Exception('Incorrect order')
+        correct = [(1, ('f', ':ARG0-of', 'j')), (1, ('f', ':ARG1-of', 'q')), (1, ('f', ':mod', 'b')),
+                   (2, ('j', ':ARG2', 'd')), (3, ('d', ':mod', 'l'))]
+        # (j/jump-03 :ARG0 (f/fox
+        # 		:ARG1-of (q/quick-02)
+        # 		:mod (b/brown))
+        # 	:ARG2 (d/dog :mod (l/lazy)))
+        test = [e for e in breadth_first_edges(amrs[1], traverse_undirected_graph=True, subgraph_root='f')]
+        if test != correct:
+            raise Exception('Incorrect order')
+
+        # alphabetical edges
+        correct = [(1, ('l', ':ARG0', 'p')), (1, ('l', ':ARG1', 'p')), (2, ('p', ':mod', 'e'))]
+        # (l/love-01
+        # 	:ARG1 (p/person
+        #         :mod (e/every))
+        #     :ARG0 p)
+        test = [e for e in breadth_first_edges(amrs2[4], traverse_undirected_graph=True)]
+        if test != correct:
+            raise Exception('Incorrect order')
+
+        # cycles
+        correct = [(1, ('l', ':ARG0', 'i')), (1, ('l', ':ARG1', 'p')), (1, ('l', ':ARG1-of', 'l2')),
+                   (2, ('p', ':ARG0-of', 'l2'))]
+        # (l/love-01 :ARG0 (i/i)
+        # 	:ARG1 (p/person
+        # 	    :ARG0-of (l2/love-01
+        # 	        :ARG1 l)))
+        test = [e for e in breadth_first_edges(amrs[3], traverse_undirected_graph=True)]
+        if test != correct:
+            raise Exception('Mishandled cycle')
+        correct = [(1, ('l2', ':ARG0', 'p')), (1, ('l2', ':ARG1', 'l')), (2, ('p', ':ARG1-of', 'l')),
+                   (2, ('l', ':ARG0', 'i'))]
+        # (l/love-01 :ARG0 (i/i)
+        # 	:ARG1 (p/person
+        # 	    :ARG0-of (l2/love-01
+        # 	        :ARG1 l)))
+        test = [e for e in breadth_first_edges(amrs[3], traverse_undirected_graph=True, subgraph_root='l2')]
+        if test != correct:
+            raise Exception('Mishandled cycle')
+
+        # thorough number test
+        for amr in self.ldc_amrs:
+            edges_ = []
+            for _, e in breadth_first_edges(amr, traverse_undirected_graph=True):
+                edges_.append(e)
+            if len(amr.edges) != len(edges_):
+                raise Exception('Number of edges mismatched:', amr.id)
+        raise NotImplementedError()
+
+    def test_subgraph_params(self):
+        # TODO
+        raise NotImplementedError()
+
+    def test_missing_concept(self):
+        # TODO
+        raise NotImplementedError()
 
 
 if __name__ == '__main__':

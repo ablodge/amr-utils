@@ -424,7 +424,7 @@ def subgraphs_by_pattern(amr: AMR, subgraph_pattern: Union[str, 'Subgraph_Patter
         return
 
     neighbors = defaultdict(list)
-    for s, r, t in amr.edges:
+    for s, r, t in edges(amr, breadth_first=True):
         neighbors[s].append((s, r, t, False))
         neighbors[t].append((t, AMR_Notation.invert_relation(r), s, True))
 
@@ -467,9 +467,9 @@ def named_entities(amr: AMR) -> Iterator[Tuple[str, Dict[str, str], Subgraph_AMR
     Iterate named entities (including dates, times, quantities, etc.) retrieving an named entity tag, a dict of
     attributes, and the subgraph as an AMR.
 
-    Named entity tags are based on the OntoNotes NER layer and include 19 labels:
+    Named entity tags are based on the OntoNotes NER layer and include 20 labels:
         PERSON, NORP, FAC, ORG, GPE, LOC, PRODUCT, EVENT, WORK_OF_ART, LAW, LANGUAGE, DATE, TIME, PERCENT, MONEY,
-        QUANTITY, ORDINAL, BIOMEDICAL, OTHER
+        QUANTITY, ORDINAL, CARDINAL, BIOMEDICAL, OTHER
     Args:
         amr (AMR): the AMR to iterate
 

@@ -765,35 +765,40 @@ class AMR_Notation:
     # for each category
     NER_TYPES = {
         'PERSON':  # PERSON People, including fictional
-            ['person', 'family'],
+            ['person', 'family', 'man', 'woman'],
         'NORP':  # NORP Nationalities or religious or political groups
             ['nationality', 'ethnic-group', 'regional-group', 'religious-group', 'political-movement'],
         'FAC':  # FACILITY Buildings, airports, highways, bridges, etc.
             ['facility', 'airport', 'station', 'port', 'tunnel', 'bridge', 'road', 'railway-line', 'canal', 'building',
              'theater', 'museum', 'palace', 'hotel', 'worship-place', 'sports-facility', 'market', 'park', 'zoo',
-             'amusement-park'],
+             'amusement-park', 'hospital', 'street', 'highway', 'subway', 'harbor', 'church', 'temple', 'synagogue',
+             'mosque'],
         'ORG':  # ORGANIZATION Companies, agencies, institutions, etc.
             ['organization', 'company', 'government-organization', 'military', 'criminal-organization',
-             'political-party', 'market-sector', 'school', 'university', 'research-institute', 'team', 'league'],
+             'political-party', 'market-sector', 'school', 'university', 'research-institute', 'team', 'league',
+             'corporation', 'conglomerate', 'agency', 'group', 'bank', 'store', 'firm', 'band'],
         'GPE':  # GPE Countries, cities, states
-            ['city', 'city-district', 'county', 'state', 'province', 'territory', 'country'],
+            ['city', 'city-district', 'county', 'state', 'province', 'territory', 'country', 'district', 'village',
+             'town'],
         'LOC':  # LOCATION Non-GPE locations, mountain ranges, bodies of water
-            ['location', 'local-region', 'country-region', 'world-region', 'continent' 'ocean', 'sea', 'lake', 'river',
+            ['location', 'local-region', 'country-region', 'world-region', 'continent', 'ocean', 'sea', 'lake', 'river',
              'gulf', 'bay', 'strait', 'canal', 'peninsula', 'mountain', 'volcano', 'valley', 'canyon', 'island',
-             'desert', 'forest', 'moon', 'planet', 'star', 'constellation'],
+             'desert', 'forest', 'moon', 'planet', 'star', 'constellation', 'region', 'beach'],
         'PRODUCT':  # PRODUCT Vehicles, weapons, foods, etc. (Not services)
-            ['product', 'vehicle', 'ship', 'aircraft', 'aircraft-type', 'spaceship', 'car-make'],
+            ['product', 'vehicle', 'ship', 'aircraft', 'aircraft-type', 'spaceship', 'car-make', 'submarine', 'rocket',
+             'car', 'missile', 'jet'],
         'EVENT':  # EVENT Named hurricanes, battles, wars, sports events, etc.
-            ['event', 'incident', 'natural-disaster', 'earthquake', 'war', 'conference', 'game', 'festival'],
+            ['event', 'incident', 'natural-disaster', 'earthquake', 'war', 'conference', 'game', 'festival', 'storm',
+             'hurricane', 'fire', 'cyclone'],
         'WORK_OF_ART':  # WORK OF ART Titles of books, songs, etc.
             ['work-of-art', 'picture', 'music', 'show', 'broadcast-program', 'publication', 'book', 'newspaper',
-             'magazine', 'journal'],
+             'magazine', 'journal', 'movie', 'film', 'statue', 'monument', 'blog', 'documentary'],
         'LAW':  # LAW Named documents made into laws
             ['law', 'court-decision', 'treaty'],
         'LANGUAGE': ['language'],  # LANGUAGE Any named language
-        'DATE': ['date-entity'],  # DATE Absolute or relative dates or periods
+        'DATE': ['date-entity', 'dynasty', 'era'],  # DATE Absolute or relative dates or periods
         'TIME': ['date-entity'],  # TIME Times smaller than a day
-        'PERCENT': ['percent-entity'],  # PERCENT Percentage (including “%”)
+        'PERCENT': ['percentage-entity'],  # PERCENT Percentage (including “%”)
         'MONEY': ['monetary-quantity'],  # MONEY Monetary values, including unit
         'QUANTITY':  # QUANTITY Measurements, as of weight or distance
             ['distance-quantity', 'area-quantity', 'volume-quantity', 'temporal-quantity', 'frequency-quantity',
@@ -801,9 +806,10 @@ class AMR_Notation:
              'energy-quantity', 'power-quantity', 'charge-quantity', 'potential-quantity', 'resistance-quantity',
              'inductance-quantity', 'magnetic-field-quantity', 'magnetic-flux-quantity', 'radiation-quantity',
              'fuel-consumption-quantity', 'numerical-quantity', 'information-quantity', 'concentration-quantity',
-             'catalytic-activity-quantity', 'acidity-quantity', 'seismic-quantity', 'temperature-quantity'],
+             'catalytic-activity-quantity', 'acidity-quantity', 'seismic-quantity', 'temperature-quantity',
+             'angle-quantity'],
         'ORDINAL': ['ordinal-entity'],  # ORDINAL “first”, “second”
-        'CARDINAL': [],  # CARDINAL Numerals that do not fall under another type
+        'CARDINAL': ['number'],  # CARDINAL Numerals that do not fall under another type
         'BIOMEDICAL':  # Added category
             ['molecular-physical-entity', 'small-molecule', 'protein', 'protein-family', 'protein-segment',
              'amino-acid', 'macro-molecular-complex', 'enzyme', 'nucleic-acid', 'pathway', 'gene', 'dna-sequence',
