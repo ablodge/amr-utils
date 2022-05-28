@@ -400,7 +400,7 @@ def attributes(amr: AMR, depth_first: bool = False, breadth_first: bool = False,
                           traverse_undirected_graph=traverse_undirected_graph, subgraph_root=subgraph_root,
                           subgraph_edges=subgraph_edges)
     for s, r, t in triple_iter:
-        if AMR_Notation.is_constant(t):
+        if r != ':instance' and AMR_Notation.is_constant(t):
             yield s, r, t
 
 

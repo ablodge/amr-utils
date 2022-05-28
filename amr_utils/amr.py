@@ -405,6 +405,11 @@ class AMR:
             if r == ':instance':
                 # new concept
                 amr_sequence.append(f' / {t}')
+                # special workaround for supporting alignment subgraphs:
+                if AMR_Notation.is_constant(t):
+                    amr_sequence.pop()
+                    amr_sequence.pop()
+                    amr_sequence.append(t)
             else:
                 whitespace = '\n' + (indent * depth) if pretty_print else ' '
                 if AMR_Notation.is_constant(t):

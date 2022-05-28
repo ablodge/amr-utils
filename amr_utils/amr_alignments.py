@@ -1,45 +1,74 @@
-import json
-import sys
 from collections import Counter, defaultdict
-from typing import Iterable, Callable, Tuple, Dict, Any, Optional, List
+from typing import Iterable, Tuple, Dict, Any, Optional, List, Union
 
 from sortedcontainers import SortedList
 
-from amr_utils.amr import AMR
+from amr_utils import amr_iterators, amr_graph
+from amr_utils.amr import AMR, AMR_Notation
+from amr_utils.amr_graph import Subgraph_AMR
 from amr_utils.utils import class_name
+
+Edge = Tuple[str, str, str]
 
 
 class AMR_Alignment:
+    """
+    This class represents a single AMR Alignment from a collection of tokens to a collection of nodes and/or edges.
+
+    Example Usage:
+    ```
+    amr = AMR.from_string('''
+    (w / want-01
+      :ARG0 (b / boy)
+      :ARG1 (g / go-02
+          :ARG0 b
+          :ARG4 (c / city
+              :name (n / name :op1 "New"
+                  :op2 "York" :op3 "City"))))
+    ''',
+    tokens=['The', 'boy', 'wants', 'to', 'go', 'to', 'New', 'York', '.'])
+    align1 = AMR_Alignment(type='subgraph', tokens=[1], nodes=['b'])
+    align2 = AMR_Alignment(type='subgraph', tokens=[2], nodes=['w'])
+    align3 = AMR_Alignment(type='subgraph', tokens=[4], nodes=['g'])
+    align4 = AMR_Alignment(type='subgraph', tokens=[6, 7], nodes=['c','n','x0','x1','x2'],
+                           edges=[('c',':name','n'), ('n',':op1','x0'), ('n',':op2','x1'), ('n',':op3','x2')])
+    align5 = AMR_Alignment(type='arg structure', tokens=[2], nodes=['w'],
+                           edges=[('w', ':ARG0', 'b'), ('w', ':ARG1', 'g')])
+    align6 = AMR_Alignment(type='arg structure', tokens=[4], nodes=['g'],
+                           edges=[('g', ':ARG0', 'b'), ('g', ':ARG4', 'c')])
+    align7 = AMR_Alignment(type='reentrancy:control', tokens=[2], edges=[('g',':ARG0','b')])
+    ```
+    """
 
     def __init__(self, type: str = None, tokens: Iterable[int] = None, nodes: Iterable[str] = None,
-                 edges: Iterable[Tuple[str, str, str]] = None):
+                 edges: Iterable[Edge] = None):
         """
-
+        Create a single AMR Alignment from a collection of tokens to a collection of nodes and/or edges.
         Args:
-            type:
-            tokens:
-            nodes:
-            edges:
+            type (str): a string representing the alignment type, if there is more than one type of alignment
+            tokens (Iterable[int]): token indices for the tokens which are aligned
+            nodes (Iterable[str]): node IDs for any nodes which are aligned
+            edges (Iterable[Edge]): edges for any edges which are aligned
         """
-        self.type = type if type else ''
+        self.type = type  # Can be None
         self.tokens = SortedList(tokens) if (tokens is not None) else SortedList()
         self.nodes = SortedList(nodes) if (nodes is not None) else SortedList()
         self.edges = SortedList(edges) if (edges is not None) else SortedList()
 
     def copy(self):
         """
-
+        Create a copy
         Returns:
-
+            AMR_Alignment: copy
         """
         return AMR_Alignment(type=self.type, tokens=self.tokens.copy(), nodes=self.nodes.copy(),
                              edges=self.edges.copy())
 
     def to_json(self, amr: AMR = None) -> Dict[str, Any]:
         """
-
+        Convert this alignment to a JSON format for saving to a file
         Returns:
-
+            dict: a dictionary representing this alignment with keys representing tokens, nodes, edges, etc.
         """
         tokens = [t for t in self.tokens]
         nodes = [n for n in self.nodes]
@@ -50,26 +79,62 @@ class AMR_Alignment:
         if not self.edges:
             del json_['edges']
         if amr is not None:
-            json_['readable'] = self.readable(amr)
+            json_['description'] = self.description(amr)
         return json_
 
-    def readable(self, amr) -> str:
-        type = self.type
-        nodes = ', '.join(amr.nodes[n] for n in self.nodes) if bool(self.nodes) else ''
-        edges = ', '.join(str((amr.nodes[s], r, amr.nodes[t])) for s, r, t in self.edges) if bool(self.edges) else ''
+    def description(self, amr: AMR) -> str:
+        """
+        TODO
+        Args:
+            amr:
+
+        Returns:
+
+        """
+        type_ = self.type + ' : ' if (self.type is not None) else ''
         tokens = ' '.join(amr.tokens[t] for t in self.tokens)
-        sep1 = ' : ' if type else ''
-        sep2 = ', ' if (nodes and edges) else ''
-        return f'{type}{sep1}{tokens} => {nodes}{sep2}{edges}'
+        # get subgraph strings (possibly disconnected)
+        subgraph = self.get_subgraph(amr)
+        return f'{type_}{tokens} => {subgraph.graph_string(pretty_print=False)}'
+
+    def get_subgraph(self, amr: AMR) -> Subgraph_AMR:
+        nodes = {n: amr.nodes[n] for n in self.nodes if n in amr.nodes}
+        if self.edges:
+            edges = self.edges
+            for s, r, t in edges:
+                if s not in nodes:
+                    nodes[s] = '<var>'
+                if t not in nodes:
+                    nodes[t] = '<var>'
+        else:
+            edges = [(s, r, t) for s, r, t in amr.edges if s in nodes and t in nodes]
+        root = amr_graph.find_best_root(amr, subgraph_nodes=nodes, subgraph_edges=edges)
+        # get new node IDs
+        node_map = {}
+        idx = 0
+        var_idx = 0
+        for n in amr_iterators.nodes(amr, depth_first=True, subgraph_root=root, subgraph_nodes=nodes):
+            if AMR_Notation.is_constant(nodes[n]):
+                node_map[n] = f'x{var_idx}'
+                var_idx += 1
+            else:
+                node_map[n] = f'a{idx}'
+                idx += 1
+        # create subgraph
+        sub = Subgraph_AMR(id=amr.id,
+                           root=node_map[root],
+                           tokens=[amr.tokens[t] for t in self.tokens],
+                           edges=[(node_map[s], r, node_map[t]) for s, r, t in edges],
+                           nodes={node_map[n]: nodes[n] for n in nodes})
+        return sub
 
     def __str__(self):
-        type = self.type
+        type_ = self.type + ' : ' if (self.type is not None) else ''
         nodes = ', '.join(n for n in self.nodes) if bool(self.nodes) else ''
-        edges = ', '.join(f'{s} {r} {t}' for s, r, t in self.edges) if bool(self.edges) else ''
-        tokens = ' '.join(str(t) for t in self.tokens)
-        sep1 = ' : ' if type else ''
+        edges = ', '.join(f'({s} {r} {t})' for s, r, t in self.edges) if bool(self.edges) else ''
+        tokens = ', '.join(str(t) for t in self.tokens)
         sep2 = ', ' if (nodes and edges) else ''
-        return f'[{class_name(self)}]: {type}{sep1}{tokens} => {nodes}{sep2}{edges}'
+        return f'[{class_name(self)}]: {type_}{tokens} => {nodes}{sep2}{edges}'
 
     def __bool__(self):
         return bool(self.tokens) and (bool(self.nodes) or bool(self.edges))
@@ -106,13 +171,16 @@ class AMR_Alignment:
 
 
 class AMR_Alignment_Set:
+    """
+    TODO
+    """
 
     def __init__(self, amr: AMR, alignments: Iterable[AMR_Alignment] = None):
         """
-
+        Create a Set of AMR Alignments for a single AMR.
         Args:
-            amr:
-            alignments:
+            amr (AMR): an AMR
+            alignments (Iterable[AMR_Alignment]): alignments to be included
         """
         self.amr = amr
         self.alignments = SortedList()
@@ -121,35 +189,47 @@ class AMR_Alignment_Set:
             for align in alignments:
                 self.add(align)
 
-    def align(self, type: str = None, tokens: Iterable[int] = None, nodes: Iterable[str] = None,
-              edges: Iterable[Tuple[str, str, str]] = None):
+    @staticmethod
+    def from_json(amr, json_obj: List[Dict[str, Any]]) -> 'AMR_Alignment_Set':
         """
-
+        TODO
         Args:
-            type:
-            tokens:
-            nodes:
-            edges:
+            amr:
+            json_obj:
 
         Returns:
 
         """
-        align = self.find(lambda a: set(a.tokens) == set(tokens) and (type is None or a.type == type))
-        if align is None:
-            self.add(AMR_Alignment(type=type, tokens=tokens, nodes=nodes, edges=edges))
-        else:
-            if nodes:
-                for n in nodes:
-                    if n not in align.nodes:
-                        align.nodes.add(n)
-            if edges:
-                for e in edges:
-                    if e not in align.edges:
-                        align.edges.add(e)
+        AMR_Alignment_Set._check_ids_match(amr, json_obj)
+        AMR_Alignment_Set._unanonymize_edges(amr, json_obj)
+        alignment_list = []
+        for json_align in json_obj:
+            nodes = json_align['nodes'] if ('nodes' in json_align) else []
+            edges = [(e[0], e[1], e[2]) for e in json_align['edges']] if ('edges' in json_align) else []
+            alignment = AMR_Alignment(type=json_align['type'], tokens=json_align['tokens'],
+                                      nodes=nodes, edges=edges)
+            alignment_list.append(alignment)
+        return AMR_Alignment_Set(amr, alignment_list)
+
+    def align(self, type: str = None, tokens: Iterable[int] = None, nodes: Iterable[str] = None,
+                 edges: Iterable[Edge] = None):
+        """
+        Create and add a single AMR Alignment from a collection of tokens to a collection of nodes and/or edges.
+        This is a shorthand for:
+        ```
+        self.add(AMR_Alignment(type, tokens, nodes, edges))
+        ```
+        Args:
+            type (str): a string representing the alignment type, if there is more than one type of alignment
+            tokens (Iterable[int]): token indices for the tokens which are aligned
+            nodes (Iterable[str]): node IDs for any nodes which are aligned
+            edges (Iterable[Edge]): edges for any edges which are aligned
+        """
+        self.add(AMR_Alignment(type=type, tokens=tokens, nodes=nodes, edges=edges))
 
     def add(self, alignment: AMR_Alignment):
         """
-
+        TODO
         Args:
             alignment:
 
@@ -162,7 +242,7 @@ class AMR_Alignment_Set:
 
     def remove(self, alignment: AMR_Alignment):
         """
-
+        TODO
         Args:
             alignment:
 
@@ -171,9 +251,10 @@ class AMR_Alignment_Set:
         """
         self.alignments.remove(alignment)
 
-    def get(self, type=None, token_id=None, node=None, edge=None) -> Optional[AMR_Alignment]:
+    def get(self, type: str = None, token_id: Union[int, Iterable[int]] = None, node: Union[str, Iterable[str]] = None,
+            edge: Union[Edge, Iterable[Edge]] = None) -> Optional[AMR_Alignment]:
         """
-
+        TODO
         Args:
             type:
             token_id:
@@ -183,17 +264,14 @@ class AMR_Alignment_Set:
         Returns:
 
         """
-        for align in self:
-            if (token_id is None or token_id in align.tokens) and \
-                    (node is None or node in align.nodes) and \
-                    (edge is None or edge in align.edges) and \
-                    (type is None or type == align.type):
-                return align
-        return None
+        for align in self.finditer(type, token_id, node, edge):
+            return align
 
-    def get_all(self, type=None, token_id=None, node=None, edge=None) -> List[AMR_Alignment]:
+    def get_all(self, type: str = None, token_id: Union[int, Iterable[int]] = None,
+                node: Union[str, Iterable[str]] = None, edge: Union[Edge, Iterable[Edge]] = None) \
+            -> List[AMR_Alignment]:
         """
-
+        TODO
         Args:
             type:
             token_id:
@@ -204,42 +282,36 @@ class AMR_Alignment_Set:
 
         """
         aligns = []
-        for align in self:
-            if (token_id is None or token_id in align.tokens) and \
-                    (node is None or node in align.nodes) and \
-                    (edge is None or edge in align.edges) and \
-                    (type is None or type == align.type):
-                aligns.append(align)
+        for align in self.finditer(type, token_id, node, edge):
+            aligns.append(align)
         return aligns
 
-    def find(self, condition: Callable[[AMR_Alignment], bool]) -> Optional[AMR_Alignment]:
+    def finditer(self, type: str = None, token_id: Union[int, Iterable[int]] = None,
+                 node: Union[str, Iterable[str]] = None, edge: Union[Edge, Iterable[Edge]] = None) \
+            -> List[AMR_Alignment]:
         """
-
+        TODO
         Args:
-            condition:
+            type:
+            token_id:
+            node:
+            edge:
 
         Returns:
 
         """
+        if isinstance(token_id, int):
+            token_id = [token_id]
+        if isinstance(node, str):
+            node = [node]
+        if edge and isinstance(edge[0], str):
+            edge = [edge]
         for align in self:
-            if condition(align):
-                return align
-        return None
-
-    def find_all(self, condition: Callable[[AMR_Alignment], bool]) -> List[AMR_Alignment]:
-        """
-
-        Args:
-            condition:
-
-        Returns:
-
-        """
-        aligns = []
-        for align in self:
-            if condition(align):
-                aligns.append(align)
-        return aligns
+            if (type is None or type == align.type) and \
+                    (token_id is None or all(t in align.tokens for t in token_id)) and \
+                    (node is None or all(n in align.tokens for n in node)) and \
+                    (edge is None or all(e in align.edges for e in edge)):
+                yield align
 
     def __iter__(self):
         return self.alignments
@@ -248,11 +320,11 @@ class AMR_Alignment_Set:
         return len(self.alignments)
 
     def __str__(self):
-        return f'[{class_name(self)}] {"; ".join(a.readable() for a in self)}'
+        return f'[{class_name(self)}] {"; ".join(a.description() for a in self)}'
 
-    def to_json(self, anonymize=True) -> List[Dict[str, Any]]:
+    def to_json(self, anonymize=False) -> List[Dict[str, Any]]:
         """
-
+        TODO
         Args:
             anonymize:
 
@@ -273,13 +345,51 @@ class AMR_Alignment_Set:
             return [a.to_json(self.amr) for a in self]
 
     def is_connected(self) -> bool:
+        """
+        TODO
+        Returns:
+
+        """
         raise NotImplemented()
 
     def is_projective(self) -> bool:
-        raise NotImplemented()
+        """
+        TODO
+        Returns:
+            bool:
+        """
+        align = self.find_nonprojective_alignment()
+        if align is None:
+            return True
+        return False
 
-
-class AMR_Alignment_Reader:
+    def find_nonprojective_alignment(self) -> Optional[AMR_Alignment]:
+        """
+        TODO
+        Returns:
+            AMR_Alignment:
+        """
+        reachable_nodes = amr_graph._get_reachable_nodes(self.amr)
+        nodes = [n for n in amr_iterators.nodes(self.amr, breadth_first=True)]
+        for n in reversed(nodes):
+            min_token_idx = float('inf')
+            max_token_idx = float('-inf')
+            for n2 in reachable_nodes[n]:
+                for align in self.get_all(node=n2):
+                    for t in align.tokens:
+                        if t < min_token_idx:
+                            min_token_idx = t
+                        if t > max_token_idx:
+                            max_token_idx = t
+            for align in self:
+                if any(min_token_idx <= t <= max_token_idx for t in align.tokens):
+                    for n2 in align.nodes:
+                        if n2 not in reachable_nodes[n]:
+                            return align
+                    for s, r, t in align.edges:
+                        if not (s in reachable_nodes[n] or t in reachable_nodes[n]):
+                            return align
+        return None
 
     @staticmethod
     def _check_ids_match(amr: AMR, json_alignment_list):
@@ -307,31 +417,7 @@ class AMR_Alignment_Reader:
         for json_align in json_alignment_list:
             if 'edges' in json_align:
                 for i, e in enumerate(json_align['edges']):
-                    s, r, t = e[0], e[1], e[2]
-                    if r == ':_':
+                    s, r, t = e
+                    if r == ':_' or r is None:
                         s, r, t = map_unlabeled_edges[(s, t)]
                     json_align['edges'][i] = (s, r, t)
-
-    def load_from_json(self, json_file: str, unanonymize: bool = False, amrs: Iterable[AMR] = None):
-        alignment_sets = []
-        if unanonymize and not amrs:
-            raise Exception('To un-anonymize alignments, the parameter "amrs" is required.')
-        with open(json_file, 'r', encoding='utf8') as f:
-            json_alignments = json.load(f)
-        amrs_from_id = {}
-        for amr in amrs:
-            amrs_from_id[amr.id] = amr
-        for amr_id in json_alignments:
-            amr = amrs_from_id[amr_id]
-            self._check_ids_match(amr, json_alignments[amr_id])
-            if unanonymize:
-                self._unanonymize_edges(amr, json_alignments[amr_id])
-            alignment_list = []
-            for json_align in json_alignments[amr_id]:
-                nodes = json_align['nodes'] if ('nodes' in json_align) else []
-                edges = [(e[0], e[1], e[2]) for e in json_align['edges']] if ('edges' in json_align) else []
-                alignment = AMR_Alignment(type=json_align['type'], tokens=json_align['tokens'],
-                                          nodes=nodes, edges=edges)
-                alignment_list.append(alignment)
-            alignment_sets.append(AMR_Alignment_Set(amr, alignment_list))
-        return alignment_sets
