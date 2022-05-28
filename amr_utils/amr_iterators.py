@@ -10,9 +10,9 @@ Edge = Tuple[str, str, str]
 Triple = Tuple[str, str, str]
 
 
-def depth_first_edges(amr: AMR, preserve_shape: bool = False, ignore_reentrancies: bool = False,
-                      traverse_undirected_graph: bool = False,
-                      subgraph_root: str = None, subgraph_edges: Iterable[Edge] = None) -> Iterator[Edge]:
+def _depth_first_edges(amr: AMR, preserve_shape: bool = False, ignore_reentrancies: bool = False,
+                       traverse_undirected_graph: bool = False,
+                       start_node: str = None, allowed_edges: Iterable[Edge] = None) -> Iterator[Edge]:
     """
     Iterate the edges in an AMR in depth first order
     Args:
@@ -21,19 +21,17 @@ def depth_first_edges(amr: AMR, preserve_shape: bool = False, ignore_reentrancie
         preserve_shape (bool): explore the graph exactly as formatted in the original graph string instead of visiting
             edges alphabetically
         traverse_undirected_graph (bool): if set, explore the graph while ignoring edge direction
-        subgraph_root (str): if set, explore the graph starting from this node (default: amr.root)
-        subgraph_edges (Iterable[Tuple[str,str,str]]): if set, explore the graph while only considering these edges
+        start_node (str): if set, explore the graph starting from this node (default: amr.root)
+        allowed_edges (Iterable[Tuple[str,str,str]]): if set, explore the graph while only considering these edges
 
     Yields:
         tuple: pairs of the form (depth, (source_id, relation, target_id))
     """
-    root, _, edges_ = process_subgraph(amr, subgraph_root=subgraph_root, subgraph_edges=subgraph_edges,
-                                       undirected_graph=traverse_undirected_graph, ignore_nodes=True)
-    if not edges_:
-        return
+    root = amr.root if (start_node is None) else start_node
+    edges_ = amr.edges if (allowed_edges is None) else allowed_edges
+    edges_ = [(i, e) for i, e in enumerate(edges_)]
     # identify each node's child edges
     children = defaultdict(list)
-    edges_ = [(i, e) for i, e in enumerate(edges_)]
     for i, e in reversed(edges_):
         s, r, t = e
         children[s].append((i, e))
@@ -68,7 +66,7 @@ def depth_first_edges(amr: AMR, preserve_shape: bool = False, ignore_reentrancie
                     if new_edge_idx in visited_edges:
                         continue
                     stack.append((depth + 1, new_edge_idx, new_edge))
-        yield depth, edge
+        yield depth, edge_idx, edge
     if len(visited_edges) < len(edges_):
         missing_edges = [e for e in edges_ if e not in visited_edges]
         warnings.warn(f'[{__name__}] Failed to iterate edges in AMR "{amr.id}" because {len(missing_edges)} of '
@@ -76,9 +74,9 @@ def depth_first_edges(amr: AMR, preserve_shape: bool = False, ignore_reentrancie
                       f'\nMissing edges: {missing_edges}')
 
 
-def breadth_first_edges(amr: AMR, preserve_shape: bool = False, ignore_reentrancies: bool = False,
-                        traverse_undirected_graph: bool = False, subgraph_root: str = None,
-                        subgraph_edges: Iterable[Edge] = None) \
+def _breadth_first_edges(amr: AMR, preserve_shape: bool = False, ignore_reentrancies: bool = False,
+                         traverse_undirected_graph: bool = False, start_node: str = None,
+                         allowed_edges: Iterable[Edge] = None) \
         -> Iterator[Edge]:
     """
     Iterate the edges in an AMR in breadth first order
@@ -88,16 +86,14 @@ def breadth_first_edges(amr: AMR, preserve_shape: bool = False, ignore_reentranc
             edges alphabetically
         ignore_reentrancies (bool): whether to skip reentrant edges when iterating
         traverse_undirected_graph (bool): if set, explore the graph while ignoring edge direction
-        subgraph_root (str): if set, explore the graph starting from this node (default: amr.root)
-        subgraph_edges (Iterable[Tuple[str,str,str]]): if set, explore the graph while only considering these edges
+        start_node (str): if set, explore the graph starting from this node (default: amr.root)
+        allowed_edges (Iterable[Tuple[str,str,str]]): if set, explore the graph while only considering these edges
 
     Yields:
         tuple: pairs of the form (depth, (source_id, relation, target_id))
     """
-    root, _, edges_ = process_subgraph(amr, subgraph_root=subgraph_root, subgraph_edges=subgraph_edges,
-                                       undirected_graph=traverse_undirected_graph, ignore_nodes=True)
-    if not edges_:
-        return
+    root = amr.root if (start_node is None) else start_node
+    edges_ = amr.edges if (allowed_edges is None) else allowed_edges
     nodes_to_visit = [(1, root)]
     children = defaultdict(list)
     for i, edge in enumerate(edges_):
@@ -129,7 +125,7 @@ def breadth_first_edges(amr: AMR, preserve_shape: bool = False, ignore_reentranc
                     if children[target] and target not in planned_nodes:
                         next_nodes_to_visit.append((depth + 1, target))
                         planned_nodes.add(target)
-                yield depth, edge
+                yield depth, edge_idx, edge
                 visited_edges.add(edge_idx)
         nodes_to_visit = next_nodes_to_visit
     if len(visited_edges) < len(edges_):
@@ -157,20 +153,26 @@ def edges(amr: AMR, depth_first: bool = False, breadth_first: bool = False, pres
     Yields:
         tuple: edges, which are tuples of the form (source_id, relation, target_id)
     """
+    root, _, edges_ = process_subgraph(amr, subgraph_root=subgraph_root, subgraph_edges=subgraph_edges,
+                                                        undirected_graph=traverse_undirected_graph, ignore_nodes=True)
     if depth_first:
-        edge_iter = depth_first_edges(amr, preserve_shape=preserve_shape,
-                                      traverse_undirected_graph=traverse_undirected_graph,
-                                      subgraph_root=subgraph_root, subgraph_edges=subgraph_edges)
+        edge_iter = _depth_first_edges(amr, preserve_shape=preserve_shape,
+                                       traverse_undirected_graph=traverse_undirected_graph,
+                                       start_node=root, allowed_edges=edges_)
     elif breadth_first:
-        edge_iter = breadth_first_edges(amr, preserve_shape=preserve_shape,
-                                        traverse_undirected_graph=traverse_undirected_graph,
-                                        subgraph_root=subgraph_root, subgraph_edges=subgraph_edges)
+        edge_iter = _breadth_first_edges(amr, preserve_shape=preserve_shape,
+                                         traverse_undirected_graph=traverse_undirected_graph,
+                                         start_node=root, allowed_edges=edges_)
     elif subgraph_edges is not None:
-        edge_iter = [(0, e) for e in amr.edges if e in subgraph_edges]
+        edge_iter = [e for e in amr.edges if e in subgraph_edges]
     else:
-        edge_iter = enumerate(amr.edges)
-    for _, edge in edge_iter:
-        yield edge
+        edge_iter = amr.edges
+    if depth_first or breadth_first:
+        for _, _, edge in edge_iter:
+            yield edge
+    else:
+        for edge in edge_iter:
+            yield edge
 
 
 def nodes(amr: AMR, depth_first: bool = False, breadth_first: bool = False, preserve_shape: bool = False,
@@ -195,18 +197,18 @@ def nodes(amr: AMR, depth_first: bool = False, breadth_first: bool = False, pres
                                             undirected_graph=traverse_undirected_graph)
     if depth_first or breadth_first:
         if depth_first:
-            edge_iter = depth_first_edges(amr, ignore_reentrancies=True, preserve_shape=preserve_shape,
-                                          traverse_undirected_graph=traverse_undirected_graph,
-                                          subgraph_root=root, subgraph_edges=edges_)
+            edge_iter = _depth_first_edges(amr, ignore_reentrancies=True, preserve_shape=preserve_shape,
+                                           traverse_undirected_graph=traverse_undirected_graph,
+                                           start_node=root, allowed_edges=edges_)
         else:
-            edge_iter = breadth_first_edges(amr, ignore_reentrancies=True, preserve_shape=preserve_shape,
-                                            traverse_undirected_graph=traverse_undirected_graph,
-                                            subgraph_root=root, subgraph_edges=edges_)
+            edge_iter = _breadth_first_edges(amr, ignore_reentrancies=True, preserve_shape=preserve_shape,
+                                             traverse_undirected_graph=traverse_undirected_graph,
+                                             start_node=root, allowed_edges=edges_)
         if root in nodes_:
             if root not in amr.nodes:
                 warnings.warn(f'[{__name__}] The node "{root}" in AMR "{amr.id}" has no concept.')
             yield root
-        for _, e in edge_iter:
+        for _, _, e in edge_iter:
             s, r, t = e
             if t in nodes_:
                 if t not in amr.nodes:
@@ -256,8 +258,8 @@ def reentrancies(amr: AMR, depth_first: bool = False, breadth_first: bool = Fals
 
 
 def triples(amr: AMR, depth_first: bool = False, breadth_first: bool = False, preserve_shape: bool = False,
-            normalize_inverse_relations: bool = False, traverse_undirected_graph: bool = False, subgraph_root: str = None,
-            subgraph_nodes: Iterable[str] = None, subgraph_edges: Iterable[Edge] = None) \
+            normalize_inverse_relations: bool = False, traverse_undirected_graph: bool = False,
+            subgraph_root: str = None, subgraph_nodes: Iterable[str] = None, subgraph_edges: Iterable[Edge] = None) \
         -> Iterator[Triple]:
     """
     Iterate AMR triples
@@ -278,23 +280,27 @@ def triples(amr: AMR, depth_first: bool = False, breadth_first: bool = False, pr
     """
     root, nodes_, edges_ = process_subgraph(amr, subgraph_root=subgraph_root, subgraph_nodes=subgraph_nodes,
                                             subgraph_edges=subgraph_edges, undirected_graph=traverse_undirected_graph)
-    edge_iter = edges(amr, depth_first=depth_first, breadth_first=breadth_first, preserve_shape=preserve_shape,
-                      traverse_undirected_graph=traverse_undirected_graph, subgraph_root=root,
-                      subgraph_edges=edges_)
-    visited_edges = set()
+    if depth_first:
+        edge_iter = _depth_first_edges(amr, preserve_shape=preserve_shape,
+                                       traverse_undirected_graph=traverse_undirected_graph,
+                                       start_node=root, allowed_edges=edges_)
+    elif breadth_first:
+        edge_iter = _breadth_first_edges(amr, preserve_shape=preserve_shape,
+                                         traverse_undirected_graph=traverse_undirected_graph,
+                                         start_node=root, allowed_edges=edges_)
+    elif subgraph_edges is not None:
+        edge_iter = [(0, i, e) for i, e in enumerate(amr.edges) if e in subgraph_edges]
+    else:
+        edge_iter = [(0, i, e) for i, e in enumerate(amr.edges)]
+    completed_nodes = {root}
     # root
     if root in nodes_:
         if root in amr.nodes:
             yield root, ':instance', amr.nodes[root]
         else:
             warnings.warn(f'[{__name__}] The node "{root}" in AMR "{amr.id}" has no concept.')
-    for s, r, t in edge_iter:
-        edge_idx = None
-        r_inv = AMR_Notation.invert_relation(r) if traverse_undirected_graph else None
-        for i, e in enumerate(amr.edges):
-            if i not in visited_edges and (e == (s, r, t) or (traverse_undirected_graph and e == (t, r_inv, s))):
-                edge_idx = i
-                break
+    for _, edge_idx, e in edge_iter:
+        s, r, t = e
         if AMR_Notation.is_attribute(amr, (s, r, t)):
             # attribute
             yield s, r, amr.nodes[t]
@@ -306,13 +312,13 @@ def triples(amr: AMR, depth_first: bool = False, breadth_first: bool = False, pr
             else:
                 yield s, r, t
             # instance
-            if t in nodes_ and (
-                    not preserve_shape or amr.shape is None or amr.shape.locate_instance(amr, t) == edge_idx):
+            if t in nodes_ and t not in completed_nodes \
+                    and (not preserve_shape or amr.shape is None or amr.shape.locate_instance(amr, t) == edge_idx):
                 if t in amr.nodes:
                     yield t, ':instance', amr.nodes[t]
                 else:
                     warnings.warn(f'[{__name__}] The node "{t}" in AMR "{amr.id}" has no concept.')
-        visited_edges.add(edge_idx)
+                completed_nodes.add(t)
 
 
 def instances(amr: AMR, depth_first: bool = False, breadth_first: bool = False, preserve_shape: bool = False,
@@ -342,8 +348,8 @@ def instances(amr: AMR, depth_first: bool = False, breadth_first: bool = False, 
 
 
 def relations(amr: AMR, depth_first: bool = False, breadth_first: bool = False, preserve_shape: bool = False,
-              normalize_inverse_relations: bool = False, traverse_undirected_graph: bool = False, subgraph_root: str = None,
-              subgraph_edges: Iterable[Edge] = None) \
+              normalize_inverse_relations: bool = False, traverse_undirected_graph: bool = False,
+              subgraph_root: str = None, subgraph_edges: Iterable[Edge] = None) \
         -> Iterator[Triple]:
     """
     Iterate AMR relation triples

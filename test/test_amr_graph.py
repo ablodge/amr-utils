@@ -3,7 +3,7 @@ import unittest
 
 from amr_utils import amr_graph
 from amr_utils.amr import AMR
-from amr_utils.amr_iterators import depth_first_edges
+from amr_utils.amr_iterators import _depth_first_edges
 from amr_utils.amr_readers import AMR_Reader
 
 TEST_FILE1 = 'test_data/test_amrs.txt'
@@ -179,7 +179,7 @@ class Test_Graph_Utils(unittest.TestCase):
                 start_node = nodes[0]
                 edges = [(s, r, t) for s, r, t in amr.edges if s in nodes and t in nodes]
                 reached_nodes = set()
-                for _, e in depth_first_edges(amr, subgraph_root=start_node, subgraph_edges=edges):
+                for _, _, e in _depth_first_edges(amr, start_node=start_node, allowed_edges=edges):
                     s, r, t = e
                     reached_nodes.add(t)
                 if reached_nodes != cycle:

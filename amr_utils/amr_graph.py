@@ -255,11 +255,10 @@ def find_shortest_path(amr: AMR, n1: str, n2: str, undirected_graph: bool = Fals
         List[str]: a list of node IDs if a path exists, else None
     """
     paths = {n1: [n1]}
-    from amr_utils.amr_iterators import breadth_first_edges
-    edge_iter = breadth_first_edges(amr, subgraph_root=n1,
-                                    subgraph_edges=subgraph_edges,
-                                    traverse_undirected_graph=undirected_graph)
-    for _, e in edge_iter:
+    from amr_utils.amr_iterators import edges
+    edge_iter = edges(amr, breadth_first=True, subgraph_root=n1, subgraph_edges=subgraph_edges,
+                      traverse_undirected_graph=undirected_graph)
+    for e in edge_iter:
         s, r, t = e
         if s in paths and t not in paths:
             paths[t] = paths[s] + [t]
@@ -323,16 +322,20 @@ def process_subgraph(amr, subgraph_root: str = None, subgraph_nodes: Iterable[st
     if subgraph_nodes is None:
         # find subgraph nodes (based on root or edges)
         # Note: We can't ignore this computation if ignore_nodes is set because subgraph_edges may depend on it.
-        if subgraph_edges is not None:
+        if ignore_nodes and (subgraph_root is not None) and (subgraph_edges is not None):
+            subgraph_nodes = set()
+        elif subgraph_edges is not None:
             subgraph_nodes = {s for s, r, t in subgraph_edges}
             subgraph_nodes.update(t for s, r, t in subgraph_edges)
         elif undirected_graph:
             subgraph_nodes = {n for n in amr.nodes}
             subgraph_nodes.update(s for s, _, _ in amr.edges)
             subgraph_nodes.update(t for _, _, t in amr.edges)
-        else:
+        elif subgraph_root is not None:
             descendants = _get_reachable_nodes(amr)
             subgraph_nodes = descendants[subgraph_root]
+        else:
+            raise Exception(f'[{__name__}] Failed to process subgraph of AMR "{amr.id}".')
     if subgraph_edges is None:
         # find subgraph edges (based on nodes)
         subgraph_edges = [(s, r, t) for s, r, t in amr.edges if (s in subgraph_nodes and t in subgraph_nodes)]
