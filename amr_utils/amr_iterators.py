@@ -537,10 +537,12 @@ class Subgraph_Pattern:
     This class makes it possible to search AMRs for complex patterns based on a simple string description.
 
     Example:
-    > # matches nodes labelled "and" or "or" along with their ":op" arguments
-    > conjunction_pattern = Subgraph_Pattern('(and|or :op* *)')
-    > # matches subgraphs for countries beginning with "A"
-    > county_pattern = Subgraph_Pattern('(country :name (name :op1 "A* :op*? *))')
+    ```
+    # matches nodes labelled "and" or "or" along with their ":op" arguments
+    conjunction_pattern = Subgraph_Pattern('(and|or :op* *)')
+    # matches subgraphs for countries beginning with "A"
+    county_pattern = Subgraph_Pattern('(country :name (name :op1 "A* :op*? *))')
+    ```
 
     Subgraph patterns support a number of useful string match features for general (but non-recursive) pattern matching.
     Wildcard match: * (nodes or relations)

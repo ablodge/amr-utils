@@ -23,11 +23,10 @@ def silence_warnings():
     """
     Context for silencing warnings and messages to stderr from a function or code block
     Usage Example:
-        > with silence_warnings():
-        >     noisy_function()
-
-    Returns:
-        None
+    ```
+    with silence_warnings():
+        noisy_function()
+    ```
     """
     stderr = sys.stderr
     devnull = open(os.devnull, 'w')

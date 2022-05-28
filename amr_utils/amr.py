@@ -49,31 +49,33 @@ class AMR:
             'notes', etc.
 
     Example Usage:
-    > amr = AMR(tokens=['Dogs', 'chase', 'cats', '.'],
-    >           root='c',
-    >           nodes={'c': 'chase-01', 'd': 'dog', 'c2': 'cat'},
-    >           edges=[('c', ':ARG0', 'd'), ('c', ':ARG1', 'c2')]
-    >           )
-    > for node_id, label in amr.nodes.items():
-    >     print(node_id, label)
-    > for source_id, relation, target_id in amr.edges.items():
-    >     print(node_id, relation, target_id)
-    > print(amr.graph_string())
-    > # equivalently:
-    > amr = AMR.from_string(
-    > '''
-    > (c / chase-01
-    >   :ARG0 (d / dog)
-    >   :ARG1 (c / cat))
-    > ''',
-    > tokens=['Dogs', 'chase', 'cats', '.']
-    > )
-    > for node_id, label in amr.nodes.items():
-    >     print(node_id, label)
-    > for source_id, relation, target_id in amr.edges.items():
-    >     print(node_id, relation, target_id)
-    > print(amr.graph_string())
+    ```
+    amr = AMR(tokens=['Dogs', 'chase', 'cats', '.'],
+              root='c',
+              nodes={'c': 'chase-01', 'd': 'dog', 'c2': 'cat'},
+              edges=[('c', ':ARG0', 'd'), ('c', ':ARG1', 'c2')]
+              )
+    for node_id, label in amr.nodes.items():
+        print(node_id, label)
+    for source_id, relation, target_id in amr.edges.items():
+        print(node_id, relation, target_id)
+    print(amr.graph_string())
+    # equivalently:
+    amr = AMR.from_string(
+    '''
+    (c / chase-01
+      :ARG0 (d / dog)
+      :ARG1 (c / cat))
+    ''',
+    tokens=['Dogs', 'chase', 'cats', '.']
+    )
+    for node_id, label in amr.nodes.items():
+        print(node_id, label)
+    for source_id, relation, target_id in amr.edges.items():
+        print(node_id, relation, target_id)
+    print(amr.graph_string())
     >
+    ```
     """
 
     class _TreePenmanModel(penman.model.Model):
@@ -123,25 +125,24 @@ class AMR:
             AMR: an AMR
 
         Example Usage:
-        > amr = AMR.from_string(
-        >     '''
-        >     (c / chase-01
-        >       :ARG0 (d / dog)
-        >       :ARG1 (c / cat))
-        >     ''',
-        >     id='1',
-        >     tokens=['Dogs', 'chase', 'cats', '.']
-        >     )
-        > # equivalently
-        > amr = AMR.from_string(
-        >     '''
-        >     # ::id 1
-        >     # ::tok Dogs chase cats .
-        >     (c / chase-01
-        >       :ARG0 (d / dog)
-        >       :ARG1 (c / cat))
-        >     '''
-        >     )
+        ```
+        amr = AMR.from_string('''
+            (c / chase-01
+              :ARG0 (d / dog)
+              :ARG1 (c / cat))
+            ''',
+            id='1',
+            tokens=['Dogs', 'chase', 'cats', '.']
+            )
+        # equivalently
+        amr = AMR.from_string('''
+            # ::id 1
+            # ::tok Dogs chase cats .
+            (c / chase-01
+              :ARG0 (d / dog)
+              :ARG1 (c / cat))
+            ''')
+        ```
         """
         metadata_string = None
         if not Metadata.AMR_START_RE.match(amr_string):
