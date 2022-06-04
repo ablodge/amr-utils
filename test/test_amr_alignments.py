@@ -1,7 +1,7 @@
 import unittest
 
 from amr_utils.amr import AMR
-from amr_utils.amr_alignments import AMR_Alignment
+from amr_utils.amr_alignments import AMR_Alignment, AMR_Alignment_Set
 
 TEST_FILE1 = 'test_data/test_amrs.txt'
 TEST_FILE2 = 'test_data/test_amrs2.txt'
@@ -21,7 +21,7 @@ class Test_AMR_Alignments(unittest.TestCase):
                       :name (n / name :op1 "New"
                           :op2 "York" :op3 "City"))))
             ''',
-                              tokens=['The', 'boy', 'wants', 'to', 'go', 'to', 'New', 'York', '.'])
+            tokens=['The', 'boy', 'wants', 'to', 'go', 'to', 'New', 'York', '.'])
         align1 = AMR_Alignment(type='subgraph', tokens=[1], nodes=['b'])
         align2 = AMR_Alignment(type='subgraph', tokens=[2], nodes=['w'])
         align3 = AMR_Alignment(type='subgraph', tokens=[4], nodes=['g'])
@@ -77,7 +77,73 @@ class Test_AMR_Alignments(unittest.TestCase):
     def test_ordering(self):
         raise NotImplementedError()
 
+    def test_is_connected(self):
+        amr = AMR.from_string('''
+                    (w / want-01
+                      :ARG0 (b / boy)
+                      :ARG1 (g / go-02
+                          :ARG0 b
+                          :ARG4 (c / city
+                              :name (n / name :op1 "New"
+                                  :op2 "York" :op3 "City"))))
+                    ''',
+                              tokens=['The', 'boy', 'wants', 'to', 'go', 'to', 'New', 'York', '.'])
+        # pos examples
+        align = AMR_Alignment(type='subgraph', tokens=[6, 7], nodes=['c', 'n', 'x0', 'x1', 'x2'],
+                               edges=[('c', ':name', 'n'), ('n', ':op1', 'x0'), ('n', ':op2', 'x1'),
+                                      ('n', ':op3', 'x2')])
+        if not align.is_connected(amr):
+            raise Exception('Failed to test connectivity')
+        align = AMR_Alignment(type='arg structure', tokens=[2], edges=[('w', ':ARG0', 'b'), ('w', ':ARG1', 'g')])
+        if not align.is_connected(amr):
+            raise Exception('Failed to test connectivity')
+        align = AMR_Alignment(type='arg structure', tokens=[2], nodes=['w'],
+                              edges=[('w', ':ARG0', 'b'), ('w', ':ARG1', 'g')])
+        if not align.is_connected(amr):
+            raise Exception('Failed to test connectivity')
+        align = AMR_Alignment(type='reentrancy:control', tokens=[2], edges=[('g', ':ARG0', 'b')])
+        if not align.is_connected(amr):
+            raise Exception('Failed to test connectivity')
+        align = AMR_Alignment(type='arg structure', tokens=[2], nodes=['g'],
+                              edges=[('w', ':ARG1', 'g'), ('g', ':ARG0', 'b'), ('g', ':ARG4', 'c')])
+        if not align.is_connected(amr):
+            raise Exception('Failed to test connectivity')
+        # neg examples
+        align = AMR_Alignment(type='arg structure', tokens=[2], edges=[('w', ':ARG0', 'b'), ('c', ':name', 'n')])
+        if align.is_connected(amr):
+            raise Exception('Failed to test connectivity')
+        align = AMR_Alignment(type='arg structure', tokens=[2], nodes=['w','c'])
+        if align.is_connected(amr):
+            raise Exception('Failed to test connectivity')
+        align = AMR_Alignment(type='arg structure', tokens=[2], nodes=['n'],
+                              edges=[('w', ':ARG0', 'b'), ('w', ':ARG1', 'g')])
+        if align.is_connected(amr):
+            raise Exception('Failed to test connectivity')
+
     def test_alignment_set(self):
+        amr = AMR.from_string('''
+            (w / want-01
+              :ARG0 (b / boy)
+              :ARG1 (g / go-02
+                  :ARG0 b
+                  :ARG4 (c / city
+                      :name (n / name :op1 "New"
+                          :op2 "York" :op3 "City"))))
+            ''',
+            tokens=['The', 'boy', 'wants', 'to', 'go', 'to', 'New', 'York', '.'])
+        alignments = AMR_Alignment_Set(amr)
+        alignments.align(type='subgraph', tokens=[1], nodes=['b'])
+        alignments.align(type='subgraph', tokens=[2], nodes=['w'])
+        alignments.align(type='subgraph', tokens=[4], nodes=['g'])
+        alignments.align(type='subgraph', tokens=[6, 7], nodes=['c', 'n', 'x0', 'x1', 'x2'],
+                               edges=[('c', ':name', 'n'), ('n', ':op1', 'x0'), ('n', ':op2', 'x1'),
+                                      ('n', ':op3', 'x2')])
+        alignments.align(type='arg structure', tokens=[2], nodes=['w'],
+                               edges=[('w', ':ARG0', 'b'), ('w', ':ARG1', 'g')])
+        alignments.align(type='arg structure', tokens=[4], nodes=['g'],
+                               edges=[('g', ':ARG0', 'b'), ('g', ':ARG4', 'c')])
+        alignments.align(type='reentrancy:control', tokens=[2], edges=[('g', ':ARG0', 'b')])
+        print()
         raise NotImplementedError()
 
     def test_add(self):
@@ -103,6 +169,7 @@ class Test_AMR_Alignments(unittest.TestCase):
 
     def test_isi_alignments(self):
         raise NotImplementedError()
+
 
 if __name__ == '__main__':
     unittest.main()

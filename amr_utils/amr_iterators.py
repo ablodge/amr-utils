@@ -176,8 +176,8 @@ def edges(amr: AMR, depth_first: bool = False, breadth_first: bool = False, pres
 
 
 def nodes(amr: AMR, depth_first: bool = False, breadth_first: bool = False, preserve_shape: bool = False,
-          traverse_undirected_graph: bool = False,
-          subgraph_root: str = None, subgraph_nodes: Iterable[str] = None) -> Iterator[str]:
+          traverse_undirected_graph: bool = False, subgraph_root: str = None, subgraph_nodes: Iterable[str] = None,
+          subgraph_edges: Iterable[Edge] = None) -> Iterator[str]:
     """
     Iterate AMR nodes
     Args:
@@ -189,12 +189,13 @@ def nodes(amr: AMR, depth_first: bool = False, breadth_first: bool = False, pres
         traverse_undirected_graph (bool): if set, explore the graph while ignoring edge direction
         subgraph_root (str): if set, explore the graph starting from this node (default: amr.root)
         subgraph_nodes (Iterable[str]): if set, explore the subgraph consisting of these nodes
+        subgraph_edges (Iterable[Tuple[str,str,str]]): if set, explore the graph while only considering these edges
 
     Yields:
         str: node IDs
     """
     root, nodes_, edges_ = process_subgraph(amr, subgraph_root=subgraph_root, subgraph_nodes=subgraph_nodes,
-                                            undirected_graph=traverse_undirected_graph)
+                                            subgraph_edges=subgraph_edges, undirected_graph=traverse_undirected_graph)
     if depth_first or breadth_first:
         if depth_first:
             edge_iter = _depth_first_edges(amr, ignore_reentrancies=True, preserve_shape=preserve_shape,
