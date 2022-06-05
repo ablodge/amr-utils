@@ -307,9 +307,8 @@ def triples(amr: AMR, depth_first: bool = False, breadth_first: bool = False, pr
             yield s, r, amr.nodes[t]
         else:
             # relation
-            if normalize_inverse_relations and AMR_Notation.is_inverse_relation(r):
-                r_inv = AMR_Notation.invert_relation(r)
-                yield t, r_inv, s
+            if normalize_inverse_relations:
+                yield AMR_Notation.normalize_edge((s, r, t))
             else:
                 yield s, r, t
             # instance

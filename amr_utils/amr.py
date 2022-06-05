@@ -230,8 +230,8 @@ class AMR:
                 warnings.warn(f'[{class_name(self)}] The node "{t}" in AMR "{self.id}" has no concept.')
             elif AMR_Notation.is_attribute(self, (s, r, t)):
                 continue
-            if normalize_inverse_relations and AMR_Notation.is_inverse_relation(r):
-                triples_.append((t, r[:-len('-of')], s))
+            if normalize_inverse_relations:
+                triples_.append(AMR_Notation.normalize_edge((s, r, t)))
             else:
                 triples_.append((s, r, t))
         # attribute triples
@@ -309,9 +309,8 @@ class AMR:
                 completed_nodes.add(t)
             else:
                 # relation
-                if normalize_inverse_relations and AMR_Notation.is_inverse_relation(edge[1]):
-                    s, r, t = edge
-                    triples.append((depth, (t, r[:-len('-of')], s)))
+                if normalize_inverse_relations:
+                    triples.append((depth, AMR_Notation.normalize_edge(edge)))
                 else:
                     triples.append((depth, edge))
                 if target not in completed_nodes and (subgraph_nodes is None or target in nodes):
@@ -489,7 +488,7 @@ class AMR_Notation:
     RELATION_PREFIXES_RE = re.compile(r'^:(ARG\d\d?|arg\d\d?|snt[1-9]\d{0,2}|op[1-9]\d{0,2})(-of)?$')
 
     @staticmethod
-    def is_frame(concept) -> bool:
+    def is_frame(concept: str) -> bool:
         """
         Test if this string is the format of an AMR frame
         Args:
@@ -537,7 +536,7 @@ class AMR_Notation:
         return False
 
     @staticmethod
-    def is_inverse_relation(relation) -> bool:
+    def is_inverse_relation(relation: str) -> bool:
         """
         Test if this relation is an inverse relation
         Args:
@@ -550,7 +549,7 @@ class AMR_Notation:
                 [':consist-of', ':prep-out-of', ':prep-on-behalf-of'])
 
     @staticmethod
-    def invert_relation(relation) -> str:
+    def invert_relation(relation: str) -> str:
         """
         Turn non-inverse relations into inverse relations and inverse relations into non-inverse relations.
         Args:
@@ -566,6 +565,21 @@ class AMR_Notation:
         elif AMR_Notation.is_inverse_relation(relation):
             return relation[:-len('-of')]
         return relation + '-of'
+
+    @staticmethod
+    def normalize_edge(edge: Edge) -> Edge:
+        """
+        Turn inverse edges into non-inverse edges and leave non-inverse edges the same.
+        Args:
+            edge (Tuple[str,str,str]): an edge, a triple of the form (source_id, relation, target_id)
+
+        Returns:
+            Tuple[str,str,str]: a non-inverse edge
+        """
+        s, r, t = edge
+        if AMR_Notation.is_inverse_relation(r):
+            return t, r[:-len('-of')], s
+        return edge
 
     @staticmethod
     def sorted_edge_key(amr: AMR, edge: Edge):
@@ -639,6 +653,24 @@ class AMR_Notation:
         if relation in AMR_Notation.REIFICATIONS:
             return AMR_Notation.REIFICATIONS[relation]
         return None
+
+    @staticmethod
+    def new_node_id(amr: AMR, prefix='x'):
+        """
+        Create a unique node ID for adding a new node
+        Args:
+            amr (AMR): an AMR
+            prefix (str): beginning of the node ID (default: "x")
+
+        Returns:
+            str: an unused node ID
+        """
+        idx = 0
+        new_node = f'{prefix}0'
+        while new_node in amr.nodes:
+            idx += 1
+            new_node = f'{prefix}{idx}'
+        return new_node
 
     STANDARD_RELATIONS = [
         ':accompanier',
@@ -848,18 +880,21 @@ class AMR_Shape:
             triples (List[Tuple[str,str,str]]): a list of triples of the form (source_id, relation, target_id)
                                                 or (source_id, relation, value).
         """
-        self.triples = triples
-        self.attribute_nodes = attribute_nodes
+        self.triples: List[Triple] = triples
+        self.attribute_nodes: Dict[int, str] = attribute_nodes
+        self.instance_locations: Dict[str, Tuple[int, Triple]] = {}
         parents = Counter()
         for s, r, t in self.triples:
             parents[t] += 1
-        self.instance_locations = {}
+        root = None
+        if triples:
+            root = triples[0][0]
         prev_triple = None
         edge_idx = 0
         for triple in triples:
             s, r, t = triple
             if r == ':instance':
-                if parents[s] > 1:
+                if parents[s] > 1 and s != root:
                     self.instance_locations[s] = (edge_idx - 1, prev_triple)
             else:
                 edge_idx += 1
