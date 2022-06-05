@@ -958,7 +958,7 @@ class Metadata:
             amr_starts.append(m.start())
             break
         if len(amr_starts) == 0:
-            raise Exception(f'[{Metadata}] Did not find AMR in string:\n', amr_string)
+            raise Exception(f'[{Metadata}] Could not find AMR in string:\n', amr_string)
         return amr_string[:amr_starts[0]].strip(), amr_string[amr_starts[0]:].strip()
 
     @staticmethod
@@ -971,7 +971,7 @@ class Metadata:
             return tag, val
         match = Metadata.METADATA_RE.match(line)
         if not match:
-            raise Exception('Failed to parse metadata:', line)
+            raise Exception(f'[{Metadata}] Failed to parse metadata:', line)
         tag = match.group('tag')
         val = match.group('value').strip()
         return tag, val
