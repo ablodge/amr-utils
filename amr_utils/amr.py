@@ -174,9 +174,9 @@ class AMR:
                 elif not quiet:
                     # check formatting errors
                     if s in nodes:
-                        warnings.warn(f'[{class_name(AMR)}] AMR "{id}" has multiple concepts for the node {s}.')
+                        warnings.warn(f'[{class_name(AMR)}] AMR "{amr.id}" has multiple concepts for the node {s}.')
                     else:
-                        warnings.warn(f'[{class_name(AMR)}] The node "{s}"  in AMR "{id}" has no concept.')
+                        warnings.warn(f'[{class_name(AMR)}] The node "{s}"  in AMR "{amr.id}" has no concept.')
         edges = []
         new_attribute_nodes = {}
         num_parents = Counter()
@@ -208,11 +208,11 @@ class AMR:
         if not quiet:
             for s, r, t in edges:
                 if s not in nodes:
-                    warnings.warn(f'[{class_name(AMR)}] The node "{s}"  in AMR "{id}" has no concept.')
+                    warnings.warn(f'[{class_name(AMR)}] The node "{s}"  in AMR "{amr.id}" has no concept.')
                 if t not in nodes:
-                    warnings.warn(f'[{class_name(AMR)}] The node "{t}"  in AMR "{id}" has no concept.')
+                    warnings.warn(f'[{class_name(AMR)}] The node "{t}"  in AMR "{amr.id}" has no concept.')
                 if s == t:
-                    warnings.warn(f'[{class_name(AMR)}] AMR "{id}" has an edge pointing from the nodes "{s}" to itself.')
+                    warnings.warn(f'[{class_name(AMR)}] AMR "{amr.id}" has an edge pointing from the nodes "{s}" to itself.')
         return amr
 
     def __str__(self):
