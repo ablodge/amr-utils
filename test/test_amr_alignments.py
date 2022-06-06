@@ -118,6 +118,10 @@ class Test_AMR_Alignments(unittest.TestCase):
         test = align.description(self.amr)
         if test != 'subgraph : New York => (a0 / city :name (a1 / name :op1 "New" :op2 "York" :op3 "City"))':
             raise Exception('Failed to make description')
+        align = AMR_Alignment(type='arg structure', tokens=[2], edges=[('w', ':ARG0', 'b'), ('w', ':ARG1', 'g')])
+        test = align.description(self.amr)
+        if test != 'arg structure : wants => (<var> :ARG0 <var> :ARG1 <var>)':
+            raise Exception('Failed to make description')
 
     def test_str(self):
         align = AMR_Alignment(type='subgraph', tokens=[6, 7], nodes=['c', 'n', 'x0', 'x1', 'x2'],

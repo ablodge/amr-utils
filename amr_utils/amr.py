@@ -111,7 +111,8 @@ class AMR:
         self.shape = shape  # might be None
 
     @staticmethod
-    def from_string(amr_string: str, id: str = None, tokens: List[str] = None, metadata: Dict[str, Any] = None):
+    def from_string(amr_string: str, id: str = None, tokens: List[str] = None, metadata: Dict[str, Any] = None,
+                    quiet: bool = False):
         """
         Construct an AMR from `amr_string`. To read AMRs from a file, see `amr_readers.AMR_Reader`.
         Args:
@@ -120,6 +121,8 @@ class AMR:
             tokens (List[str]): a list of tokens for the sentence this AMR represents
             metadata (Dict[str, Any]): a dictionary of metadata for this AMR, with keys such as 'snt', 'alignments',
                 'notes', etc.
+            quiet (bool): if True, supress warnings about formatting errors such as missing concepts, reflexive edges,
+                etc.
 
         Returns:
             AMR: an AMR
@@ -157,7 +160,18 @@ class AMR:
                 raise Exception(f'[{AMR}] Failed to read AMR from string:\n', amr_string)
 
         root = penman_graph.top
-        nodes = {s: t for s, r, t in penman_graph.triples if r == ':instance'}
+        nodes = {}
+        for s, r, t in penman_graph.triples:
+            if r == ':instance':
+                if s not in nodes and t is not None:
+                    nodes[s] = t
+                elif not quiet:
+                    if id is None and metadata_string is not None:
+                        id, _, _ = Metadata.read_metadata(metadata_string)
+                    if s in nodes:
+                        warnings.warn(f'[{AMR}] AMR "{id}" has multiple concepts for the node {s}.')
+                    else:
+                        warnings.warn(f'[{AMR}] The node "{s}"  in AMR "{id}" has no concept.')
         edges = []
         new_attribute_nodes = {}
         num_parents = Counter()
@@ -179,7 +193,14 @@ class AMR:
                 # edge
                 edges.append((s, r, t))
                 num_parents[t] += 1
-
+        if not quiet:
+            for s, r, t in edges:
+                if s not in nodes:
+                    warnings.warn(f'[{AMR}] The node "{s}"  in AMR "{id}" has no concept.')
+                if t not in nodes:
+                    warnings.warn(f'[{AMR}] The node "{t}"  in AMR "{id}" has no concept.')
+                if s == t:
+                    warnings.warn(f'[{AMR}] AMR "{id}" has an edge pointing from the nodes "{s}" to itself.')
         amr = AMR(root=root, nodes=nodes, edges=edges)
         amr.shape = AMR_Shape(penman_graph.triples, new_attribute_nodes)
         if metadata_string is not None:
@@ -331,7 +352,7 @@ class AMR:
             self._handle_missing_nodes([n for n in nodes if n not in completed_nodes])
         return triples
 
-    def graph_string(self, pretty_print: bool = False, indent: str = '\t'):
+    def graph_string(self, pretty_print: bool = True, indent: str = '\t'):
         """
         Build a string representation for this AMR graph as a PENMAN string.
         Args:
@@ -344,7 +365,7 @@ class AMR:
         return self._graph_string(indent=indent, pretty_print=pretty_print)
 
     def subgraph_string(self, subgraph_root: str, subgraph_nodes: Iterable[str] = None,
-                        subgraph_edges: Iterable[Edge] = None, pretty_print: bool = False, indent: str = '\t'):
+                        subgraph_edges: Iterable[Edge] = None, pretty_print: bool = True, indent: str = '\t'):
         """
         Build a string representation for a subgraph of this AMR as a PENMAN string.
         Args:
@@ -405,7 +426,7 @@ class AMR:
                 # new concept
                 amr_sequence.append(f' / {t}')
                 # special workaround for supporting alignment subgraphs:
-                if AMR_Notation.is_constant(t):
+                if t.startswith('<') and t.endswith('>'):
                     amr_sequence.pop()
                     amr_sequence.pop()
                     amr_sequence.append(t)
@@ -577,7 +598,9 @@ class AMR_Notation:
             Tuple[str,str,str]: a non-inverse edge
         """
         s, r, t = edge
-        if AMR_Notation.is_inverse_relation(r):
+        if r == ':mod':
+            return t, ':domain', s
+        elif AMR_Notation.is_inverse_relation(r):
             return t, r[:-len('-of')], s
         return edge
 

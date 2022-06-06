@@ -75,15 +75,15 @@ class Test_AMR(unittest.TestCase):
         reader = AMR_Reader()
         amrs = reader.load(TEST_FILE1, quiet=True)
         amr = amrs[0]
-        output = amr.subgraph_string(subgraph_root='g')
+        output = amr.subgraph_string(subgraph_root='g', pretty_print=False)
         if output != '(g / go-02 :ARG0 (b / boy) :ARG4 (c / city :name (n / name :op1 "New" :op2 "York" :op3 "City")))':
             raise Exception('Failed to print subgraph')
 
-        output = amr.subgraph_string(subgraph_root='g', subgraph_nodes=['g', 'c'])
+        output = amr.subgraph_string(subgraph_root='g', subgraph_nodes=['g', 'c'], pretty_print=False)
         if output != '(g / go-02 :ARG4 (c / city))':
             raise Exception('Failed to print subgraph')
 
-        output = amr.subgraph_string(subgraph_root='w', subgraph_nodes=['w', 'g', 'b'],
+        output = amr.subgraph_string(pretty_print=False, subgraph_root='w', subgraph_nodes=['w', 'g', 'b'],
                                      subgraph_edges=[('w', ':ARG0', 'b'), ('w', ':ARG1', 'g'), ('g', ':ARG0', 'b')])
         if output != '(w / want-01 :ARG0 (b / boy) :ARG1 (g / go-02 :ARG0 b))':
             raise Exception('Failed to print subgraph')
@@ -394,6 +394,29 @@ class Test_AMR(unittest.TestCase):
             del amr.nodes['b']
             for t in amr.triples():
                 pass
+        # reflexive edge
+        with self.assertWarns(Warning):
+            amr = AMR.from_string('''
+            (a / aardvark :mod a)
+            ''')
+        # missing concept
+        with self.assertWarns(Warning):
+            amr = AMR.from_string('''
+            (a :mod (z / zebra))
+            ''')
+        with self.assertWarns(Warning):
+            amr = AMR.from_string('''
+            (a / aardvark :mod z)
+            ''')
+        # multiple concepts
+        with self.assertWarns(Warning):
+            amr = AMR.from_string('''
+            (a / aardvark :mod (z / zebra :mod (a / awkward)))
+            ''')
+        with self.assertWarns(Warning):
+            amr = AMR.from_string('''
+            (a / aardvark :mod (z / zebra :mod (a / aardvark)))
+            ''')
 
 
 
