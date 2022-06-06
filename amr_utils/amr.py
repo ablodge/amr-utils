@@ -147,17 +147,23 @@ class AMR:
             ''')
         ```
         """
-        metadata_string = None
+        amr = AMR()
+        # process metadata
         if not Metadata.AMR_START_RE.match(amr_string):
             metadata_string, amr_string = Metadata.separate_metadata(amr_string)
+            amr.id, amr.tokens, amr.metadata = Metadata.read_metadata(metadata_string)
         else:
             amr_string = amr_string.strip()
+        amr.id = id if (id is not None) else amr.id
+        amr.tokens = tokens if (tokens is not None) else amr.tokens
+        amr.metadata = metadata if (metadata is not None) else amr.metadata
+
         with silence_warnings():
             try:
                 penman_graph = penman.decode(amr_string, model=AMR._penman_model)
             except Exception:
                 AMR._test_parens(amr_string)
-                raise Exception(f'[{AMR}] Failed to read AMR from string:\n', amr_string)
+                raise Exception(f'[{class_name(AMR)}] Failed to read AMR from string:\n', amr_string)
 
         root = penman_graph.top
         nodes = {}
@@ -166,12 +172,11 @@ class AMR:
                 if s not in nodes and t is not None:
                     nodes[s] = t
                 elif not quiet:
-                    if id is None and metadata_string is not None:
-                        id, _, _ = Metadata.read_metadata(metadata_string)
+                    # check formatting errors
                     if s in nodes:
-                        warnings.warn(f'[{AMR}] AMR "{id}" has multiple concepts for the node {s}.')
+                        warnings.warn(f'[{class_name(AMR)}] AMR "{id}" has multiple concepts for the node {s}.')
                     else:
-                        warnings.warn(f'[{AMR}] The node "{s}"  in AMR "{id}" has no concept.')
+                        warnings.warn(f'[{class_name(AMR)}] The node "{s}"  in AMR "{id}" has no concept.')
         edges = []
         new_attribute_nodes = {}
         num_parents = Counter()
@@ -193,21 +198,21 @@ class AMR:
                 # edge
                 edges.append((s, r, t))
                 num_parents[t] += 1
+        # assign graph
+        amr.root = root
+        amr.nodes = nodes
+        amr.edges = edges
+        amr.shape = AMR_Shape(penman_graph.triples, new_attribute_nodes)
+
+        # check for formatting errors
         if not quiet:
             for s, r, t in edges:
                 if s not in nodes:
-                    warnings.warn(f'[{AMR}] The node "{s}"  in AMR "{id}" has no concept.')
+                    warnings.warn(f'[{class_name(AMR)}] The node "{s}"  in AMR "{id}" has no concept.')
                 if t not in nodes:
-                    warnings.warn(f'[{AMR}] The node "{t}"  in AMR "{id}" has no concept.')
+                    warnings.warn(f'[{class_name(AMR)}] The node "{t}"  in AMR "{id}" has no concept.')
                 if s == t:
-                    warnings.warn(f'[{AMR}] AMR "{id}" has an edge pointing from the nodes "{s}" to itself.')
-        amr = AMR(root=root, nodes=nodes, edges=edges)
-        amr.shape = AMR_Shape(penman_graph.triples, new_attribute_nodes)
-        if metadata_string is not None:
-            amr.id, amr.tokens, amr.metadata = Metadata.read_metadata(metadata_string)
-        amr.id = id if (id is not None) else amr.id
-        amr.tokens = tokens if (tokens is not None) else amr.tokens
-        amr.metadata = metadata if (metadata is not None) else amr.metadata
+                    warnings.warn(f'[{class_name(AMR)}] AMR "{id}" has an edge pointing from the nodes "{s}" to itself.')
         return amr
 
     def __str__(self):
