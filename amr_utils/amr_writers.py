@@ -34,7 +34,7 @@ class AMR_Writer:
                 fw.write(self.write_amr(amr))
                 fw.write('\n\n')
 
-class JAMR_Metadata_Writer(Default_Metadata_Writer):
+class JAMR_Metadata_Writer:
     '''
     # ::id sentence id
     # ::tok tokens...
