@@ -14,38 +14,25 @@ class Metadata_Writer:
 
 class AMR_Writer:
 
-    def __init__(self, metadata_writer: Metadata_Writer = None, pretty_print: bool = True, indent='\t'):
-        self.metadata_writer = metadata_writer
-        if metadata_writer is None:
-            self.metadata_writer = Default_Metadata_Writer()
-        self.pretty_print = pretty_print
-        self.indent = indent
+    def write_metadata(self, amr):
+        metadata = []
+        metadata.append(f'# ::id {amr.id}')
+        metadata.append(f'# ::tok {" ".join(amr.tokens)}')
+        for tag in amr.metadata:
+            metadata.append(f'# ::{tag} {amr.metadata[tag]}')
+        return '\n'.join(metadata)
 
-    def prints(self, amr: AMR, print_matadata=True):
-        amr_string = amr.graph_string(pretty_print=self.pretty_print, indent=self.indent)
-        if print_matadata:
-            return self.metadata_writer.write(amr) + amr_string
-        return amr_string
+    def write_amr(self, amr):
+        return amr.graph_string(pretty_print=True)
 
-    def write_to_file(self, file: str, amrs: Iterable[AMR], quiet: bool = False):
-        print(f'[{class_name(self)}] Writing AMRs to file:', file)
+    def write_to_file(self, file, amrs):
+        print('Writing AMRs to file:', file)
         with open(file, 'w+') as fw:
             for amr in amrs:
-                fw.write(self.prints(amr))
-
-
-class Default_Metadata_Writer(Metadata_Writer):
-
-    def write(self, amr: AMR):
-        metadata_strings = [f'# ::id {amr.id}\n',
-                            f'# ::tok {" ".join(amr.tokens)}\n']
-        if 'snt' in amr.metadata:
-            metadata_strings.append(f'# ::snt {amr.metadata["snt"]}\n')
-        for tag in amr.metadata:
-            if tag == 'snt': continue
-            metadata_strings.append(f'# ::{tag} {amr.metadata[tag]}\n')
-        return ''.join(metadata_strings)
-
+                fw.write(self.write_metadata(amr))
+                fw.write('\n')
+                fw.write(self.write_amr(amr))
+                fw.write('\n\n')
 
 class JAMR_Metadata_Writer(Default_Metadata_Writer):
     '''
